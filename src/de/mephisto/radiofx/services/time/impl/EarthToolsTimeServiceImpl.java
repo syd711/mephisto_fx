@@ -3,6 +3,7 @@ package de.mephisto.radiofx.services.time.impl;
 import de.mephisto.radiofx.services.time.TimeListener;
 import de.mephisto.radiofx.services.time.TimeService;
 import de.mephisto.radiofx.util.Config;
+import javafx.application.Platform;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,9 +86,14 @@ public class EarthToolsTimeServiceImpl implements TimeService {
             long dateTime = localTime.getTime()+1000;
             localTime = new Date(dateTime);
 
-            for(TimeListener listener : listeners) {
-              listener.timeChanged(localTime);
-            }
+            Platform.runLater(new Runnable() {
+              @Override
+              public void run() {
+                for(TimeListener listener : listeners) {
+                  listener.timeChanged(localTime);
+                }
+              }
+            });
           }
         } catch (InterruptedException e) {
           LOG.error("Error in timer thread: " + e.getMessage());

@@ -16,6 +16,8 @@ public class UIController {
   private WeatherController weatherController = new WeatherController();
   private BorderPane borderPane;
 
+  private Footer footer;
+
   private UIController() {
     Group root = new Group();
     borderPane = new BorderPane();
@@ -28,14 +30,13 @@ public class UIController {
     else {
       primaryStage.getScene().setRoot(root);
     }
+
+    new Header(borderPane);
+    footer = new Footer(borderPane);
   }
 
   public static UIController getInstance() {
     return instance;
-  }
-
-  public void showCurrentStage() {
-    UIUtil.showDefaultScene(borderPane);
   }
 
   public void showDefaultWeather() {
@@ -44,5 +45,9 @@ public class UIController {
 
   public void showNextWeather() {
     weatherController.showNextWeather();
+  }
+
+  public void toggleState() {
+    footer.toggleFooter();
   }
 }

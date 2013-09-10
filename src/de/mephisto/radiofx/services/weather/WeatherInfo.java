@@ -1,5 +1,7 @@
 package de.mephisto.radiofx.services.weather;
 
+import de.mephisto.radiofx.services.IServiceModel;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -7,7 +9,7 @@ import java.util.List;
 /**
  * Weather info token
  */
-public class WeatherInfo {
+public class WeatherInfo implements IServiceModel {
   private List<WeatherInfo> forecast = new ArrayList<WeatherInfo>();
 
   private String city;
@@ -150,5 +152,14 @@ public class WeatherInfo {
 
   public void setDefaultLocation(boolean defaultLocation) {
     this.defaultLocation = defaultLocation;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null || !(obj instanceof WeatherInfo) ) {
+      return false;
+    }
+
+    return this.getCity().equals(((WeatherInfo)obj).getCity());
   }
 }

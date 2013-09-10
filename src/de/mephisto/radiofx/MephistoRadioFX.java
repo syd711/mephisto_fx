@@ -40,8 +40,21 @@ public class MephistoRadioFX extends Application {
     primaryStage.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
       @Override
       public void handle(KeyEvent keyEvent) {
+        if (keyEvent.getCode() == KeyCode.RIGHT) {
+          Platform.runLater(new Runnable() {
+            @Override public void run() {
+              UIController.getInstance().showNextWeather();
+            }
+          });
+
+        }
         if (keyEvent.getCode() == KeyCode.DOWN) {
-          UIController.getInstance().showNextWeather();
+          Platform.runLater(new Runnable() {
+            @Override public void run() {
+              UIController.getInstance().toggleState();
+            }
+          });
+
         }
       }
     });
@@ -54,8 +67,6 @@ public class MephistoRadioFX extends Application {
         System.exit(0);
       }
     });
-
-    UIController.getInstance().showCurrentStage();
   }
 
   public Stage getStage() {

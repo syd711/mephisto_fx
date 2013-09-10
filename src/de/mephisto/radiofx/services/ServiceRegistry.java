@@ -1,5 +1,7 @@
 package de.mephisto.radiofx.services;
 
+import de.mephisto.radiofx.services.mpd.RadioService;
+import de.mephisto.radiofx.services.mpd.impl.RadioServiceImpl;
 import de.mephisto.radiofx.services.time.TimeService;
 import de.mephisto.radiofx.services.time.impl.EarthToolsTimeServiceImpl;
 import de.mephisto.radiofx.services.weather.WeatherService;
@@ -11,6 +13,7 @@ import de.mephisto.radiofx.services.weather.impl.YahooWeatherServiceImpl;
 public class ServiceRegistry {
   private static WeatherService weatherService;
   private static TimeService timeService;
+  private static RadioService mpdService;
 
   /**
    * Returns the service for retrieving weather forecast.
@@ -23,6 +26,10 @@ public class ServiceRegistry {
     return weatherService;
   }
 
+  /**
+   * Returns the service instance for the timer.
+   * @return
+   */
   public static TimeService getTimeService() {
     if(timeService == null) {
       timeService = new EarthToolsTimeServiceImpl();
@@ -30,4 +37,14 @@ public class ServiceRegistry {
     return timeService;
   }
 
+  /**
+   * Returns the MPD service instance.
+   * @return
+   */
+  public static RadioService getRadioService() {
+    if(mpdService == null) {
+      mpdService = new RadioServiceImpl();
+    }
+    return mpdService;
+  }
 }

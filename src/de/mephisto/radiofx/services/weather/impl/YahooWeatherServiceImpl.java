@@ -261,8 +261,11 @@ public class YahooWeatherServiceImpl implements WeatherService {
     else if ((code >= 5 && code < 9) || code == 17 || code == 18 || code == 13 || code == 14 || code == 46) {
       img = IMG_SNOW_RAINY;
     }
-    else if ((code >= 9 && code < 13) || (code >= 15 && code <= 16) || (code >= 40 && code <= 43)) {
+    else if ((code >= 15 && code <= 16) || (code >= 40 && code <= 43)) {
       img = IMG_SNOW;
+    }
+    else if(code >= 9 && code < 13) {
+      img = IMG_RAINY;
     }
     else if (code == 36 || (code >= 32 && code <= 34) || code == 31) {
       img = IMG_SUNNY;

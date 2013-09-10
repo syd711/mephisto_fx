@@ -1,53 +1,72 @@
 package de.mephisto.radiofx.ui;
 
-import de.mephisto.radiofx.MephistoRadioFX;
 import de.mephisto.radiofx.util.UIUtil;
-import javafx.scene.Group;
-import javafx.scene.Scene;
+import javafx.animation.FadeTransition;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 
 /**
  *
  */
 public class UIController {
   private static UIController instance = new UIController();
-  private WeatherController weatherController = new WeatherController();
   private BorderPane borderPane;
-
   private Footer footer;
 
+  private WeatherController weatherController = new WeatherController();
+  private RadioController radioController = new RadioController();
+
+  private ITabController activeController = radioController;
+
   private UIController() {
-    Group root = new Group();
     borderPane = new BorderPane();
-    root.getChildren().add(borderPane);
-    Stage primaryStage = MephistoRadioFX.getInstance().getStage();
-    if(primaryStage.getScene() == null) {
-      Scene scene = new Scene(root, UIUtil.WIDTH, UIUtil.HEIGHT, Color.valueOf("#DACEB8"));
-      primaryStage.setScene(scene);
-    }
-    else {
-      primaryStage.getScene().setRoot(root);
-    }
+    UIUtil.createScene(borderPane);
 
     new Header(borderPane);
     footer = new Footer(borderPane);
   }
 
+  /**
+   * Singleton getter
+   * @return
+   */
   public static UIController getInstance() {
     return instance;
   }
 
-  public void showDefaultWeather() {
-    weatherController.showDefaultWeather(borderPane);
+  public void showDefault() {
+    activeController.showDefault(borderPane);
   }
 
-  public void showNextWeather() {
-    weatherController.showNextWeather();
+  public void showNext() {
+    activeController.next();
+  }
+
+  public void showPrevious() {
+    activeController.prev();
   }
 
   public void toggleState() {
     footer.toggleFooter();
+
+    if(activeController == radioController) {
+      activeController = weatherController;
+    }
+    else {
+      activeController = radioController;
+    }
+
+    final Node center = borderPane.getCenter();
+    final FadeTransition outFader = UIUtil.createOutFader(center);
+    outFader.setOnFinished(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent actionEvent) {
+        activeController.showDefault(borderPane);
+      }
+    });
+    outFader.play();
+
   }
 }

@@ -1,17 +1,13 @@
 package de.mephisto.radiofx.ui;
 
 import de.mephisto.radiofx.util.UIUtil;
-import javafx.animation.FillTransitionBuilder;
-import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import javafx.util.Duration;
 
 /**
  *
@@ -22,7 +18,7 @@ public class Footer {
   private HBox tab1;
   private HBox tab2;
 
-  private boolean tab1Active;
+  private boolean tab1Active = true;
 
   public Footer(BorderPane root) {
     HBox main = new HBox(0);
@@ -32,8 +28,6 @@ public class Footer {
     tab1.setMinWidth(UIUtil.WIDTH/2);
     tab1.setAlignment(Pos.CENTER);
     tab1.setPadding(new Insets(6, 8, 8, 8));
-    tab1.setStyle("-fx-border-color: " + UIUtil.HEX_COLOR_SEPARATOR + " " + UIUtil.HEX_COLOR_SEPARATOR + " transparent " +
-        "transparent;-fx-background-color: " + UIUtil.HEX_COLOR_INACTIVE + ";");
 
     main.getChildren().add(tab1);
     root.setBottom(main);
@@ -47,6 +41,8 @@ public class Footer {
     tab2.setMinWidth(UIUtil.WIDTH / 2);
     tab2.setAlignment(Pos.CENTER);
     tab2.setPadding(new Insets(6, 8, 8, 8));
+    tab2.setStyle("-fx-border-color: " + UIUtil.HEX_COLOR_SEPARATOR + " " + UIUtil.HEX_COLOR_SEPARATOR + " transparent " +
+        UIUtil.HEX_COLOR_SEPARATOR + ";-fx-background-color: " + UIUtil.HEX_COLOR_INACTIVE + ";");
 
     text = new Text(0, 0, "Weather");
     text.setFont(TAB_FONT);

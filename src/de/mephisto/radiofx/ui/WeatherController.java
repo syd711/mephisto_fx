@@ -11,7 +11,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -19,12 +18,10 @@ import javafx.scene.text.Text;
 /**
  *
  */
-public class WeatherController {
+public class WeatherController implements ITabController {
   private static final Font WEATHER_HEADER_BOLD_FONT = Font.font("Tahoma", FontWeight.BOLD, 22);
   private static final Font WEATHER_DETAILS_FONT = Font.font("Tahoma", FontWeight.NORMAL, 16);
   private static final Font WEATHER_TEMP_BOLD_FONT = Font.font("Tahoma", FontWeight.NORMAL, 60);
-
-  private static final Color FONT_COLOR = UIUtil.COLOR_DARK_HEADER;
 
   private static final int IMAGE_SIZE = 128;
 
@@ -41,12 +38,13 @@ public class WeatherController {
 
   private Pager pager;
 
-  public void showDefaultWeather(BorderPane root) {
+  @Override
+  public void showDefault(BorderPane root) {
     WeatherInfo currentWeatherInfo = ServiceRegistry.getWeatherService().getDefaultWeatherInfo();
 
     locationText = new Text(0, 0, currentWeatherInfo.getCity() +  ", " + currentWeatherInfo.getCountry());
     locationText.setFont(WEATHER_HEADER_BOLD_FONT);
-    locationText.setFill(FONT_COLOR);
+    locationText.setFill(UIUtil.COLOR_DARK_HEADER);
 
     BorderPane mainRoot = new BorderPane();
     root.setCenter(mainRoot);
@@ -72,7 +70,7 @@ public class WeatherController {
     //temp
     tempText = new Text(0, 0, currentWeatherInfo.getTemp() + " °C");
     tempText.setFont(WEATHER_TEMP_BOLD_FONT);
-    tempText.setFill(FONT_COLOR);
+    tempText.setFill(UIUtil.COLOR_DARK_HEADER);
     hBox.getChildren().add(tempText);
 
     //detail info
@@ -82,17 +80,17 @@ public class WeatherController {
 
     maxTempText = new Text(0, 0, "Max " + currentWeatherInfo.getHighTemp() + " °C");
     maxTempText.setFont(WEATHER_DETAILS_FONT);
-    maxTempText.setFill(FONT_COLOR);
+    maxTempText.setFill(UIUtil.COLOR_DARK_HEADER);
     temps.getChildren().add(maxTempText);
 
     minTempText = new Text(0, 0, "Min " + currentWeatherInfo.getLowTemp() + " °C");
     minTempText.setFont(WEATHER_DETAILS_FONT);
-    minTempText.setFill(FONT_COLOR);
+    minTempText.setFill(UIUtil.COLOR_DARK_HEADER);
     temps.getChildren().add(minTempText);
 
     descriptionText = new Text(0, 0, currentWeatherInfo.getDescription());
     descriptionText.setFont(WEATHER_DETAILS_FONT);
-    descriptionText.setFill(FONT_COLOR);
+    descriptionText.setFill(UIUtil.COLOR_DARK_HEADER);
     temps.getChildren().add(descriptionText);
 
     hBox.getChildren().add(temps);
@@ -104,12 +102,23 @@ public class WeatherController {
   /**
    * Slides to the next weather info
    */
-  public void showNextWeather() {
+  public void next() {
     WeatherInfo info = (WeatherInfo) pager.next();
     UIUtil.fadeOutComponent(verticalRoot);
     updateWeatherComponents(info);
     UIUtil.fadeInComponent(verticalRoot);
   }
+
+  /**
+   * Slides to the previous weather info
+   */
+  public void prev() {
+    WeatherInfo info = (WeatherInfo) pager.prev();
+    UIUtil.fadeOutComponent(verticalRoot);
+    updateWeatherComponents(info);
+    UIUtil.fadeInComponent(verticalRoot);
+  }
+
 
   /**
    * Assigns all values of the current weather info to the correspondig
@@ -127,8 +136,8 @@ public class WeatherController {
 
     //temps
     tempText.setText(info.getTemp() + " °C");
-    maxTempText.setText(info.getHighTemp()+ " °C");
-    minTempText.setText(info.getLowTemp() + " °C");
+    maxTempText.setText("Max " + info.getHighTemp()+ " °C");
+    minTempText.setText("Min " + info.getLowTemp() + " °C");
 
     //description
     descriptionText.setText(info.getDescription());

@@ -1,7 +1,9 @@
 package de.mephisto.radiofx;
 
 import de.mephisto.radiofx.ui.UIController;
+import de.mephisto.radiofx.ui.UIState;
 import de.mephisto.radiofx.util.Config;
+import de.mephisto.radiofx.util.UIUtil;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -32,18 +34,18 @@ public class MephistoRadioFX extends Application {
   @Override
   public void start(final Stage primaryStage) {
     instance = this;
-    Configuration configuration = Config.getConfiguration("settings.properties");
-
     this.stage = primaryStage;
     primaryStage.show();
-    UIController.getInstance().showDefaultWeather();
+
+    final UIState state = new UIState();
+
     primaryStage.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
       @Override
       public void handle(KeyEvent keyEvent) {
         if (keyEvent.getCode() == KeyCode.RIGHT) {
           Platform.runLater(new Runnable() {
             @Override public void run() {
-              UIController.getInstance().showNextWeather();
+              state.right();
             }
           });
 
@@ -51,22 +53,30 @@ public class MephistoRadioFX extends Application {
         if (keyEvent.getCode() == KeyCode.DOWN) {
           Platform.runLater(new Runnable() {
             @Override public void run() {
-              UIController.getInstance().toggleState();
+              state.enter();
             }
           });
-
+        }
+        if (keyEvent.getCode() == KeyCode.LEFT) {
+          Platform.runLater(new Runnable() {
+            @Override public void run() {
+              state.left();
+            }
+          });
         }
       }
     });
 
     //ensures that the process is terminated on window dispose
-    primaryStage.setOnCloseRequest( new EventHandler<WindowEvent>() {
+    primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
       @Override
       public void handle(WindowEvent windowEvent) {
         Platform.exit();
         System.exit(0);
       }
     });
+
+    UIController.getInstance().showDefault();
   }
 
   public Stage getStage() {

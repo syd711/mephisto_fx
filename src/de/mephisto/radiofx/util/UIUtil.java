@@ -1,9 +1,13 @@
 package de.mephisto.radiofx.util;
 
+import de.mephisto.radiofx.MephistoRadioFX;
 import de.mephisto.radiofx.ui.Footer;
 import de.mephisto.radiofx.ui.Header;
 import javafx.animation.FadeTransition;
 import javafx.animation.FadeTransitionBuilder;
+import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -11,6 +15,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.apache.commons.configuration.Configuration;
 
@@ -44,16 +49,48 @@ public class UIUtil {
   }
 
   /**
+   * Creates the initial state of the the UI.
+   * @param borderPane
+   */
+  public static void createScene(BorderPane borderPane) {
+    Group root = new Group();
+    root.getChildren().add(borderPane);
+    Stage primaryStage = MephistoRadioFX.getInstance().getStage();
+    if(primaryStage.getScene() == null) {
+      Scene scene = new Scene(root, UIUtil.WIDTH, UIUtil.HEIGHT, Color.valueOf("#DACEB8"));
+      primaryStage.setScene(scene);
+    }
+    else {
+      primaryStage.getScene().setRoot(root);
+    }
+  }
+
+  /**
+   * Creates a fade out effect without playing it
+   * @param node
+   * @return
+   */
+  public static FadeTransition createOutFader(Node node) {
+    return FadeTransitionBuilder.create()
+        .duration(Duration.seconds(1))
+        .node(node)
+        .fromValue(0)
+        .toValue(0.9)
+        .autoReverse(false)
+        .build();
+  }
+
+  /**
    * Hides a component via fade out.
    * @param root
    */
-  public static void fadeOutComponent(Pane root) {
+  public static void fadeOutComponent(Node root) {
     final FadeTransition fadeTransition = FadeTransitionBuilder.create()
         .duration(Duration.seconds(1))
         .node(root)
         .fromValue(0)
-        .toValue(1)
-        .autoReverse(true)
+        .toValue(0.9)
+        .autoReverse(false)
         .build();
 
     fadeTransition.play();
@@ -63,13 +100,13 @@ public class UIUtil {
    * Hides a component via fade int.
    * @param root
    */
-  public static void fadeInComponent(Pane root) {
+  public static void fadeInComponent(Node root) {
     final FadeTransition fadeTransition = FadeTransitionBuilder.create()
         .duration(Duration.seconds(1))
         .node(root)
         .fromValue(0)
         .toValue(1)
-        .autoReverse(true)
+        .autoReverse(false)
         .build();
 
     fadeTransition.play();

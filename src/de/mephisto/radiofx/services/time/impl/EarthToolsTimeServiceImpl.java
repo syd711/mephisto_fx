@@ -79,18 +79,18 @@ public class EarthToolsTimeServiceImpl implements TimeService {
     @Override
     public void run() {
       while(running) {
-        if(localTime != null) {
-          try {
-            Thread.sleep(1000);
+        try {
+          Thread.sleep(1000);
+          if(localTime != null) {
             long dateTime = localTime.getTime()+1000;
             localTime = new Date(dateTime);
 
             for(TimeListener listener : listeners) {
               listener.timeChanged(localTime);
             }
-          } catch (InterruptedException e) {
-            LOG.error("Error in timer thread: " + e.getMessage());
           }
+        } catch (InterruptedException e) {
+          LOG.error("Error in timer thread: " + e.getMessage());
         }
       }
     }

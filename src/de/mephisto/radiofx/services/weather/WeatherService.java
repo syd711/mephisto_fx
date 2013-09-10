@@ -8,8 +8,8 @@ import java.util.List;
 public interface WeatherService {
   public static final String IMG_SUNNY = "weather-sun.png";
   public static final String IMG_SUNNY_CLOUDY_1 = "weather-cloud-sun.png";
-  public static final String IMG_SUNNY_CLOUDY_2 = "weather-cloud.png";
-  public static final String IMG_CLOUDY = "weather-clouds.png";
+  public static final String IMG_SUNNY_CLOUDY_2 = "weather-clouds.png";
+  public static final String IMG_CLOUDY = "weather-cloud.png";
   public static final String IMG_SNOW = "weather-snow.png";
   public static final String IMG_SNOW_RAINY = "weather-snow.png";
   public static final String IMG_SUNNY_RAINY = "weather-rain.png";

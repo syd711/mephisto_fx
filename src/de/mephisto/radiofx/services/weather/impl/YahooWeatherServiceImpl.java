@@ -98,8 +98,10 @@ public class YahooWeatherServiceImpl implements WeatherService {
       String url = configuration.getString(String.valueOf(count));
       if (!StringUtils.isEmpty(url)) {
         WeatherInfo info = getWeather(url);
-        info.setDefaultLocation(count == 1);
-        infoList.add(info);
+        if(info != null) {
+          info.setDefaultLocation(count == 1);
+          infoList.add(info);
+        }
       }
       else {
         break;
@@ -138,9 +140,12 @@ public class YahooWeatherServiceImpl implements WeatherService {
    */
   public WeatherInfo getWeather(String url) {
     SyndFeed feed = getFeed(url);
-    WeatherInfo info = getWeatherInfo(feed);
-    info.setId(url);
-    return info;
+    if(feed != null) {
+      WeatherInfo info = getWeatherInfo(feed);
+      info.setId(url);
+      return info;
+    }
+    return null;
   }
 
   /**

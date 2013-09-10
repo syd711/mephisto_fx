@@ -36,11 +36,12 @@ public class MephistoRadioFX extends Application {
 
     this.stage = primaryStage;
     primaryStage.show();
+    UIController.getInstance().showDefaultWeather();
     primaryStage.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
       @Override
       public void handle(KeyEvent keyEvent) {
         if (keyEvent.getCode() == KeyCode.DOWN) {
-
+          UIController.getInstance().showNextWeather();
         }
       }
     });

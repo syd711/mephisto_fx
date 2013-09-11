@@ -71,7 +71,7 @@ public class RadioServiceImpl implements RadioService {
         info.setUrl(url);
         stations.add(info);
 
-        StreamInfoHelper.loadInfo(info);
+//        StreamInfoHelper.loadInfo(info);
       }
       LOG.info("Created MPD service with " + stations.size() + " stations.");
     } catch (ConfigurationException e) {

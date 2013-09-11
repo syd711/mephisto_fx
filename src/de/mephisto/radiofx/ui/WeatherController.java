@@ -5,6 +5,7 @@ import de.mephisto.radiofx.services.weather.WeatherInfo;
 import de.mephisto.radiofx.util.UIUtil;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -37,23 +38,30 @@ public class WeatherController implements ITabController {
   private Canvas weatherIconCanvas;
 
   private Pager pager;
+  private BorderPane tabRoot;
 
   @Override
   public void showDefault(BorderPane root) {
+    if(tabRoot != null) {
+      root.setCenter(tabRoot);
+      UIUtil.fadeInComponent(tabRoot);
+      return;
+    }
+
     WeatherInfo currentWeatherInfo = ServiceRegistry.getWeatherService().getDefaultWeatherInfo();
 
     locationText = new Text(0, 0, currentWeatherInfo.getCity() +  ", " + currentWeatherInfo.getCountry());
     locationText.setFont(WEATHER_HEADER_BOLD_FONT);
     locationText.setFill(UIUtil.COLOR_DARK_HEADER);
 
-    BorderPane mainRoot = new BorderPane();
-    root.setCenter(mainRoot);
+    tabRoot = new BorderPane();
+    root.setCenter(tabRoot);
 
     verticalRoot = new VBox(5);
     verticalRoot.setMinHeight(170);
     verticalRoot.setAlignment(Pos.TOP_CENTER);
     verticalRoot.setPadding(new Insets(5, 0, 5, 0));
-    mainRoot.setCenter(verticalRoot);
+    tabRoot.setCenter(verticalRoot);
     verticalRoot.setAlignment(Pos.CENTER);
     verticalRoot.getChildren().add(locationText);
 
@@ -96,7 +104,14 @@ public class WeatherController implements ITabController {
     hBox.getChildren().add(temps);
 
     //add page
-    pager = new Pager(mainRoot, ServiceRegistry.getWeatherService().getWeatherInfoList());
+    pager = new Pager(tabRoot, ServiceRegistry.getWeatherService().getWeatherInfoList());
+
+    UIUtil.fadeInComponent(tabRoot);
+  }
+
+  @Override
+  public Node getTabRoot() {
+    return tabRoot;
   }
 
   /**

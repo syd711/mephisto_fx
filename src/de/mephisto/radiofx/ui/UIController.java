@@ -51,18 +51,17 @@ public class UIController {
   public void toggleState() {
     footer.toggleFooter();
 
-    if(activeController == radioController) {
-      activeController = weatherController;
-    }
-    else {
-      activeController = radioController;
-    }
-
-    final Node center = borderPane.getCenter();
+    final Node center = activeController.getTabRoot();
     final FadeTransition outFader = UIUtil.createOutFader(center);
-    outFader.setOnFinished(new EventHandler<ActionEvent>() {
+    outFader.onFinishedProperty().set(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent actionEvent) {
+        if(activeController == radioController) {
+          activeController = weatherController;
+        }
+        else {
+          activeController = radioController;
+        }
         activeController.showDefault(borderPane);
       }
     });

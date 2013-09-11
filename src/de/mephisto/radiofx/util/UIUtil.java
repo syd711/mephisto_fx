@@ -72,10 +72,10 @@ public class UIUtil {
    */
   public static FadeTransition createOutFader(Node node) {
     return FadeTransitionBuilder.create()
-        .duration(Duration.seconds(1))
+        .duration(Duration.millis(300))
         .node(node)
-        .fromValue(0)
-        .toValue(0.9)
+        .fromValue(1)
+        .toValue(0)
         .autoReverse(false)
         .build();
   }
@@ -86,7 +86,7 @@ public class UIUtil {
    */
   public static void fadeOutComponent(Node root) {
     final FadeTransition fadeTransition = FadeTransitionBuilder.create()
-        .duration(Duration.seconds(1))
+        .duration(Duration.millis(1))
         .node(root)
         .fromValue(0)
         .toValue(0.9)
@@ -102,7 +102,7 @@ public class UIUtil {
    */
   public static void fadeInComponent(Node root) {
     final FadeTransition fadeTransition = FadeTransitionBuilder.create()
-        .duration(Duration.seconds(1))
+        .duration(Duration.millis(300))
         .node(root)
         .fromValue(0)
         .toValue(1)

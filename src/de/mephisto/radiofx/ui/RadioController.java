@@ -4,6 +4,7 @@ import de.mephisto.radiofx.services.ServiceRegistry;
 import de.mephisto.radiofx.services.mpd.StationInfo;
 import de.mephisto.radiofx.util.UIUtil;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -26,15 +27,23 @@ public class RadioController implements ITabController {
   private VBox verticalRoot;
 
   private Pager pager;
+  private BorderPane tabRoot;
 
+  @Override
   public void showDefault(BorderPane root) {
-    BorderPane radioRoot = new BorderPane();
-    radioRoot.setMinHeight(UIUtil.HEIGHT - 88);
-    root.setCenter(radioRoot);
+    if(tabRoot != null) {
+      root.setCenter(tabRoot);
+      UIUtil.fadeInComponent(tabRoot);
+      return;
+    }
+
+    tabRoot = new BorderPane();
+    tabRoot.setMinHeight(UIUtil.HEIGHT - 88);
+    root.setCenter(tabRoot);
 
     verticalRoot = new VBox(20);
     verticalRoot.setPadding(new Insets(20, 0, 0, 20));
-    radioRoot.setCenter(verticalRoot);
+    tabRoot.setCenter(verticalRoot);
 
     stationText = new Text(0, 0, "");
     stationText.setFont(RADIO_STATION_FONT);
@@ -53,9 +62,16 @@ public class RadioController implements ITabController {
     verticalRoot.getChildren().add(urlText);
 
     final List<StationInfo> stations = ServiceRegistry.getRadioService().getStations();
-    pager = new Pager(radioRoot, stations);
+    pager = new Pager(tabRoot, stations);
 
     updateRadioComponents(stations.get(0));
+
+    UIUtil.fadeInComponent(tabRoot);
+  }
+
+  @Override
+  public Node getTabRoot() {
+    return tabRoot;
   }
 
 

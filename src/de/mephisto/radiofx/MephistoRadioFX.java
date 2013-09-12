@@ -1,9 +1,7 @@
 package de.mephisto.radiofx;
 
-import de.mephisto.radiofx.ui.UIController;
+import de.mephisto.radiofx.ui.UIStateController;
 import de.mephisto.radiofx.ui.UIState;
-import de.mephisto.radiofx.util.Config;
-import de.mephisto.radiofx.util.UIUtil;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -11,7 +9,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import org.apache.commons.configuration.Configuration;
 
 
 public class MephistoRadioFX extends Application {
@@ -76,7 +73,7 @@ public class MephistoRadioFX extends Application {
       }
     });
 
-    UIController.getInstance().showDefault();
+    UIStateController.getInstance().showDefault();
   }
 
   public Stage getStage() {

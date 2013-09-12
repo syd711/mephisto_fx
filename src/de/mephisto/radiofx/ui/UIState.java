@@ -6,14 +6,14 @@ package de.mephisto.radiofx.ui;
 public class UIState {
 
   public void left() {
-    UIController.getInstance().showPrevious();
+    UIStateController.getInstance().showPrevious();
   }
 
   public void right() {
-    UIController.getInstance().showNext();
+    UIStateController.getInstance().showNext();
   }
 
   public void enter() {
-    UIController.getInstance().toggleState();
+    UIStateController.getInstance().toggleState();
   }
 }

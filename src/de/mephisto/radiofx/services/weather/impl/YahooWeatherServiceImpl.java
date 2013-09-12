@@ -186,6 +186,27 @@ public class YahooWeatherServiceImpl implements WeatherService {
       }
     }
 
+    //root elements
+    final List<Element> channelElements = (List<Element>) feed.getForeignMarkup();
+    for(Element element : channelElements) {
+      //wind
+      if(element.getName().equalsIgnoreCase("wind")) {
+        info.setWind(Double.parseDouble(element.getAttributeValue("speed")));
+      }
+      //sunrise and sunset
+      else if(element.getName().equalsIgnoreCase("astronomy")) {
+        try {
+          SimpleDateFormat format = new SimpleDateFormat("hh:mm a", Locale.US);
+          info.setSunrise(format.parse(element.getAttributeValue("sunrise")));
+          info.setSunset(format.parse(element.getAttributeValue("sunset")));
+        }
+        catch (ParseException e) {
+          LOG.error("Error retrieving sunrise time for " + element.getAttributeValue("sunrise")+ ": " + e.getMessage());
+        }
+      }
+    }
+
+
     final List<SyndEntry> items = (List) feed.getEntries();
     for (SyndEntry entry : items) {
       final List<Element> forecastInfo = (List) entry.getForeignMarkup();

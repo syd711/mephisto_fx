@@ -4,7 +4,6 @@ import de.mephisto.radiofx.services.mpd.IStationListener;
 import de.mephisto.radiofx.services.mpd.RadioService;
 import de.mephisto.radiofx.services.mpd.StationInfo;
 import de.mephisto.radiofx.util.Config;
-import de.mephisto.radiofx.util.StreamInfoHelper;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;

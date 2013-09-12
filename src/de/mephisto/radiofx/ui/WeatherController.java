@@ -1,11 +1,11 @@
 package de.mephisto.radiofx.ui;
 
+import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.services.ServiceRegistry;
 import de.mephisto.radiofx.services.weather.WeatherInfo;
 import de.mephisto.radiofx.util.UIUtil;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -16,12 +16,14 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
+import java.text.SimpleDateFormat;
+
 /**
- *
+ * UIController for the weather infos.
  */
-public class WeatherController implements ITabController {
+public class WeatherController extends PageableUIController {
   private static final Font WEATHER_HEADER_BOLD_FONT = Font.font("Tahoma", FontWeight.BOLD, 22);
-  private static final Font WEATHER_DETAILS_FONT = Font.font("Tahoma", FontWeight.NORMAL, 16);
+  private static final Font WEATHER_DETAILS_FONT = Font.font("Tahoma", FontWeight.NORMAL, 14);
   private static final Font WEATHER_TEMP_BOLD_FONT = Font.font("Tahoma", FontWeight.NORMAL, 60);
 
   private static final int IMAGE_SIZE = 128;
@@ -32,32 +34,20 @@ public class WeatherController implements ITabController {
   private Text maxTempText;
   private Text minTempText;
   private Text descriptionText;
+  private Text sunriseText;
+  private Text sunsetText;
 
-
-  private VBox verticalRoot;
   private Canvas weatherIconCanvas;
 
-  private Pager pager;
-  private BorderPane tabRoot;
-
   @Override
-  public void showDefault(BorderPane root) {
-    if(tabRoot != null) {
-      root.setCenter(tabRoot);
-      UIUtil.fadeInComponent(tabRoot);
-      return;
-    }
-
-    WeatherInfo currentWeatherInfo = ServiceRegistry.getWeatherService().getDefaultWeatherInfo();
-
-    locationText = new Text(0, 0, currentWeatherInfo.getCity() +  ", " + currentWeatherInfo.getCountry());
+  public BorderPane init() {
+    locationText = new Text(0, 0, "");
     locationText.setFont(WEATHER_HEADER_BOLD_FONT);
     locationText.setFill(UIUtil.COLOR_DARK_HEADER);
 
-    tabRoot = new BorderPane();
-    root.setCenter(tabRoot);
+    BorderPane tabRoot = new BorderPane();
 
-    verticalRoot = new VBox(5);
+    VBox verticalRoot = new VBox(5);
     verticalRoot.setMinHeight(170);
     verticalRoot.setAlignment(Pos.TOP_CENTER);
     verticalRoot.setPadding(new Insets(5, 0, 5, 0));
@@ -65,81 +55,78 @@ public class WeatherController implements ITabController {
     verticalRoot.setAlignment(Pos.CENTER);
     verticalRoot.getChildren().add(locationText);
 
+    super.setPagingRoot(verticalRoot);
+
     HBox hBox = new HBox(15);
     hBox.setAlignment(Pos.CENTER);
     hBox.setPadding(new Insets(0, 0, 0, 10));
     verticalRoot.getChildren().add(hBox);
 
     //image
+    WeatherInfo currentWeatherInfo = ServiceRegistry.getWeatherService().getDefaultWeatherInfo();
     String url = currentWeatherInfo.getImageUrl();
     this.weatherIconCanvas = UIUtil.createImageCanvas(url, IMAGE_SIZE, IMAGE_SIZE);
     hBox.getChildren().add(weatherIconCanvas);
 
-    //temp
-    tempText = new Text(0, 0, currentWeatherInfo.getTemp() + " °C");
+    //temps
+    VBox mainTemp = new VBox(5);
+    mainTemp.setAlignment(Pos.CENTER);
+    tempText = new Text(0, 0, "");
     tempText.setFont(WEATHER_TEMP_BOLD_FONT);
     tempText.setFill(UIUtil.COLOR_DARK_HEADER);
-    hBox.getChildren().add(tempText);
-
-    //detail info
-    VBox temps = new VBox(5);
-    temps.setMinWidth(128);
-    temps.setPadding(new Insets(28, 20, 0, 15));
-
-    maxTempText = new Text(0, 0, "Max " + currentWeatherInfo.getHighTemp() + " °C");
-    maxTempText.setFont(WEATHER_DETAILS_FONT);
-    maxTempText.setFill(UIUtil.COLOR_DARK_HEADER);
-    temps.getChildren().add(maxTempText);
-
-    minTempText = new Text(0, 0, "Min " + currentWeatherInfo.getLowTemp() + " °C");
-    minTempText.setFont(WEATHER_DETAILS_FONT);
-    minTempText.setFill(UIUtil.COLOR_DARK_HEADER);
-    temps.getChildren().add(minTempText);
+    mainTemp.getChildren().add(tempText);
+    hBox.getChildren().add(mainTemp);
 
     descriptionText = new Text(0, 0, currentWeatherInfo.getDescription());
     descriptionText.setFont(WEATHER_DETAILS_FONT);
     descriptionText.setFill(UIUtil.COLOR_DARK_HEADER);
-    temps.getChildren().add(descriptionText);
+    mainTemp.getChildren().add(descriptionText);
+
+    //detail info
+    VBox temps = new VBox(5);
+    temps.setMinWidth(128);
+    temps.setPadding(new Insets(20, 20, 0, 15));
+
+    minTempText = new Text(0, 0, "");
+    minTempText.setFont(WEATHER_DETAILS_FONT);
+    minTempText.setFill(UIUtil.COLOR_DARK_HEADER);
+    temps.getChildren().add(minTempText);
+
+    maxTempText = new Text(0, 0, "");
+    maxTempText.setFont(WEATHER_DETAILS_FONT);
+    maxTempText.setFill(UIUtil.COLOR_DARK_HEADER);
+    temps.getChildren().add(maxTempText);
+
+    sunriseText = new Text(0, 0, "");
+    sunriseText.setFont(WEATHER_DETAILS_FONT);
+    sunriseText.setFill(UIUtil.COLOR_DARK_HEADER);
+    temps.getChildren().add(sunriseText);
+
+    sunsetText = new Text(0, 0, "");
+    sunsetText.setFont(WEATHER_DETAILS_FONT);
+    sunsetText.setFill(UIUtil.COLOR_DARK_HEADER);
+    temps.getChildren().add(sunsetText);
 
     hBox.getChildren().add(temps);
 
     //add page
-    pager = new Pager(tabRoot, ServiceRegistry.getWeatherService().getWeatherInfoList());
+    Pager pager = new Pager(tabRoot, ServiceRegistry.getWeatherService().getWeatherInfoList());
+    super.setPager(pager);
+    super.setTabRoot(tabRoot);
+
+    updatePage(currentWeatherInfo);
 
     UIUtil.fadeInComponent(tabRoot);
-  }
-
-  @Override
-  public Node getTabRoot() {
     return tabRoot;
   }
-
-  /**
-   * Slides to the next weather info
-   */
-  public void next() {
-    WeatherInfo info = (WeatherInfo) pager.next();
-    UIUtil.fadeOutComponent(verticalRoot);
-    updateWeatherComponents(info);
-    UIUtil.fadeInComponent(verticalRoot);
-  }
-
-  /**
-   * Slides to the previous weather info
-   */
-  public void prev() {
-    WeatherInfo info = (WeatherInfo) pager.prev();
-    UIUtil.fadeOutComponent(verticalRoot);
-    updateWeatherComponents(info);
-    UIUtil.fadeInComponent(verticalRoot);
-  }
-
 
   /**
    * Assigns all values of the current weather info to the correspondig
    * components.
    */
-  private void updateWeatherComponents(WeatherInfo info) {
+  @Override
+  public void updatePage(IServiceModel model) {
+    WeatherInfo info = (WeatherInfo) model;
     //location
     locationText.setText(info.getCity() +  ", " + info.getCountry());
 
@@ -151,10 +138,14 @@ public class WeatherController implements ITabController {
 
     //temps
     tempText.setText(info.getTemp() + " °C");
-    maxTempText.setText("Max " + info.getHighTemp()+ " °C");
-    minTempText.setText("Min " + info.getLowTemp() + " °C");
+    maxTempText.setText("Max: " + info.getHighTemp()+ " °C");
+    minTempText.setText("Min: " + info.getLowTemp() + " °C");
 
     //description
     descriptionText.setText(info.getDescription());
+
+    SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+    sunsetText.setText("Sunset: " + format.format(info.getSunset()));
+    sunriseText.setText("Sunrise: " + format.format(info.getSunrise()));
   }
 }

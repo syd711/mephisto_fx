@@ -6,33 +6,39 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- *
+ * The global UI controller, receives the input from the state machine that
+ * can be triggered via GPIO or via keyboard inputs.
  */
-public class UIController {
-  private static UIController instance = new UIController();
+public class UIStateController {
+  private static UIStateController instance = new UIStateController();
   private BorderPane borderPane;
   private Footer footer;
 
   private WeatherController weatherController = new WeatherController();
   private RadioController radioController = new RadioController();
 
-  private ITabController activeController = radioController;
+  private IFeatureController activeController = radioController;
 
-  private UIController() {
+  private UIStateController() {
     borderPane = new BorderPane();
     UIUtil.createScene(borderPane);
 
     new Header(borderPane);
     footer = new Footer(borderPane);
+
+    weatherController.init();
+    radioController.init();
   }
 
   /**
    * Singleton getter
    * @return
    */
-  public static UIController getInstance() {
+  public static UIStateController getInstance() {
     return instance;
   }
 

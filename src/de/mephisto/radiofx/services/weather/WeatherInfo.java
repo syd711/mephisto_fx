@@ -34,6 +34,11 @@ public class WeatherInfo implements IServiceModel {
   private String latitude;
   private String longitude;
 
+  private Date sunrise;
+  private Date sunset;
+
+  private double wind;
+
   public String getCity() {
     return city;
   }
@@ -161,5 +166,29 @@ public class WeatherInfo implements IServiceModel {
     }
 
     return this.getCity().equals(((WeatherInfo)obj).getCity());
+  }
+
+  public double getWind() {
+    return wind;
+  }
+
+  public void setWind(double wind) {
+    this.wind = wind;
+  }
+
+  public Date getSunset() {
+    return sunset;
+  }
+
+  public void setSunset(Date sunset) {
+    this.sunset = sunset;
+  }
+
+  public Date getSunrise() {
+    return sunrise;
+  }
+
+  public void setSunrise(Date sunrise) {
+    this.sunrise = sunrise;
   }
 }

@@ -1,5 +1,6 @@
 package de.mephisto.radiofx.ui;
 
+import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.services.ServiceRegistry;
 import de.mephisto.radiofx.services.mpd.StationInfo;
 import de.mephisto.radiofx.util.UIUtil;
@@ -16,7 +17,7 @@ import java.util.List;
 /**
  * Controls the UI for the radio
  */
-public class RadioController implements ITabController {
+public class RadioController extends PageableUIController {
   private static final Font RADIO_STATION_FONT = Font.font("Tahoma", FontWeight.BOLD, 32);
   private static final Font RADIO_TRACK_FONT= Font.font("Tahoma", FontWeight.NORMAL, 18);
   private static final Font RADIO_URL_FONT= Font.font("Tahoma", FontWeight.NORMAL, 12);
@@ -24,24 +25,13 @@ public class RadioController implements ITabController {
   private Text stationText;
   private Text trackText;
   private Text urlText;
-  private VBox verticalRoot;
-
-  private Pager pager;
-  private BorderPane tabRoot;
 
   @Override
-  public void showDefault(BorderPane root) {
-    if(tabRoot != null) {
-      root.setCenter(tabRoot);
-      UIUtil.fadeInComponent(tabRoot);
-      return;
-    }
-
-    tabRoot = new BorderPane();
+  public BorderPane init() {
+    BorderPane tabRoot = new BorderPane();
     tabRoot.setMinHeight(UIUtil.HEIGHT - 88);
-    root.setCenter(tabRoot);
 
-    verticalRoot = new VBox(20);
+    VBox verticalRoot = new VBox(20);
     verticalRoot.setPadding(new Insets(20, 0, 0, 20));
     tabRoot.setCenter(verticalRoot);
 
@@ -62,44 +52,23 @@ public class RadioController implements ITabController {
     verticalRoot.getChildren().add(urlText);
 
     final List<StationInfo> stations = ServiceRegistry.getRadioService().getStations();
-    pager = new Pager(tabRoot, stations);
 
-    updateRadioComponents(stations.get(0));
+    super.setPager(new Pager(tabRoot, stations));
+    super.setTabRoot(tabRoot);
+
+    updatePage(stations.get(0));
 
     UIUtil.fadeInComponent(tabRoot);
-  }
-
-  @Override
-  public Node getTabRoot() {
     return tabRoot;
-  }
-
-
-  /**
-   * Slides to the next weather info
-   */
-  public void next() {
-    StationInfo info = (StationInfo) pager.next();
-    UIUtil.fadeOutComponent(verticalRoot);
-    updateRadioComponents(info);
-    UIUtil.fadeInComponent(verticalRoot);
-  }
-
-  /**
-   * Slides to the previous weather info
-   */
-  public void prev() {
-    StationInfo info = (StationInfo) pager.prev();
-    UIUtil.fadeOutComponent(verticalRoot);
-    updateRadioComponents(info);
-    UIUtil.fadeInComponent(verticalRoot);
   }
 
   /**
    * Updates the fields with the given station info.
-   * @param info
+   * @param model
    */
-  private void updateRadioComponents(StationInfo info) {
+  @Override
+  public void updatePage(IServiceModel model) {
+    StationInfo info = (StationInfo) model;
     stationText.setText(formatValue(info.getName(), 22));
     trackText.setText(formatValue(info.getTrack(), 50));
     urlText.setText(formatValue(info.getUrl(), 70));

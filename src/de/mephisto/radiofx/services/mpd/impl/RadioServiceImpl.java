@@ -1,7 +1,7 @@
 package de.mephisto.radiofx.services.mpd.impl;
 
-import de.mephisto.radiofx.services.mpd.IStationListener;
-import de.mephisto.radiofx.services.mpd.RadioService;
+import de.mephisto.radiofx.services.IServiceModel;
+import de.mephisto.radiofx.services.RefreshingService;
 import de.mephisto.radiofx.services.mpd.StationInfo;
 import de.mephisto.radiofx.util.Config;
 import org.apache.commons.configuration.Configuration;
@@ -17,7 +17,7 @@ import java.util.List;
 /**
  *
  */
-public class RadioServiceImpl implements RadioService {
+public class RadioServiceImpl extends RefreshingService {
   private final static Logger LOG = LoggerFactory.getLogger(RadioServiceImpl.class);
 
   private final static String CONFIG_NAME = "mpd.properties";
@@ -31,21 +31,16 @@ public class RadioServiceImpl implements RadioService {
   private Configuration config;
   private MPDClient client;
 
-  private List<StationInfo> stations = new ArrayList<StationInfo>();
-  private List<IStationListener> listeners = new ArrayList<IStationListener>();
-
-  private MPDStatusListener statusListenerThread;
+  private List<IServiceModel> stations = new ArrayList<IServiceModel>();
 
   public RadioServiceImpl() {
+    super(REFRESH_INTERVAL);
+
     this.config = Config.getConfiguration(CONFIG_NAME);
     String host = config.getString(PROPERTY_HOST);
     int port = config.getInt(PROPERTY_PORT, 6600);
 //    client = new MPDClient(host, port);
 //    client.connect();
-
-    //listens on the playlist status
-    statusListenerThread = new MPDStatusListener();
-    statusListenerThread.start();
 
     if(client != null && client.isLocalModeEnabled()) {
       client.executeLocalCommand("volume 99");
@@ -79,33 +74,7 @@ public class RadioServiceImpl implements RadioService {
   }
 
   @Override
-  public List<StationInfo> getStations() {
+  public List<IServiceModel> getServiceData() {
     return stations;
-  }
-
-  @Override
-  public void addStationListener(IStationListener listener) {
-    this.listeners.add(listener);
-  }
-
-  /**
-   * Reads the MPD server status to update the UI.
-   */
-  class MPDStatusListener extends Thread {
-    private boolean running = true;
-
-    @Override
-    public void run() {
-      while(running) {
-        try {
-          Thread.sleep(3000);
-          for(IStationListener listener : listeners) {
-
-          }
-        } catch (InterruptedException e) {
-          LOG.error("Error refresh MPD thread: " + e.getMessage());
-        }
-      }
-    }
   }
 }

@@ -51,12 +51,10 @@ public class RadioController extends PageableUIController {
 
     verticalRoot.getChildren().add(urlText);
 
-    final List<StationInfo> stations = ServiceRegistry.getRadioService().getStations();
-
-    super.setPager(new Pager(tabRoot, stations));
+    super.setPager(new Pager(tabRoot, ServiceRegistry.getRadioService()));
     super.setTabRoot(tabRoot);
 
-    updatePage(stations.get(0));
+    updatePage(ServiceRegistry.getRadioService().getServiceData().get(0));
 
     UIUtil.fadeInComponent(tabRoot);
     return tabRoot;

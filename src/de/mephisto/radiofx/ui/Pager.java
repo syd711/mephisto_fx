@@ -1,5 +1,6 @@
 package de.mephisto.radiofx.ui;
 
+import de.mephisto.radiofx.services.IService;
 import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.util.UIUtil;
 import javafx.collections.ObservableList;
@@ -19,13 +20,13 @@ import java.util.List;
 public class Pager {
   private final static int STROKE_WIDTH = 2;
 
-  private List<? extends IServiceModel> models;
   private HBox box;
   private IServiceModel activeModel;
+  private IService service;
 
-
-  public Pager(BorderPane root, List<? extends IServiceModel> models) {
-    this.models = models;
+  public Pager(BorderPane root, IService service) {
+    this.service = service;
+    List<IServiceModel> models = service.getServiceData();
     int margin = 20;
     if(models.size() > 10) {
       margin = 15;
@@ -51,6 +52,7 @@ public class Pager {
    * Next element
    */
   public IServiceModel next() {
+    List<IServiceModel> models = service.getServiceData();
     Iterator<IServiceModel> iterator = (Iterator<IServiceModel>) models.iterator();
     IServiceModel current = activeModel;
     activeModel = null;
@@ -72,6 +74,7 @@ public class Pager {
    * Prev element
    */
   public IServiceModel prev() {
+    List<IServiceModel> models = service.getServiceData();
     Iterator<IServiceModel> iterator = (Iterator<IServiceModel>) models.iterator();
     IServiceModel current = activeModel;
     activeModel = null;

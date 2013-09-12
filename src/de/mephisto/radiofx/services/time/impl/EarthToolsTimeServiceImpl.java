@@ -1,9 +1,8 @@
 package de.mephisto.radiofx.services.time.impl;
 
-import de.mephisto.radiofx.services.time.TimeListener;
-import de.mephisto.radiofx.services.time.TimeService;
+import de.mephisto.radiofx.services.IServiceModel;
+import de.mephisto.radiofx.services.RefreshingService;
 import de.mephisto.radiofx.util.Config;
-import javafx.application.Platform;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,20 +21,28 @@ import java.util.Locale;
 /**
  * Service for retrieving the current time.
  */
-public class EarthToolsTimeServiceImpl implements TimeService {
+public class EarthToolsTimeServiceImpl extends RefreshingService {
   private final static Logger LOG = LoggerFactory.getLogger(EarthToolsTimeServiceImpl.class);
+  private final static int REFRESH_INTERVAL = 1000;
 
   private Date localTime;
-  private List<TimeListener> listeners = new ArrayList<TimeListener>();
 
-  public Date getTime() {
+  public EarthToolsTimeServiceImpl() {
+    super(REFRESH_INTERVAL);
+  }
+
+  @Override
+  public List<IServiceModel> getServiceData() {
+    List<IServiceModel> data = new ArrayList<IServiceModel>();
     if(localTime != null) {
-      return localTime;
+      DateTimeInfo info = new DateTimeInfo();
+      info.setDate(localTime);
+      data.add(info);
+      return data;
     }
 
     BufferedReader in = null;
     try {
-      new Timer().start();
       Configuration configuration = Config.getConfiguration("time.properties");
       String url = configuration.getString("time.service.url");
       URL earthToolsServer = new URL(url);
@@ -47,7 +54,10 @@ public class EarthToolsTimeServiceImpl implements TimeService {
         if(inputLine.contains("localtime")) {
           String date = inputLine.substring(inputLine.indexOf(">")+1, inputLine.lastIndexOf("<"));
           localTime = new SimpleDateFormat("d MMM yyyy hh:mm:ss", Locale.getDefault()).parse(date);
-          return localTime;
+          DateTimeInfo info = new DateTimeInfo();
+          info.setDate(localTime);
+          data.add(info);
+          break;
         }
       }
 
@@ -63,42 +73,7 @@ public class EarthToolsTimeServiceImpl implements TimeService {
         }
       }
     }
-    return new Date();
-  }
 
-  @Override
-  public void addTimeListener(TimeListener listener) {
-    this.listeners.add(listener);
-  }
-
-  /**
-   * Updates the timer so that the time is requested only once.
-   */
-  class Timer extends Thread {
-    private boolean running = true;
-
-    @Override
-    public void run() {
-      while(running) {
-        try {
-          Thread.sleep(1000);
-          if(localTime != null) {
-            long dateTime = localTime.getTime()+1000;
-            localTime = new Date(dateTime);
-
-            Platform.runLater(new Runnable() {
-              @Override
-              public void run() {
-                for(TimeListener listener : listeners) {
-                  listener.timeChanged(localTime);
-                }
-              }
-            });
-          }
-        } catch (InterruptedException e) {
-          LOG.error("Error in timer thread: " + e.getMessage());
-        }
-      }
-    }
+    return data;
   }
 }

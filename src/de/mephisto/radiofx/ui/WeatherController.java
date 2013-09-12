@@ -63,7 +63,7 @@ public class WeatherController extends PageableUIController {
     verticalRoot.getChildren().add(hBox);
 
     //image
-    WeatherInfo currentWeatherInfo = ServiceRegistry.getWeatherService().getDefaultWeatherInfo();
+    WeatherInfo currentWeatherInfo = ServiceRegistry.getWeatherService().getDefaultWeather();
     String url = currentWeatherInfo.getImageUrl();
     this.weatherIconCanvas = UIUtil.createImageCanvas(url, IMAGE_SIZE, IMAGE_SIZE);
     hBox.getChildren().add(weatherIconCanvas);
@@ -110,7 +110,7 @@ public class WeatherController extends PageableUIController {
     hBox.getChildren().add(temps);
 
     //add page
-    Pager pager = new Pager(tabRoot, ServiceRegistry.getWeatherService().getWeatherInfoList());
+    Pager pager = new Pager(tabRoot, ServiceRegistry.getWeatherService());
     super.setPager(pager);
     super.setTabRoot(tabRoot);
 
@@ -121,7 +121,7 @@ public class WeatherController extends PageableUIController {
   }
 
   /**
-   * Assigns all values of the current weather info to the correspondig
+   * Assigns all values of the current weather info to the corresponding
    * components.
    */
   @Override

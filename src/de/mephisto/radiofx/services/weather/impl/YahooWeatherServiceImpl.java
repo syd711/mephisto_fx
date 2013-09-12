@@ -7,9 +7,11 @@ import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 import de.mephisto.radiofx.resources.weather.big.WeatherBigResourceLoader;
 import de.mephisto.radiofx.resources.weather.small.WeatherSmallResourceLoader;
-import de.mephisto.radiofx.services.weather.WeatherService;
+import de.mephisto.radiofx.services.IServiceModel;
+import de.mephisto.radiofx.services.RefreshingService;
+import de.mephisto.radiofx.services.ServiceRegistry;
+import de.mephisto.radiofx.services.weather.IWeatherService;
 import de.mephisto.radiofx.services.weather.WeatherInfo;
-import de.mephisto.radiofx.services.weather.WeatherInfoListener;
 import de.mephisto.radiofx.util.Config;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -77,20 +79,34 @@ import java.util.Locale;
  * 47	isolated thundershowers
  * 3200	not available
  */
-public class YahooWeatherServiceImpl implements WeatherService {
+public class YahooWeatherServiceImpl extends RefreshingService implements IWeatherService {
   private static final Logger LOG = LoggerFactory.getLogger(YahooWeatherServiceImpl.class);
+
+  public static final String IMG_SUNNY = "weather-sun.png";
+  public static final String IMG_SUNNY_CLOUDY_1 = "weather-cloud-sun.png";
+  public static final String IMG_SUNNY_CLOUDY_2 = "weather-clouds.png";
+  public static final String IMG_CLOUDY = "weather-cloud.png";
+  public static final String IMG_SNOW = "weather-snow.png";
+  public static final String IMG_SNOW_RAINY = "weather-snow.png";
+  public static final String IMG_SUNNY_RAINY = "weather-rain.png";
+  public static final String IMG_RAINY = "weather-rain.png";
+
+
+  public static final String IMG_STORMY = "weather-thunder.png";
   private static final int REFRESH_INTERVAL = 60000;
 
-  private Timer timer;
-  private List<WeatherInfoListener> listeners = new ArrayList<WeatherInfoListener>();
+  public YahooWeatherServiceImpl() {
+    super(REFRESH_INTERVAL);
+  }
 
   /**
    * Returns a list of all configured weather locations.
    *
    * @return
    */
-  public List<WeatherInfo> getWeatherInfoList() {
-    List<WeatherInfo> infoList = new ArrayList<WeatherInfo>();
+  @Override
+  public List<IServiceModel> getServiceData() {
+    List<IServiceModel> infoList = new ArrayList<IServiceModel>();
     final Configuration configuration = Config.getConfiguration("weather.properties");
     int count = 0;
     while (true) {
@@ -108,28 +124,7 @@ public class YahooWeatherServiceImpl implements WeatherService {
       }
     }
 
-    if(timer == null) {
-      timer = new Timer();
-      timer.start();
-    }
-
     return infoList;
-  }
-
-  @Override
-  public void addWeatherListener(WeatherInfoListener listener) {
-    this.listeners.add(listener);
-  }
-
-  @Override
-  public WeatherInfo getDefaultWeatherInfo() {
-    final List<WeatherInfo> weatherInfoList = getWeatherInfoList();
-    for(WeatherInfo info : weatherInfoList) {
-      if(info.isDefaultLocation()) {
-        return info;
-      }
-    }
-    return null;
   }
 
   /**
@@ -138,7 +133,7 @@ public class YahooWeatherServiceImpl implements WeatherService {
    * @param url
    * @return
    */
-  public WeatherInfo getWeather(String url) {
+  private WeatherInfo getWeather(String url) {
     SyndFeed feed = getFeed(url);
     if(feed != null) {
       WeatherInfo info = getWeatherInfo(feed);
@@ -274,7 +269,7 @@ public class YahooWeatherServiceImpl implements WeatherService {
     return info;
   }
 
-  public String convertTypeCodeImage(int code) {
+  private String convertTypeCodeImage(int code) {
     String img = IMG_SUNNY_CLOUDY_1;
     if (code < 5 || (code >= 37 && code <= 39) || code == 45) {
       img = IMG_STORMY;
@@ -312,28 +307,15 @@ public class YahooWeatherServiceImpl implements WeatherService {
     return img;
   }
 
-
-  /**
-   * Updates the timer so that the time is requested only once.
-   */
-  class Timer extends Thread {
-    private boolean running = true;
-
-    @Override
-    public void run() {
-      while (running) {
-        try {
-          Thread.sleep(REFRESH_INTERVAL);
-          final List<WeatherInfo> weatherInfoList = getWeatherInfoList();
-          for (WeatherInfo info : weatherInfoList) {
-            for (WeatherInfoListener listener : listeners) {
-              listener.weatherChanged(info);
-            }
-          }
-        } catch (InterruptedException e) {
-          LOG.error("Error in timer thread: " + e.getMessage());
-        }
+  @Override
+  public WeatherInfo getDefaultWeather() {
+    final List<IServiceModel> serviceData = ServiceRegistry.getWeatherService().getServiceData();
+    for(IServiceModel model : serviceData) {
+      WeatherInfo info = (WeatherInfo) model;
+      if(info.isDefaultLocation()) {
+        return info;
       }
     }
+    return null;
   }
 }

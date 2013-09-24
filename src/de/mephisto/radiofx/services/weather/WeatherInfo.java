@@ -22,7 +22,8 @@ public class WeatherInfo implements IServiceModel {
   private String highTemp;
 
   private String imageUrl;
-  private String iconUrl;
+  private String iconWhiteUrl;
+  private String iconBlackUrl;
 
   private Date forecastDate;
   private Date localTime;
@@ -143,12 +144,12 @@ public class WeatherInfo implements IServiceModel {
     this.temp = temp;
   }
 
-  public String getIconUrl() {
-    return iconUrl;
+  public String getIconWhiteUrl() {
+    return iconWhiteUrl;
   }
 
-  public void setIconUrl(String iconUrl) {
-    this.iconUrl = iconUrl;
+  public void setIconWhiteUrl(String iconWhiteUrl) {
+    this.iconWhiteUrl = iconWhiteUrl;
   }
 
   public boolean isDefaultLocation() {
@@ -159,14 +160,6 @@ public class WeatherInfo implements IServiceModel {
     this.defaultLocation = defaultLocation;
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    if(obj == null || !(obj instanceof WeatherInfo) ) {
-      return false;
-    }
-
-    return this.getCity().equals(((WeatherInfo)obj).getCity());
-  }
 
   public double getWind() {
     return wind;
@@ -190,5 +183,22 @@ public class WeatherInfo implements IServiceModel {
 
   public void setSunrise(Date sunrise) {
     this.sunrise = sunrise;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null || !(obj instanceof WeatherInfo) ) {
+      return false;
+    }
+
+    return this.getCity().equals(((WeatherInfo)obj).getCity());
+  }
+
+  public String getIconBlackUrl() {
+    return iconBlackUrl;
+  }
+
+  public void setIconBlackUrl(String iconBlackUrl) {
+    this.iconBlackUrl = iconBlackUrl;
   }
 }

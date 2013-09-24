@@ -1,5 +1,6 @@
 package de.mephisto.radiofx;
 
+import de.mephisto.radiofx.services.ServiceRegistry;
 import de.mephisto.radiofx.ui.UIStateController;
 import de.mephisto.radiofx.ui.UIState;
 import javafx.application.Application;
@@ -30,6 +31,7 @@ public class MephistoRadioFX extends Application {
 
   @Override
   public void start(final Stage primaryStage) {
+    ServiceRegistry.init();
     instance = this;
     this.stage = primaryStage;
     primaryStage.show();
@@ -50,7 +52,14 @@ public class MephistoRadioFX extends Application {
         if (keyEvent.getCode() == KeyCode.DOWN) {
           Platform.runLater(new Runnable() {
             @Override public void run() {
-              state.enter();
+              state.push();
+            }
+          });
+        }
+        if (keyEvent.getCode() == KeyCode.UP) {
+          Platform.runLater(new Runnable() {
+            @Override public void run() {
+              state.longPush();
             }
           });
         }

@@ -1,4 +1,4 @@
-package de.mephisto.radiofx.ui;
+package de.mephisto.radiofx.ui.controller;
 
 import de.mephisto.radiofx.util.UIUtil;
 import javafx.scene.Node;
@@ -7,9 +7,13 @@ import javafx.scene.layout.BorderPane;
 /**
  * Common methods for the services.
  */
-public abstract class AbstractUIController implements IFeatureController{
+public abstract class AbstractUIController implements IFeatureController {
 
   private BorderPane tabRoot;
+
+  public AbstractUIController() {
+    init();
+  }
 
   @Override
   public void showDefault(BorderPane root) {

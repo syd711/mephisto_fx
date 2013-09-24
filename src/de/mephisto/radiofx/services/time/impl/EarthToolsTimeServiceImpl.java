@@ -2,6 +2,7 @@ package de.mephisto.radiofx.services.time.impl;
 
 import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.services.RefreshingService;
+import de.mephisto.radiofx.services.time.DateTimeInfo;
 import de.mephisto.radiofx.util.Config;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
@@ -23,7 +24,7 @@ import java.util.Locale;
  */
 public class EarthToolsTimeServiceImpl extends RefreshingService {
   private final static Logger LOG = LoggerFactory.getLogger(EarthToolsTimeServiceImpl.class);
-  private final static int REFRESH_INTERVAL = 1000;
+  private final static int REFRESH_INTERVAL = 60000;
 
   private Date localTime;
 
@@ -36,6 +37,8 @@ public class EarthToolsTimeServiceImpl extends RefreshingService {
     List<IServiceModel> data = new ArrayList<IServiceModel>();
     if(localTime != null) {
       DateTimeInfo info = new DateTimeInfo();
+      long time = localTime.getTime() + REFRESH_INTERVAL;
+      localTime = new Date(time);
       info.setDate(localTime);
       data.add(info);
       return data;

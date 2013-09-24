@@ -1,6 +1,7 @@
 package de.mephisto.radiofx.util;
 
 import de.mephisto.radiofx.MephistoRadioFX;
+import de.mephisto.radiofx.resources.ResourceLoader;
 import de.mephisto.radiofx.ui.Footer;
 import de.mephisto.radiofx.ui.Header;
 import javafx.animation.FadeTransition;
@@ -58,6 +59,7 @@ public class UIUtil {
     Stage primaryStage = MephistoRadioFX.getInstance().getStage();
     if(primaryStage.getScene() == null) {
       Scene scene = new Scene(root, UIUtil.WIDTH, UIUtil.HEIGHT, Color.valueOf("#DACEB8"));
+      scene.getStylesheets().add(ResourceLoader.getResource("theme.css"));
       primaryStage.setScene(scene);
     }
     else {

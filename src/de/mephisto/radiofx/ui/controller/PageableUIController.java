@@ -1,6 +1,7 @@
-package de.mephisto.radiofx.ui;
+package de.mephisto.radiofx.ui.controller;
 
 import de.mephisto.radiofx.services.IServiceModel;
+import de.mephisto.radiofx.ui.Pager;
 import de.mephisto.radiofx.util.UIUtil;
 import javafx.scene.Node;
 
@@ -23,6 +24,7 @@ public abstract class PageableUIController extends AbstractUIController {
   /**
    * Slides to the next weather info
    */
+  @Override
   public void next() {
     IServiceModel info = pager.next();
     UIUtil.fadeOutComponent(pagingRoot);
@@ -33,6 +35,7 @@ public abstract class PageableUIController extends AbstractUIController {
   /**
    * Slides to the previous weather info
    */
+  @Override
   public void prev() {
     IServiceModel info = pager.prev();
     UIUtil.fadeOutComponent(pagingRoot);
@@ -40,9 +43,13 @@ public abstract class PageableUIController extends AbstractUIController {
     UIUtil.fadeInComponent(pagingRoot);
   }
 
+
   /**
-   * Method to be implemented by the controller, shows the UI for the given model.
-   * @param model
+   * Invoked for the push event
    */
-  public abstract void updatePage(IServiceModel model);
+  @Override
+  public void push() {
+    //maybe implemented by subclasses
+  }
+
 }

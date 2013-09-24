@@ -6,7 +6,8 @@ import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 import de.mephisto.radiofx.resources.weather.big.WeatherBigResourceLoader;
-import de.mephisto.radiofx.resources.weather.small.WeatherSmallResourceLoader;
+import de.mephisto.radiofx.resources.weather.small_black.WeatherSmallBlackResourceLoader;
+import de.mephisto.radiofx.resources.weather.small_white.WeatherSmallWhiteResourceLoader;
 import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.services.RefreshingService;
 import de.mephisto.radiofx.services.ServiceRegistry;
@@ -230,7 +231,8 @@ public class YahooWeatherServiceImpl extends RefreshingService implements IWeath
           forecast.setHighTemp(high);
           forecast.setLowTemp(low);
           forecast.setImageUrl(WeatherBigResourceLoader.getResource(imageUrl));
-          forecast.setIconUrl(WeatherSmallResourceLoader.getResource(imageUrl));
+          forecast.setIconWhiteUrl(WeatherSmallWhiteResourceLoader.getResource(imageUrl));
+          forecast.setIconBlackUrl(WeatherSmallBlackResourceLoader.getResource(imageUrl));
 
           info.getForecast().add(forecast);
         }
@@ -253,7 +255,7 @@ public class YahooWeatherServiceImpl extends RefreshingService implements IWeath
             int code = Integer.parseInt(element.getAttribute("code").getValue());
             String imageUrl = convertTypeCodeImage(code);
             info.setImageUrl(WeatherBigResourceLoader.getResource(imageUrl));
-            info.setIconUrl(WeatherSmallResourceLoader.getResource(imageUrl));
+            info.setIconWhiteUrl(WeatherSmallWhiteResourceLoader.getResource(imageUrl));
           } catch (ParseException e) {
             LOG.error("Error retrieving local time for " + date + ": " + e.getMessage());
           }

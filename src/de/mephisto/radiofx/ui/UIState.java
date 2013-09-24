@@ -13,7 +13,11 @@ public class UIState {
     UIStateController.getInstance().showNext();
   }
 
-  public void enter() {
-    UIStateController.getInstance().toggleState();
+  public void push() {
+    UIStateController.getInstance().push();
+  }
+
+  public void longPush() {
+    UIStateController.getInstance().longPush();
   }
 }

@@ -14,18 +14,23 @@ import javafx.scene.text.Text;
  */
 public class Footer {
   private static Font TAB_FONT = Font.font("Tahoma", FontWeight.NORMAL, 18);
+  private static final String STYLE_INACTIVE = "-fx-border-color: " + UIUtil.HEX_COLOR_SEPARATOR + " " + UIUtil.HEX_COLOR_SEPARATOR + " transparent "
+      + UIUtil.HEX_COLOR_SEPARATOR + ";-fx-background-color: " + UIUtil.HEX_COLOR_INACTIVE + ";";
+  private static final String STYLE_ACTIVE = "-fx-background-color: " + UIUtil.HEX_COLOR_BACKGROUND + ";-fx-border-color: transparent transparent transparent transparent";
 
   private HBox tab1;
   private HBox tab2;
+  private HBox tab3;
 
-  private boolean tab1Active = true;
+  private int activeTab = 1;
 
   public Footer(BorderPane root) {
     HBox main = new HBox(0);
     main.setPadding(new Insets(14, 0, 5, 0));
 
+    //radio tab
     tab1 = new HBox(0);
-    tab1.setMinWidth(UIUtil.WIDTH/2);
+    tab1.setMinWidth(UIUtil.WIDTH/3);
     tab1.setAlignment(Pos.CENTER);
     tab1.setPadding(new Insets(6, 8, 8, 8));
 
@@ -37,12 +42,12 @@ public class Footer {
     text.setFill(UIUtil.COLOR_DARK_HEADER);
     tab1.getChildren().add(text);
 
+    //weather tab
     tab2 = new HBox(0);
-    tab2.setMinWidth(UIUtil.WIDTH / 2);
+    tab2.setMinWidth(UIUtil.WIDTH / 3);
     tab2.setAlignment(Pos.CENTER);
     tab2.setPadding(new Insets(6, 8, 8, 8));
-    tab2.setStyle("-fx-border-color: " + UIUtil.HEX_COLOR_SEPARATOR + " " + UIUtil.HEX_COLOR_SEPARATOR + " transparent " +
-        UIUtil.HEX_COLOR_SEPARATOR + ";-fx-background-color: " + UIUtil.HEX_COLOR_INACTIVE + ";");
+    tab2.setStyle(STYLE_INACTIVE);
 
     text = new Text(0, 0, "Weather");
     text.setFont(TAB_FONT);
@@ -50,23 +55,47 @@ public class Footer {
     tab2.getChildren().add(text);
 
     main.getChildren().add(tab2);
+
+    //google tab
+    tab3 = new HBox(0);
+    tab3.setMinWidth(UIUtil.WIDTH / 3);
+    tab3.setAlignment(Pos.CENTER);
+    tab3.setPadding(new Insets(6, 8, 8, 8));
+    tab3.setStyle(STYLE_INACTIVE);
+
+    text = new Text(0, 0, "Music");
+    text.setFont(TAB_FONT);
+    text.setFill(UIUtil.COLOR_DARK_HEADER);
+    tab3.getChildren().add(text);
+
+    main.getChildren().add(tab3);
   }
 
-  public void toggleFooter() {
-    tab1Active = !tab1Active;
-    if(tab1Active) {
-      tab1.setStyle("-fx-background-color: " + UIUtil.HEX_COLOR_BACKGROUND + ";");
-
-      tab1.setStyle("-fx-background-color: " + UIUtil.HEX_COLOR_BACKGROUND + ";-fx-border-color: transparent transparent transparent transparent");
-      tab2.setStyle("-fx-border-color: " + UIUtil.HEX_COLOR_SEPARATOR + " " + UIUtil.HEX_COLOR_SEPARATOR + " transparent "
-          + UIUtil.HEX_COLOR_SEPARATOR + ";-fx-background-color: " + UIUtil.HEX_COLOR_INACTIVE + ";");
+  public void switchTab() {
+    activeTab+=1;
+    if(activeTab > 3) {
+      activeTab = 1;
     }
-    else {
-      tab2.setStyle("-fx-background-color: " + UIUtil.HEX_COLOR_BACKGROUND + ";");
 
-      tab2.setStyle("-fx-background-color: " + UIUtil.HEX_COLOR_BACKGROUND + ";-fx-border-color: transparent transparent transparent transparent");
-      tab1.setStyle("-fx-border-color: " + UIUtil.HEX_COLOR_SEPARATOR + " " + UIUtil.HEX_COLOR_SEPARATOR + " transparent "
-          + UIUtil.HEX_COLOR_SEPARATOR + ";-fx-background-color: " + UIUtil.HEX_COLOR_INACTIVE + ";");
+    switch (activeTab) {
+      case 1: {
+        tab1.setStyle(STYLE_ACTIVE);
+        tab2.setStyle(STYLE_INACTIVE);
+        tab3.setStyle(STYLE_INACTIVE);
+        return;
+      }
+      case 2: {
+        tab2.setStyle(STYLE_ACTIVE);
+        tab1.setStyle(STYLE_INACTIVE);
+        tab3.setStyle(STYLE_INACTIVE);
+        return;
+      }
+      case 3: {
+        tab3.setStyle(STYLE_ACTIVE);
+        tab2.setStyle(STYLE_INACTIVE);
+        tab1.setStyle(STYLE_INACTIVE);
+        return;
+      }
     }
   }
 }

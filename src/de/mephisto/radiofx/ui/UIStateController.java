@@ -1,13 +1,15 @@
 package de.mephisto.radiofx.ui;
 
+import de.mephisto.radiofx.ui.controller.GoogleUIController;
+import de.mephisto.radiofx.ui.controller.IFeatureController;
+import de.mephisto.radiofx.ui.controller.RadioUIController;
+import de.mephisto.radiofx.ui.controller.WeatherUIController;
 import de.mephisto.radiofx.util.UIUtil;
 import javafx.animation.FadeTransition;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The global UI controller, receives the input from the state machine that
@@ -18,10 +20,13 @@ public class UIStateController {
   private BorderPane borderPane;
   private Footer footer;
 
-  private WeatherController weatherController = new WeatherController();
-  private RadioController radioController = new RadioController();
+  private RadioUIController radioController = new RadioUIController();
+  private WeatherUIController weatherController = new WeatherUIController();
+  private GoogleUIController googleController = new GoogleUIController();
 
   private IFeatureController activeController = radioController;
+
+  private int activeControllerId = 1;
 
   private UIStateController() {
     borderPane = new BorderPane();
@@ -29,9 +34,6 @@ public class UIStateController {
 
     new Header(borderPane);
     footer = new Footer(borderPane);
-
-    weatherController.init();
-    radioController.init();
   }
 
   /**
@@ -54,24 +56,41 @@ public class UIStateController {
     activeController.prev();
   }
 
-  public void toggleState() {
-    footer.toggleFooter();
+  public void push() {
+    footer.switchTab();
+
+    activeControllerId+=1;
+    if(activeControllerId > 3) {
+      activeControllerId = 1;
+    }
 
     final Node center = activeController.getTabRoot();
     final FadeTransition outFader = UIUtil.createOutFader(center);
     outFader.onFinishedProperty().set(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent actionEvent) {
-        if(activeController == radioController) {
-          activeController = weatherController;
-        }
-        else {
-          activeController = radioController;
+        switch(activeControllerId) {
+          case 1: {
+            activeController = radioController;
+            break;
+          }
+          case 2: {
+            activeController = weatherController;
+            break;
+          }
+          case 3: {
+            activeController = googleController;
+            break;
+          }
         }
         activeController.showDefault(borderPane);
       }
     });
     outFader.play();
 
+  }
+
+  public void longPush() {
+    activeController.push();
   }
 }

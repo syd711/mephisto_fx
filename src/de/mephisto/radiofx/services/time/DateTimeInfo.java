@@ -1,4 +1,4 @@
-package de.mephisto.radiofx.services.time.impl;
+package de.mephisto.radiofx.services.time;
 
 import de.mephisto.radiofx.services.IServiceModel;
 
@@ -16,5 +16,10 @@ public class DateTimeInfo implements IServiceModel{
 
   public void setDate(Date date) {
     this.date = date;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj != null && obj instanceof DateTimeInfo && ((DateTimeInfo)obj).getDate().getTime() == date.getTime();
   }
 }

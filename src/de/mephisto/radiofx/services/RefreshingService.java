@@ -59,6 +59,9 @@ public abstract class RefreshingService implements IService {
         try {
           Thread.sleep(refreshInterval);
           final List<IServiceModel> infoList = getServiceData();
+          if(infoList == null) {
+            return;
+          }
           for (IServiceModel info : infoList) {
             notifyDataChange(info);
           }

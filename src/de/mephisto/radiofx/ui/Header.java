@@ -1,12 +1,14 @@
 package de.mephisto.radiofx.ui;
 
+import de.mephisto.radiofx.resources.ResourceLoader;
 import de.mephisto.radiofx.services.IServiceInfoListener;
 import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.services.ServiceRegistry;
-import de.mephisto.radiofx.services.time.impl.DateTimeInfo;
+import de.mephisto.radiofx.services.time.DateTimeInfo;
 import de.mephisto.radiofx.services.weather.WeatherInfo;
 import de.mephisto.radiofx.util.UIUtil;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -41,8 +43,9 @@ public class Header implements IServiceInfoListener {
   public Header(BorderPane root) {
     topRoot = new HBox();
 
-    HBox hbox = new HBox(15);
-    hbox.setPadding(new Insets(11, 142, 11, 15));
+    HBox hbox = new HBox(12);
+    hbox.setAlignment(Pos.CENTER);
+    hbox.setPadding(new Insets(11, 120, 11, 15));
     hbox.setStyle("-fx-background-color: " + UIUtil.HEX_COLOR_DARK + ";");
     root.setTop(topRoot);
     topRoot.getChildren().add(hbox);
@@ -60,6 +63,8 @@ public class Header implements IServiceInfoListener {
     timeText.setFont(HEADER_LABEL_BOLD_FONT);
     timeText.setFill(Color.WHITE);
 
+    final Canvas imageCanvas = UIUtil.createImageCanvas(ResourceLoader.getResource("time.png"), 16, 16);
+    hbox.getChildren().add(imageCanvas);
     hbox.getChildren().add(timeText);
     hbox.getChildren().add(dateText);
 
@@ -70,7 +75,7 @@ public class Header implements IServiceInfoListener {
 
 
     WeatherInfo defaultInfo = ServiceRegistry.getWeatherService().getDefaultWeather();
-    String url = defaultInfo.getIconUrl();
+    String url = defaultInfo.getIconWhiteUrl();
     weatherIconCanvas = UIUtil.createImageCanvas(url, 32, 32);
     iconBox.getChildren().add(weatherIconCanvas);
 
@@ -102,7 +107,7 @@ public class Header implements IServiceInfoListener {
       tempText.setText(temp + " °C");
 
       weatherIconCanvas.getGraphicsContext2D().clearRect(0, 0, UIUtil.WIDTH, UIUtil.HEIGHT);
-      String url = info.getIconUrl();
+      String url = info.getIconWhiteUrl();
       ImageView weatherImage = new ImageView(new Image(url, 32, 32, false, true));
       weatherIconCanvas.getGraphicsContext2D().drawImage(weatherImage.getImage(), 0, 0);
     }

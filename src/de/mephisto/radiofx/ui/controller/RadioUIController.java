@@ -1,23 +1,21 @@
-package de.mephisto.radiofx.ui;
+package de.mephisto.radiofx.ui.controller;
 
 import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.services.ServiceRegistry;
 import de.mephisto.radiofx.services.mpd.StationInfo;
+import de.mephisto.radiofx.ui.Pager;
 import de.mephisto.radiofx.util.UIUtil;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
-import java.util.List;
-
 /**
  * Controls the UI for the radio
  */
-public class RadioController extends PageableUIController {
+public class RadioUIController extends PageableUIController {
   private static final Font RADIO_STATION_FONT = Font.font("Tahoma", FontWeight.BOLD, 32);
   private static final Font RADIO_TRACK_FONT= Font.font("Tahoma", FontWeight.NORMAL, 18);
   private static final Font RADIO_URL_FONT= Font.font("Tahoma", FontWeight.NORMAL, 12);
@@ -51,7 +49,7 @@ public class RadioController extends PageableUIController {
 
     verticalRoot.getChildren().add(urlText);
 
-    super.setPager(new Pager(tabRoot, ServiceRegistry.getRadioService()));
+    super.setPager(new Pager(tabRoot, ServiceRegistry.getRadioService(), this));
     super.setTabRoot(tabRoot);
 
     updatePage(ServiceRegistry.getRadioService().getServiceData().get(0));

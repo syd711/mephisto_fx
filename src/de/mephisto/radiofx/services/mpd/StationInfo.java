@@ -52,4 +52,9 @@ public class StationInfo implements IServiceModel {
   public void setInfoAvailable(boolean infoAvailable) {
     this.infoAvailable = infoAvailable;
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj != null && obj instanceof StationInfo && ((StationInfo)obj).getUrl().equalsIgnoreCase(this.url);
+  }
 }

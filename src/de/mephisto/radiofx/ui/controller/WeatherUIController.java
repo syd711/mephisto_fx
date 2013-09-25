@@ -16,8 +16,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 import java.text.SimpleDateFormat;
@@ -27,11 +25,6 @@ import java.util.List;
  * UIController for the weather infos.
  */
 public class WeatherUIController extends PageableUIController {
-  private static final Font WEATHER_HEADER_BOLD_FONT = Font.font("Tahoma", FontWeight.BOLD, 22);
-  private static final Font WEATHER_DETAILS_FONT = Font.font("Tahoma", FontWeight.NORMAL, 14);
-  private static final Font WEATHER_FORECAST_FONT = Font.font("Tahoma", FontWeight.NORMAL, 16);
-  private static final Font WEATHER_TEMP_BOLD_FONT = Font.font("Tahoma", FontWeight.NORMAL, 60);
-
   private static final int IMAGE_SIZE = 128;
 
   private Text locationText;
@@ -52,7 +45,7 @@ public class WeatherUIController extends PageableUIController {
   @Override
   public BorderPane init() {
     locationText = new Text(0, 0, "");
-    locationText.setFont(WEATHER_HEADER_BOLD_FONT);
+    locationText.setFont(UIUtil.FONT_BOLD_22);
     locationText.setFill(UIUtil.COLOR_DARK_HEADER);
 
     BorderPane tabRoot = new BorderPane();
@@ -102,13 +95,13 @@ public class WeatherUIController extends PageableUIController {
     centerVertical.setAlignment(Pos.CENTER);
 
     tempText = new Text(0, 0, "");
-    tempText.setFont(WEATHER_TEMP_BOLD_FONT);
+    tempText.setFont(UIUtil.FONT_NORMAL_60);
     tempText.setFill(UIUtil.COLOR_DARK_HEADER);
     centerVertical.getChildren().add(tempText);
     mainSection.getChildren().add(centerVertical);
 
     descriptionText = new Text(0, 0, currentWeatherInfo.getDescription());
-    descriptionText.setFont(WEATHER_DETAILS_FONT);
+    descriptionText.setFont(UIUtil.FONT_NORMAL_14);
     descriptionText.setFill(UIUtil.COLOR_DARK_HEADER);
     centerVertical.getChildren().add(descriptionText);
 
@@ -118,22 +111,22 @@ public class WeatherUIController extends PageableUIController {
     temps.setPadding(new Insets(20, 20, 0, 15));
 
     minTempText = new Text(0, 0, "");
-    minTempText.setFont(WEATHER_DETAILS_FONT);
+    minTempText.setFont(UIUtil.FONT_NORMAL_14);
     minTempText.setFill(UIUtil.COLOR_DARK_HEADER);
     temps.getChildren().add(minTempText);
 
     maxTempText = new Text(0, 0, "");
-    maxTempText.setFont(WEATHER_DETAILS_FONT);
+    maxTempText.setFont(UIUtil.FONT_NORMAL_14);
     maxTempText.setFill(UIUtil.COLOR_DARK_HEADER);
     temps.getChildren().add(maxTempText);
 
     sunriseText = new Text(0, 0, "");
-    sunriseText.setFont(WEATHER_DETAILS_FONT);
+    sunriseText.setFont(UIUtil.FONT_NORMAL_14);
     sunriseText.setFill(UIUtil.COLOR_DARK_HEADER);
     temps.getChildren().add(sunriseText);
 
     sunsetText = new Text(0, 0, "");
-    sunsetText.setFont(WEATHER_DETAILS_FONT);
+    sunsetText.setFont(UIUtil.FONT_NORMAL_14);
     sunsetText.setFill(UIUtil.COLOR_DARK_HEADER);
     temps.getChildren().add(sunsetText);
 
@@ -152,7 +145,7 @@ public class WeatherUIController extends PageableUIController {
 
       Text dayText = new Text();
       dayText.setFill(UIUtil.COLOR_DARK_HEADER);
-      dayText.setFont(WEATHER_FORECAST_FONT);
+      dayText.setFont(UIUtil.FONT_NORMAL_16);
       SimpleDateFormat format = new SimpleDateFormat("EEE");
       dayText.setText(format.format(info.getForecastDate()));
       infoBox.getChildren().add(dayText);
@@ -162,7 +155,7 @@ public class WeatherUIController extends PageableUIController {
 
       Text tempText = new Text();
       tempText.setFill(UIUtil.COLOR_DARK_HEADER);
-      tempText.setFont(WEATHER_DETAILS_FONT);
+      tempText.setFont(UIUtil.FONT_NORMAL_14);
       tempText.setText(info.getLowTemp() + "-" + info.getHighTemp() + " °C");
       infoBox.getChildren().add(tempText);
 

@@ -26,6 +26,20 @@ public class Album extends Playlist {
     return "Album '" + getName() + "' by '" + artist + "', tracks: " + getSize();
   }
 
+  public String getCoverId() {
+    return (getArtist() + "-" + getName()).replaceAll(" ", "_")
+        .replaceAll("\\?", "")
+        .replaceAll("!", "")
+        .replaceAll(":", "-")
+        .replaceAll("ö", "oe")
+        .replaceAll("ä", "ae")
+        .replaceAll("ü", "ue")
+        .replaceAll("ß", "ss")
+        .replaceAll("\\\\", "-")
+        .replaceAll("'", "")
+        .replaceAll("/", "-");
+  }
+
   public String getGenre() {
     return genre;
   }

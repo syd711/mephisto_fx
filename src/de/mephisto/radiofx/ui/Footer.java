@@ -18,6 +18,8 @@ public class Footer {
       + UIUtil.HEX_COLOR_SEPARATOR + ";-fx-background-color: " + UIUtil.HEX_COLOR_INACTIVE + ";";
   private static final String STYLE_ACTIVE = "-fx-background-color: " + UIUtil.HEX_COLOR_BACKGROUND + ";-fx-border-color: transparent transparent transparent transparent";
 
+  private static final int TOP_TAB_PADDING = 4;
+
   private HBox tab1;
   private HBox tab2;
   private HBox tab3;
@@ -32,7 +34,7 @@ public class Footer {
     tab1 = new HBox(0);
     tab1.setMinWidth(UIUtil.WIDTH/3);
     tab1.setAlignment(Pos.CENTER);
-    tab1.setPadding(new Insets(6, 8, 8, 8));
+    tab1.setPadding(new Insets(TOP_TAB_PADDING, 8, 8, 8));
 
     main.getChildren().add(tab1);
     root.setBottom(main);
@@ -46,7 +48,7 @@ public class Footer {
     tab2 = new HBox(0);
     tab2.setMinWidth(UIUtil.WIDTH / 3);
     tab2.setAlignment(Pos.CENTER);
-    tab2.setPadding(new Insets(6, 8, 8, 8));
+    tab2.setPadding(new Insets(TOP_TAB_PADDING, 8, 8, 8));
     tab2.setStyle(STYLE_INACTIVE);
 
     text = new Text(0, 0, "Weather");
@@ -60,7 +62,7 @@ public class Footer {
     tab3 = new HBox(0);
     tab3.setMinWidth(UIUtil.WIDTH / 3);
     tab3.setAlignment(Pos.CENTER);
-    tab3.setPadding(new Insets(6, 8, 8, 8));
+    tab3.setPadding(new Insets(TOP_TAB_PADDING, 8, 8, 8));
     tab3.setStyle(STYLE_INACTIVE);
 
     text = new Text(0, 0, "Music");

@@ -1,6 +1,5 @@
 package de.mephisto.radiofx.services.google.impl;
 
-import de.mephisto.radiofx.services.IServiceInfoListener;
 import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.services.RefreshingService;
 import de.mephisto.radiofx.services.google.Album;
@@ -114,11 +113,6 @@ public class GoogleServiceImpl extends RefreshingService implements IGoogleMusic
   @Override
   public List<IServiceModel> getServiceData() {
     return new ArrayList<IServiceModel>(getAlbums());
-  }
-
-  @Override
-  public void addServiceListener(IServiceInfoListener listener) {
-    //To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override

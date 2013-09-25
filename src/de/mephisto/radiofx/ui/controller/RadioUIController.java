@@ -27,7 +27,7 @@ public class RadioUIController extends PageableUIController {
   @Override
   public BorderPane init() {
     BorderPane tabRoot = new BorderPane();
-    tabRoot.setMinHeight(UIUtil.HEIGHT - 88);
+    tabRoot.setMinHeight(UIUtil.MIN_MAIN_HEIGHT);
 
     VBox verticalRoot = new VBox(20);
     verticalRoot.setPadding(new Insets(20, 0, 0, 20));

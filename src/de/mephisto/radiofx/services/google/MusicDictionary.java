@@ -61,7 +61,7 @@ public class MusicDictionary {
    */
   public List<Album> getAlbums() {
     List<Album> list = new ArrayList(albums.values());
-    Collections.sort(list, new SongCollectionComparator());
+    Collections.sort(list, new AlbumComparator());
     return list;
   }
 

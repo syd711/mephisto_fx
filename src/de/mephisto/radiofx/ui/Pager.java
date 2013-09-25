@@ -8,11 +8,15 @@ import de.mephisto.radiofx.util.UIUtil;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -26,14 +30,17 @@ public class Pager implements IServiceInfoListener {
   private IService service;
   private List<IServiceModel> models;
   private IFeatureController controller;
-  private boolean visible;
+  private boolean bubbleMode;
+  private boolean circle;
+  private GraphicsContext gc;
 
   public Pager(BorderPane root, IService service, IFeatureController controller) {
-    this(root, service, controller, true);
+    this(root, service, controller, true, true);
   }
 
-  public Pager(BorderPane root, IService service, IFeatureController controller, boolean visible) {
-    this.visible = visible;
+  public Pager(BorderPane root, IService service, IFeatureController controller, boolean bubbleMode, boolean circle) {
+    this.bubbleMode = bubbleMode;
+    this.circle = circle;
     this.service = service;
     this.controller = controller;
     this.models = service.getServiceData();
@@ -44,21 +51,35 @@ public class Pager implements IServiceInfoListener {
     if(models.size() > 20) {
       margin = 10;
     }
+    this.activeModel = models.get(0);
 
-    if(visible) {
+    if(bubbleMode) {
       box = new HBox(margin);
       box.setAlignment(Pos.BASELINE_CENTER);
-      this.activeModel = models.get(0);
       for(IServiceModel model : models) {
-        Circle circle = new Circle(6,6,6, UIUtil.COLOR_DARK_HEADER);
-        circle.setStrokeWidth(STROKE_WIDTH);
-        circle.setStroke(UIUtil.COLOR_DARK_HEADER);
-        circle.setUserData(model);
-        box.getChildren().add(circle);
+        Circle selectorCircle = new Circle(6,6,6, UIUtil.COLOR_DARK_HEADER);
+        selectorCircle.setStrokeWidth(STROKE_WIDTH);
+        selectorCircle.setStroke(UIUtil.COLOR_DARK_HEADER);
+        selectorCircle.setUserData(model);
+        box.getChildren().add(selectorCircle);
       }
-      root.setBottom(box);
+    }
+    else {
+      box = new HBox(0);
+      box.setAlignment(Pos.CENTER);
+
+      Canvas progress = new Canvas(450, 10);
+      gc = progress.getGraphicsContext2D();
+      gc.setFill(Paint.valueOf(UIUtil.HEX_COLOR_INACTIVE));
+      gc.fillRoundRect(0, 0, 450, 10, 10, 10);
+      gc.setFill(Paint.valueOf(UIUtil.HEX_COLOR_DARK));
+      gc.fillOval(2,0,8, 8);
+
+      box.getChildren().add(progress);
     }
 
+    box.setMaxHeight(10);
+    root.setBottom(box);
     updateActivity();
 
     service.addServiceListener(this);
@@ -68,18 +89,27 @@ public class Pager implements IServiceInfoListener {
    * Next element
    */
   public IServiceModel next() {
-    Iterator<IServiceModel> iterator = (Iterator<IServiceModel>) models.iterator();
-    IServiceModel current = activeModel;
-    activeModel = null;
-    while(iterator.hasNext()) {
-      IServiceModel info = iterator.next();
-      if(info.equals(current) && iterator.hasNext()) {
-        activeModel = iterator.next();
-        break;
-      }
+    if(models.isEmpty())  {
+      return null;
     }
+
     if(activeModel == null) {
       activeModel = models.get(0);
+    }
+    else {
+      int index = models.indexOf(activeModel);
+      index++;
+      if(index < models.size()) {
+        activeModel = models.get(index);
+      }
+      else {
+        if(circle) {
+          activeModel = models.get(0);
+        }
+        else {
+          //ignore event
+        }
+      }
     }
     updateActivity();
     return activeModel;
@@ -89,18 +119,27 @@ public class Pager implements IServiceInfoListener {
    * Prev element
    */
   public IServiceModel prev() {
-    Iterator<IServiceModel> iterator = (Iterator<IServiceModel>) models.iterator();
-    IServiceModel current = activeModel;
-    activeModel = null;
-    while(iterator.hasNext()) {
-      IServiceModel info = iterator.next();
-      if(info.equals(current) && activeModel != null) {
-        break;
-      }
-      activeModel = info;
+    if(models.isEmpty())  {
+      return null;
     }
-    if(activeModel == null) {
+
+    if(activeModel == null && circle) {
       activeModel = models.get(models.size()-1);
+    }
+    else {
+      int index = models.indexOf(activeModel);
+      index--;
+      if(index >= 0) {
+        activeModel = models.get(index);
+      }
+      else {
+        if(circle) {
+          activeModel = models.get(models.size()-1);
+        }
+        else {
+          //ignore event
+        }
+      }
     }
     updateActivity();
     return activeModel;
@@ -110,7 +149,7 @@ public class Pager implements IServiceInfoListener {
    * Updates the circle selection
    */
   private void updateActivity() {
-    if(visible) {
+    if(bubbleMode) {
       final ObservableList<Node> children = this.box.getChildren();
       for(Node child : children) {
         Circle circle = (Circle) child;
@@ -124,6 +163,16 @@ public class Pager implements IServiceInfoListener {
           circle.setFill(UIUtil.COLOR_DARK_HEADER);
         }
       }
+    }
+    else{
+      gc.clearRect(0, 0, 450, 10);
+      gc.setFill(Paint.valueOf(UIUtil.HEX_COLOR_INACTIVE));
+      gc.fillRoundRect(0, 0, 450, 10, 10, 10);
+      gc.setFill(Paint.valueOf(UIUtil.HEX_COLOR_DARK));
+
+      double pos = new Double(440)/models.size();
+      pos = (pos*models.indexOf(activeModel))+2;
+      gc.fillOval(pos,1,8, 8);
     }
   }
 

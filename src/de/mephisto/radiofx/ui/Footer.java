@@ -13,7 +13,7 @@ import javafx.scene.text.Text;
  *
  */
 public class Footer {
-  private static Font TAB_FONT = Font.font("Tahoma", FontWeight.NORMAL, 18);
+  private static Font TAB_FONT = Font.font("Tahoma", FontWeight.NORMAL, 16);
   private static final String STYLE_INACTIVE = "-fx-border-color: " + UIUtil.HEX_COLOR_SEPARATOR + " " + UIUtil.HEX_COLOR_SEPARATOR + " transparent "
       + UIUtil.HEX_COLOR_SEPARATOR + ";-fx-background-color: " + UIUtil.HEX_COLOR_INACTIVE + ";";
   private static final String STYLE_ACTIVE = "-fx-background-color: " + UIUtil.HEX_COLOR_BACKGROUND + ";-fx-border-color: transparent transparent transparent transparent";
@@ -26,7 +26,7 @@ public class Footer {
 
   public Footer(BorderPane root) {
     HBox main = new HBox(0);
-    main.setPadding(new Insets(14, 0, 5, 0));
+    main.setPadding(new Insets(10, 0, 5, 0));
 
     //radio tab
     tab1 = new HBox(0);

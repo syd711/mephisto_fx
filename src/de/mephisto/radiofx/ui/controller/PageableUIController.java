@@ -13,6 +13,10 @@ public abstract class PageableUIController extends AbstractUIController {
   private Pager pager;
   private Node pagingRoot;
 
+  public PageableUIController() {
+
+  }
+
   protected void setPagingRoot(Node node) {
     this.pagingRoot = node;
   }

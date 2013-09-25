@@ -19,13 +19,24 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.apache.commons.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Common UI helpers.
  */
 public class UIUtil {
+  private final static Logger LOG = LoggerFactory.getLogger(UIUtil.class);
+
   public static int WIDTH;
   public static int HEIGHT;
+  public static int MIN_MAIN_HEIGHT;
+
+  private static ExecutorService executor = Executors.newFixedThreadPool(3);
 
 
   public static String HEX_COLOR_DARK = "#333333";
@@ -34,18 +45,34 @@ public class UIUtil {
   public static String HEX_COLOR_INACTIVE = "#C1B6A3";
   public static String HEX_COLOR_SEPARATOR = "#ABA18F";
   public static Color COLOR_DARK_HEADER = Color.valueOf(HEX_COLOR_DARK);
+  public static Color COLOR_BACKGROUND = Color.valueOf(HEX_COLOR_BACKGROUND);
 
   static {
     final Configuration configuration = Config.getConfiguration("settings.properties");
     WIDTH = configuration.getInt("screen.width");
     HEIGHT = configuration.getInt("screen.height");
+
+    MIN_MAIN_HEIGHT = HEIGHT-85;
   }
 
   public static Canvas createImageCanvas(String url, int width, int height) {
-    ImageView weatherImage = new ImageView(new Image(url, width, height, false, true));
+    ImageView img = new ImageView(new Image(url, width, height, false, true));
     final Canvas canvas = new Canvas(width, height);
     final GraphicsContext gc = canvas.getGraphicsContext2D();
-    gc.drawImage(weatherImage.getImage(), 0, 0);
+    gc.drawImage(img.getImage(), 0, 0);
+    return canvas;
+  }
+
+  public static Canvas createLazyLoadingImageCanvas(final String url, final int width, final int height) {
+    final Canvas canvas = new Canvas(width, height);
+    executor.execute(new Runnable() {
+      public void run() {
+        ImageView img = new ImageView(new Image(url, width, height, false, true));
+        final GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.drawImage(img.getImage(), 0, 0);
+        LOG.info("Loaded image " + url);
+      }
+    });
     return canvas;
   }
 

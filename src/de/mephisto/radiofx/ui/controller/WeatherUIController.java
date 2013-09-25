@@ -56,9 +56,9 @@ public class WeatherUIController extends PageableUIController {
     locationText.setFill(UIUtil.COLOR_DARK_HEADER);
 
     BorderPane tabRoot = new BorderPane();
+    tabRoot.setMinHeight(UIUtil.MIN_MAIN_HEIGHT);
 
     VBox verticalRoot = new VBox(5);
-    verticalRoot.setMinHeight(170);
     verticalRoot.setAlignment(Pos.TOP_CENTER);
     verticalRoot.setPadding(new Insets(5, 0, 5, 0));
     tabRoot.setCenter(verticalRoot);

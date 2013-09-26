@@ -2,9 +2,10 @@ package de.mephisto.radiofx.services.mpd.impl;
 
 import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.services.RefreshingService;
+import de.mephisto.radiofx.services.google.Album;
+import de.mephisto.radiofx.services.mpd.IMpdService;
 import de.mephisto.radiofx.services.mpd.StationInfo;
 import de.mephisto.radiofx.util.Config;
-import de.mephisto.radiofx.util.StreamInfoHelper;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -18,8 +19,8 @@ import java.util.List;
 /**
  *
  */
-public class RadioServiceImpl extends RefreshingService {
-  private final static Logger LOG = LoggerFactory.getLogger(RadioServiceImpl.class);
+public class MpdServiceImpl extends RefreshingService implements IMpdService {
+  private final static Logger LOG = LoggerFactory.getLogger(MpdServiceImpl.class);
 
   private final static String CONFIG_NAME = "mpd.properties";
   private final static String SAVE_FILE = "conf/streams.properties";
@@ -34,7 +35,7 @@ public class RadioServiceImpl extends RefreshingService {
 
   private List<IServiceModel> stations = new ArrayList<IServiceModel>();
 
-  public RadioServiceImpl() {
+  public MpdServiceImpl() {
     super(REFRESH_INTERVAL);
 
     this.config = Config.getConfiguration(CONFIG_NAME);
@@ -85,5 +86,15 @@ public class RadioServiceImpl extends RefreshingService {
   public List<IServiceModel> getServiceData() {
     refreshStations();
     return stations;
+  }
+
+  @Override
+  public void playStation(StationInfo info) {
+    //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  @Override
+  public void playAlbum(Album album) {
+    //To change body of implemented methods use File | Settings | File Templates.
   }
 }

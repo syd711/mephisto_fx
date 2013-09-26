@@ -80,7 +80,7 @@ public class Header implements IServiceInfoListener {
     iconBox.getChildren().add(weatherIconCanvas);
 
     HBox tempBox= new HBox(10);
-    tempBox.setPadding(new Insets(11, 15, 11, 0));
+    tempBox.setPadding(new Insets(11, 25, 11, 0));
     tempBox.setStyle("-fx-background-color: " + UIUtil.HEX_COLOR_DARK_2 + ";");
     topRoot.getChildren().add(tempBox);
     tempText = new Text(0, 0, defaultInfo.getTemp() + " °C");

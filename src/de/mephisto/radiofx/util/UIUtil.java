@@ -99,7 +99,6 @@ public class UIUtil {
           if (imageCache.containsKey(id)) {
             File image = imageCache.get(id);
             imageUrl = image.toURI().toURL().toString();
-            LOG.info("Loaded cached image " + url);
           }
           else {
             URL imgUrl = new URL(url);

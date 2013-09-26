@@ -145,4 +145,8 @@ public class Playlist extends MModel {
   public boolean equals(Object obj) {
     return obj instanceof Playlist && ((Playlist)obj).getMID() == this.getMID();
   }
+
+  public int getActiveSongIndex() {
+    return songs.indexOf(activeSong);
+  }
 }

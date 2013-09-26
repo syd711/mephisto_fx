@@ -2,7 +2,8 @@ package de.mephisto.radiofx.services;
 
 import de.mephisto.radiofx.services.google.IGoogleMusicService;
 import de.mephisto.radiofx.services.google.impl.GoogleServiceImpl;
-import de.mephisto.radiofx.services.mpd.impl.RadioServiceImpl;
+import de.mephisto.radiofx.services.mpd.IMpdService;
+import de.mephisto.radiofx.services.mpd.impl.MpdServiceImpl;
 import de.mephisto.radiofx.services.time.impl.EarthToolsTimeServiceImpl;
 import de.mephisto.radiofx.services.weather.IWeatherService;
 import de.mephisto.radiofx.services.weather.impl.YahooWeatherServiceImpl;
@@ -13,13 +14,13 @@ import de.mephisto.radiofx.services.weather.impl.YahooWeatherServiceImpl;
 public class ServiceRegistry {
   private static IWeatherService weatherService;
   private static RefreshingService timeService;
-  private static RefreshingService mpdService;
+  private static IMpdService mpdService;
   private static IGoogleMusicService googleService;
 
   public static void init() {
     weatherService = new YahooWeatherServiceImpl();
     timeService = new EarthToolsTimeServiceImpl();
-    mpdService = new RadioServiceImpl();
+    mpdService = new MpdServiceImpl();
     googleService = new GoogleServiceImpl();
   }
 
@@ -49,9 +50,9 @@ public class ServiceRegistry {
    * Returns the MPD service instance.
    * @return
    */
-  public static RefreshingService getRadioService() {
+  public static IMpdService getMpdService() {
     if(mpdService == null) {
-      mpdService = new RadioServiceImpl();
+      mpdService = new MpdServiceImpl();
     }
     return mpdService;
   }

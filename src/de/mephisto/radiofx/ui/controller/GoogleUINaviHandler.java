@@ -14,8 +14,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import org.apache.commons.lang.StringUtils;
 
@@ -48,7 +46,6 @@ public class GoogleUINaviHandler {
     hBoxAlbums.setPadding(new Insets(0,185,0,185));
     centerScroller.setContent(hBoxAlbums);
 
-    int count = 0;
     for(Album album : albums) {
       VBox vbox = new VBox(2);
       vbox.setMaxWidth(COVER_SIZE);

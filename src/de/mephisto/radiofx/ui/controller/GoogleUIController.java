@@ -1,5 +1,6 @@
 package de.mephisto.radiofx.ui.controller;
 
+import de.mephisto.radiofx.resources.ResourceLoader;
 import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.services.ServiceRegistry;
 import de.mephisto.radiofx.services.google.Album;
@@ -12,6 +13,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -30,8 +32,6 @@ public class GoogleUIController extends PageableUIController {
   private ScrollPane centerScroller;
   private Pager pager;
 
-  private boolean playbackMode = false;
-
   private GoogleUINaviHandler naviHandler;
   private GoogleUIPlayerHandler playerHandler;
 
@@ -48,9 +48,14 @@ public class GoogleUIController extends PageableUIController {
     vMain.setPadding(new Insets(5, 0, 0, 0));
     vMain.setAlignment(Pos.CENTER_LEFT);
 
-    HBox selectionBox = new HBox(5);
-    selectionBox.setPadding(new Insets(0, 0, 0, 15));
+    HBox topBox = new HBox(5);
+    topBox.setPadding(new Insets(0, 0, 0, 15));
 
+    HBox selectionBox = new HBox();
+    selectionBox.setMinWidth(419);
+    topBox.getChildren().add(selectionBox);
+
+    //title text
     artistText = new Text(0, 0, "");
     artistText.setFont(UIUtil.FONT_BOLD_14);
     artistText.setFill(UIUtil.COLOR_DARK_HEADER);
@@ -60,7 +65,19 @@ public class GoogleUIController extends PageableUIController {
     selectionBox.getChildren().add(artistText);
     selectionBox.getChildren().add(albumText);
 
-    vMain.getChildren().add(selectionBox);
+    //back button
+    HBox backBox = new HBox();
+    backBox.setAlignment(Pos.CENTER);
+    backBox.setMinWidth(30);
+    backBox.setMinHeight(20);
+    backBox.setStyle(GoogleUIPlayerHandler.STYLE_INACTIVE);
+    final Canvas imageCanvas = UIUtil.createImageCanvas(ResourceLoader.getResource("backward.png"), 16, 16);
+    backBox.getChildren().add(imageCanvas);
+    topBox.getChildren().add(backBox);
+    backBox.setVisible(false);
+
+    //add the top navi to the root
+    vMain.getChildren().add(topBox);
     tabRoot.setCenter(vMain);
 
     centerScroller = new ScrollPane();
@@ -73,7 +90,7 @@ public class GoogleUIController extends PageableUIController {
     this.activeAlbum = (Album) pager.getActiveModel();
 
     naviHandler = new GoogleUINaviHandler(centerScroller);
-    playerHandler = new GoogleUIPlayerHandler(centerScroller, pager);
+    playerHandler = new GoogleUIPlayerHandler(centerScroller, pager, backBox, naviHandler);
 
     naviHandler.display();
 
@@ -99,7 +116,7 @@ public class GoogleUIController extends PageableUIController {
     if (model instanceof Album) {
       Album album = (Album) model;
       albumText.setText(album.getName());
-      artistText.setText(album.getArtist() + ":");
+      artistText.setText(album.getArtist() + ": ");
       naviHandler.updatePage(model);
     }
     else if (model instanceof Song) {
@@ -109,47 +126,50 @@ public class GoogleUIController extends PageableUIController {
 
   @Override
   public void next() {
-    if (playbackMode) {
+    if (playerHandler.isVisible()) {
       playerHandler.next();
     }
     else {
       naviHandler.next();
     }
+
+    if(playerHandler.isVisible() && playerHandler.isBackSelected()) {
+      return;
+    }
     super.next();
+
   }
 
   @Override
   public void prev() {
-    if (playbackMode) {
+    if (playerHandler.isVisible()) {
       playerHandler.prev();
     }
     else {
       naviHandler.prev();
+    }
+    if(playerHandler.isVisible() && playerHandler.isBackSelected()) {
+      return;
     }
     super.prev();
   }
 
   @Override
   public void push() {
-    playbackMode = !playbackMode;
+    if(playerHandler.isVisible()) {
+      playerHandler.push();
+      return;
+    }
 
     final FadeTransition outFader = UIUtil.createOutFader(centerScroller);
     outFader.onFinishedProperty().set(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent actionEvent) {
-        if (playbackMode) {
-          activeAlbum = (Album) pager.getActiveModel();
-          activeAlbum.setActiveSong(activeAlbum.getSongs().get(0));
-          pager.setModels(new ArrayList<IServiceModel>(activeAlbum.getSongs()), activeAlbum.getActiveSong());
-          playerHandler.display(activeAlbum);
-        }
-        else {
-          IGoogleMusicService service = ServiceRegistry.getGoogleService();
-          List<Album> albums = service.getAlbums();
-          pager.setModels(new ArrayList<IServiceModel>(albums), activeAlbum);
-          naviHandler.display();
+        activeAlbum = (Album) pager.getActiveModel();
+        activeAlbum.setActiveSong(activeAlbum.getSongs().get(0));
+        pager.setModels(new ArrayList<IServiceModel>(activeAlbum.getSongs()), activeAlbum.getActiveSong());
+        playerHandler.display(activeAlbum);
 
-        }
         pager.toggleDisplayMode();
         updatePage(activeAlbum);
         UIUtil.fadeInComponent(centerScroller);

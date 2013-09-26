@@ -29,7 +29,8 @@ import java.util.List;
 public class GoogleUIController extends PageableUIController {
   private Text artistText;
   private Text albumText;
-  private ScrollPane centerScroller;
+
+  private ScrollPane centerRegion;
   private Pager pager;
 
   private GoogleUINaviHandler naviHandler;
@@ -80,17 +81,17 @@ public class GoogleUIController extends PageableUIController {
     vMain.getChildren().add(topBox);
     tabRoot.setCenter(vMain);
 
-    centerScroller = new ScrollPane();
-    centerScroller.setMinHeight(153);
-    centerScroller.setStyle("-fx-background-color:transparent;");
-    centerScroller.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-    vMain.getChildren().add(centerScroller);
+    centerRegion = new ScrollPane();
+    centerRegion.setMinHeight(153);
+    centerRegion.setStyle("-fx-background-color:transparent;");
+    centerRegion.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+    vMain.getChildren().add(centerRegion);
 
     pager = new Pager(tabRoot, service, this, false, false);
     this.activeAlbum = (Album) pager.getActiveModel();
 
-    naviHandler = new GoogleUINaviHandler(centerScroller);
-    playerHandler = new GoogleUIPlayerHandler(centerScroller, pager, backBox, naviHandler);
+    naviHandler = new GoogleUINaviHandler(this);
+    playerHandler = new GoogleUIPlayerHandler(this, backBox);
 
     naviHandler.display();
 
@@ -103,6 +104,18 @@ public class GoogleUIController extends PageableUIController {
     }
 
     return tabRoot;
+  }
+
+  public GoogleUINaviHandler getNaviHandler() {
+    return naviHandler;
+  }
+
+  public ScrollPane getCenterRegion() {
+    return centerRegion;
+  }
+
+  public Pager getPager() {
+    return pager;
   }
 
 
@@ -127,29 +140,30 @@ public class GoogleUIController extends PageableUIController {
   @Override
   public void next() {
     if (playerHandler.isVisible()) {
+      boolean skipPager = playerHandler.isVisible() && playerHandler.isBackSelected();
       playerHandler.next();
+      if(skipPager) {
+        return;
+      }
     }
     else {
       naviHandler.next();
     }
 
-    if(playerHandler.isVisible() && playerHandler.isBackSelected()) {
-      return;
-    }
     super.next();
-
   }
 
   @Override
   public void prev() {
     if (playerHandler.isVisible()) {
+      boolean skipPager = playerHandler.isVisible() && playerHandler.isBackSelected();
       playerHandler.prev();
+      if(skipPager) {
+        return;
+      }
     }
     else {
       naviHandler.prev();
-    }
-    if(playerHandler.isVisible() && playerHandler.isBackSelected()) {
-      return;
     }
     super.prev();
   }
@@ -161,7 +175,7 @@ public class GoogleUIController extends PageableUIController {
       return;
     }
 
-    final FadeTransition outFader = UIUtil.createOutFader(centerScroller);
+    final FadeTransition outFader = UIUtil.createOutFader(centerRegion);
     outFader.onFinishedProperty().set(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent actionEvent) {
@@ -172,7 +186,7 @@ public class GoogleUIController extends PageableUIController {
 
         pager.toggleDisplayMode();
         updatePage(activeAlbum);
-        UIUtil.fadeInComponent(centerScroller);
+        UIUtil.fadeInComponent(centerRegion);
       }
     });
     outFader.play();

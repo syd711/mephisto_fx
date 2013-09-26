@@ -13,6 +13,7 @@ public interface IFeatureController {
   void prev();
   void next();
   void push();
+//  void longPush();
   void showDefault(BorderPane borderPane);
   Node getTabRoot();
 

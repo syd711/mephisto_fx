@@ -105,7 +105,7 @@ public class UIUtil {
             BufferedImage image = ImageIO.read(imgUrl);
             File target = new File(IMAGE_CACHE_DIR, id + ".png");
             ImageIO.write(image, "png", target);
-            LOG.info("Written " + target.getAbsolutePath() + " to cache.");
+            LOG.info("Written " + target.getAbsolutePath() + " to cache, URL: " + url);
             imageCache.put(id, target);
             imageUrl = target.toURI().toURL().toString();
 

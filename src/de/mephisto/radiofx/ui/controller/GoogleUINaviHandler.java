@@ -11,7 +11,6 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -26,13 +25,13 @@ public class GoogleUINaviHandler {
   public static final int COVER_SIZE = 100;
   private static final double SCROLL_CORRECTION = 0.000023;
 
-  private ScrollPane centerScroller;
+  private GoogleUIController googleUIController;
   private HBox hBoxAlbums;
   private double scrollPos;
   private Node lastAlbumSelection;
 
-  public GoogleUINaviHandler(ScrollPane centerScroller) {
-    this.centerScroller = centerScroller;
+  public GoogleUINaviHandler(GoogleUIController googleUIController) {
+    this.googleUIController = googleUIController;
   }
 
   /**
@@ -44,7 +43,7 @@ public class GoogleUINaviHandler {
 
     hBoxAlbums = new HBox(5);
     hBoxAlbums.setPadding(new Insets(0,185,0,185));
-    centerScroller.setContent(hBoxAlbums);
+    googleUIController.getCenterRegion().setContent(hBoxAlbums);
 
     for(Album album : albums) {
       VBox vbox = new VBox(2);
@@ -78,27 +77,33 @@ public class GoogleUINaviHandler {
     Platform.runLater(new Runnable() {
       @Override
       public void run() {
-        centerScroller.setHvalue(scrollPos);
+        googleUIController.getCenterRegion().setHvalue(scrollPos);
       }
     });
   }
 
+  /**
+   * Delegated from main controller
+   */
   protected void prev() {
     scrollPos-=(1.0/hBoxAlbums.getChildren().size());
     if(scrollPos < 0) {
       scrollPos = 0;
     }
     scrollPos-=SCROLL_CORRECTION;
-    centerScroller.setHvalue(scrollPos);
+    googleUIController.getCenterRegion().setHvalue(scrollPos);
   }
 
+  /**
+   * Delegated from main controller
+   */
   protected void next() {
     scrollPos+=(1.0/hBoxAlbums.getChildren().size());
     if(scrollPos > 1.0) {
       scrollPos = 1;
     }
     scrollPos+=SCROLL_CORRECTION;
-    centerScroller.setHvalue(scrollPos);
+    googleUIController.getCenterRegion().setHvalue(scrollPos);
   }
 
   public void updatePage(IServiceModel model) {

@@ -6,7 +6,6 @@ import de.mephisto.radiofx.services.ServiceRegistry;
 import de.mephisto.radiofx.services.google.Album;
 import de.mephisto.radiofx.services.google.IGoogleMusicService;
 import de.mephisto.radiofx.services.google.Song;
-import de.mephisto.radiofx.ui.Pager;
 import de.mephisto.radiofx.util.UIUtil;
 import javafx.animation.TranslateTransitionBuilder;
 import javafx.collections.ObservableList;
@@ -37,29 +36,23 @@ public class GoogleUIPlayerHandler {
 
   public static final int COVER_SIZE = 100;
 
-  private ScrollPane centerScroller;
-  private Node lastSongSelection;
-  private VBox songBox;
-  private Pager pager;
-
   private final static int VISIBLE_ITEM_COUNT = 3;
+
   private final static int SCROLL_DELAY = 300;
   private static int SCROLL_LENGTH = 29;
   private int scrollPos = 0;
 
-
+  private Node lastSongSelection;
+  private VBox songBox;
+  private GoogleUIController googleUIController;
   private Album album;
   private boolean visible;
-
   private boolean backSelected;
   private Node backBox;
-  private GoogleUINaviHandler naviHandler;
 
-  public GoogleUIPlayerHandler(ScrollPane centerScroller, Pager pager, HBox backBox, GoogleUINaviHandler naviHandler) {
-    this.centerScroller = centerScroller;
-    this.naviHandler = naviHandler;
-    this.pager = pager;
+  public GoogleUIPlayerHandler(GoogleUIController googleUIController, HBox backBox) {
     this.backBox = backBox;
+    this.googleUIController = googleUIController;
   }
 
   public boolean isBackSelected() {
@@ -156,19 +149,22 @@ public class GoogleUIPlayerHandler {
     songScroller.setContent(songBox);
 
     playbackBox.getChildren().add(songScroller);
-    centerScroller.setContent(playbackBox);
+    googleUIController.getCenterRegion().setContent(playbackBox);
 
     updatePage(album.getActiveSong());
   }
 
+  /**
+   * Delegated from main controller
+   */
   protected void prev() {
     selectBackButton(false);
-    if (album.getActiveSongIndex() <= 1) {
+    if (album.getActiveSongIndex() == 0) {
       selectBackButton(true);
       return;
     }
 
-    album.setActiveSong((Song) pager.getActiveModel());
+    album.setActiveSong((Song) googleUIController.getPager().getActiveModel());
 
     if (album.getActiveSongIndex() > (album.getSize() - VISIBLE_ITEM_COUNT)) {
       return;
@@ -197,7 +193,7 @@ public class GoogleUIPlayerHandler {
       selectBackButton(true);
       return;
     }
-    album.setActiveSong((Song) pager.getActiveModel());
+    album.setActiveSong((Song) googleUIController.getPager().getActiveModel());
 
     if (album.getActiveSongIndex() < (VISIBLE_ITEM_COUNT - 1)) {
       return;
@@ -222,7 +218,7 @@ public class GoogleUIPlayerHandler {
    * @param model
    */
   public void updatePage(IServiceModel model) {
-    Song song = (Song) pager.getActiveModel();
+    Song song = (Song) googleUIController.getPager().getActiveModel();
 
     if (lastSongSelection != null) {
       lastSongSelection.setStyle(STYLE_INACTIVE);
@@ -284,11 +280,11 @@ public class GoogleUIPlayerHandler {
 
       IGoogleMusicService service = ServiceRegistry.getGoogleService();
       List<Album> albums = service.getAlbums();
-      pager.setModels(new ArrayList<IServiceModel>(albums), album);
-      naviHandler.display();
+      googleUIController.getPager().setModels(new ArrayList<IServiceModel>(albums), album);
+      googleUIController.getNaviHandler().display();
 
-      pager.toggleDisplayMode();
-      UIUtil.fadeInComponent(centerScroller);
+      googleUIController.getPager().toggleDisplayMode();
+      UIUtil.fadeInComponent(googleUIController.getCenterRegion());
     }
     else {
       album.play();

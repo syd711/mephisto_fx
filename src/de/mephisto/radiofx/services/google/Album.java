@@ -37,6 +37,7 @@ public class Album extends Playlist {
         .replaceAll("ö", "oe")
         .replaceAll("ä", "ae")
         .replaceAll("ü", "ue")
+        .replaceAll("\\.", "")
         .replaceAll("ß", "ss")
         .replaceAll("\\\\", "-")
         .replaceAll("'", "")

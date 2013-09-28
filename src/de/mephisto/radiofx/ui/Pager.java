@@ -1,17 +1,16 @@
 package de.mephisto.radiofx.ui;
 
-import de.mephisto.radiofx.services.IService;
-import de.mephisto.radiofx.services.IServiceInfoListener;
 import de.mephisto.radiofx.services.IServiceModel;
-import de.mephisto.radiofx.ui.controller.IFeatureController;
 import de.mephisto.radiofx.util.UIUtil;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 
@@ -20,35 +19,33 @@ import java.util.List;
 /**
  * Paging for pageable elements of the UI
  */
-public class Pager implements IServiceInfoListener {
+public class Pager {
+  private final static int PAGER_WIDTH = 410;
   private final static int STROKE_WIDTH = 2;
 
-  private static int BUBBLE_RADIUS = 6;
-
+  private int bubbleRadius= 6;
   private HBox box;
   private IServiceModel activeModel;
   private List<IServiceModel> models;
-  private IFeatureController controller;
   private boolean bubbleMode;
   private boolean circle;
   private GraphicsContext gc;
-  private BorderPane root;
+  private Pane root;
 
-  public Pager(BorderPane root, IService service, IFeatureController controller) {
-    this(root, service, controller, true, true);
+  public Pager(Pane root, List<IServiceModel> models) {
+    this(root, models, true, true);
   }
 
-  public Pager(BorderPane root, IService service, IFeatureController controller, boolean bubbleMode, boolean circle) {
+  public Pager(Pane root, List<IServiceModel> models, boolean bubbleMode, boolean circle) {
     this.bubbleMode = bubbleMode;
     this.circle = circle;
     this.root = root;
-    this.controller = controller;
-    this.models = service.getServiceData();
-    this.activeModel = models.get(0);
+    this.models = models;
 
-    updateUI();
-
-    service.addServiceListener(this);
+    if(!models.isEmpty()) {
+      this.activeModel = models.get(0);
+      updateUI();
+    }
   }
 
   private void updateUI() {
@@ -65,12 +62,12 @@ public class Pager implements IServiceInfoListener {
       }
       if (models.size() > 25) {
         margin = 2;
-        BUBBLE_RADIUS = 4;
+        bubbleRadius = 4;
       }
       box = new HBox(margin);
       box.setAlignment(Pos.BASELINE_CENTER);
       for (IServiceModel model : models) {
-        Circle selectorCircle = new Circle(BUBBLE_RADIUS, BUBBLE_RADIUS, BUBBLE_RADIUS, UIUtil.COLOR_DARK_HEADER);
+        Circle selectorCircle = new Circle(bubbleRadius, bubbleRadius, bubbleRadius, UIUtil.COLOR_DARK_HEADER);
         selectorCircle.setStrokeWidth(STROKE_WIDTH);
         selectorCircle.setStroke(UIUtil.COLOR_DARK_HEADER);
         selectorCircle.setUserData(model);
@@ -78,44 +75,31 @@ public class Pager implements IServiceInfoListener {
       }
     }
     else {
-      BUBBLE_RADIUS = 6;
+      bubbleRadius = 6;
       box = new HBox(0);
-      box.setAlignment(Pos.CENTER);
+      box.setAlignment(Pos.BASELINE_LEFT);
+      box.setPadding(new Insets(0,0,0,30));
 
-      Canvas progress = new Canvas(450, BUBBLE_RADIUS*2+2);
+      Canvas progress = new Canvas(PAGER_WIDTH, bubbleRadius*2+2);
       gc = progress.getGraphicsContext2D();
       gc.setFill(Paint.valueOf(UIUtil.HEX_COLOR_INACTIVE));
-      gc.fillRoundRect(0, 0, 450, BUBBLE_RADIUS*2+2, BUBBLE_RADIUS*2+2, BUBBLE_RADIUS*2+2);
+      gc.fillRoundRect(0, 0, PAGER_WIDTH, bubbleRadius*2+2, bubbleRadius*2+2, bubbleRadius*2+2);
       gc.setFill(Paint.valueOf(UIUtil.HEX_COLOR_DARK));
-      gc.fillOval(2, 0, BUBBLE_RADIUS*2, BUBBLE_RADIUS*2);
+      gc.fillOval(2, 0, bubbleRadius*2, bubbleRadius*2);
 
       box.getChildren().add(progress);
     }
 
     box.setMaxHeight(10);
-    root.setBottom(box);
+
+    if(root instanceof BorderPane) {
+      ((BorderPane)root).setBottom(box);
+    }
+    else {
+      root.getChildren().add(box);
+    }
 
     updateActivity();
-  }
-
-  /**
-   * Updates the models the pager is working on.
-   *
-   * @param models
-   */
-  public void setModels(List<IServiceModel> models, IServiceModel activeModel) {
-    this.models = models;
-    this.activeModel = activeModel;
-
-    updateUI();
-  }
-
-  /**
-   * Toggles the display mode for paging.
-   */
-  public void toggleDisplayMode() {
-    this.bubbleMode = !bubbleMode;
-    updateUI();
   }
 
   /**
@@ -198,21 +182,14 @@ public class Pager implements IServiceInfoListener {
       }
     }
     else {
-      gc.clearRect(0, 0, 450, BUBBLE_RADIUS*2+2);
+      gc.clearRect(0, 0, PAGER_WIDTH, bubbleRadius*2+2);
       gc.setFill(Paint.valueOf(UIUtil.HEX_COLOR_INACTIVE));
-      gc.fillRoundRect(0, 0, 450, BUBBLE_RADIUS*2+2, BUBBLE_RADIUS*2+2, BUBBLE_RADIUS*2+2);
+      gc.fillRoundRect(0, 0, PAGER_WIDTH, bubbleRadius*2+2, bubbleRadius*2+2, bubbleRadius*2+2);
       gc.setFill(Paint.valueOf(UIUtil.HEX_COLOR_DARK));
 
-      double pos = new Double(440) / models.size();
+      double pos = new Double(PAGER_WIDTH-bubbleRadius*2) / models.size();
       pos = (pos * models.indexOf(activeModel)) + 2;
-      gc.fillOval(pos, 1, BUBBLE_RADIUS*2, BUBBLE_RADIUS*2);
-    }
-  }
-
-  @Override
-  public void serviceDataChanged(IServiceModel model) {
-    if (this.activeModel.equals(model)) {
-      controller.updatePage(model);
+      gc.fillOval(pos, 1, bubbleRadius*2, bubbleRadius*2);
     }
   }
 
@@ -222,5 +199,27 @@ public class Pager implements IServiceInfoListener {
    */
   public IServiceModel getActiveModel() {
     return activeModel;
+  }
+
+  public void setModels(List<IServiceModel> models, IServiceModel activeModel) {
+    this.models = models;
+    this.activeModel = activeModel;
+    updateUI();
+  }
+
+  /**
+   * Returns true if the page is at the first position.
+   * @return
+   */
+  public boolean isAtStart() {
+    return models.indexOf(activeModel) == 0;
+  }
+
+  /**
+   * Returns true if the pager has the last element selected.
+   * @return
+   */
+  public boolean isAtEnd() {
+    return models.indexOf(activeModel) == (models.size()-1);
   }
 }

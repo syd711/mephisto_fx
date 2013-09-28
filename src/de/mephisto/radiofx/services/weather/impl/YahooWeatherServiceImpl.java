@@ -157,6 +157,7 @@ public class YahooWeatherServiceImpl extends RefreshingService implements IWeath
       URL feedSource = new URL(url);
       SyndFeedInput input = new SyndFeedInput();
       SyndFeed feed = input.build(new XmlReader(feedSource));
+//      LOG.info("Requested weather info " + url);
       return feed;
     } catch (Exception e) {
       LOG.error("Error reading weather RSS stream: " + e.getMessage(), e);

@@ -1,9 +1,6 @@
 package de.mephisto.radiofx.ui;
 
-import de.mephisto.radiofx.ui.controller.GoogleUIController;
-import de.mephisto.radiofx.ui.controller.IFeatureController;
-import de.mephisto.radiofx.ui.controller.RadioUIController;
-import de.mephisto.radiofx.ui.controller.WeatherUIController;
+import de.mephisto.radiofx.ui.controller.*;
 import de.mephisto.radiofx.util.UIUtil;
 import javafx.animation.FadeTransition;
 import javafx.event.ActionEvent;
@@ -22,11 +19,11 @@ public class UIStateController {
 
   private RadioUIController radioController = new RadioUIController();
   private WeatherUIController weatherController = new WeatherUIController();
-  private GoogleUIController googleController = new GoogleUIController();
+  private GoogleUINaviController googleNaviController = new GoogleUINaviController();
+  private GoogleUIPlayerController googlePlayerController = new GoogleUIPlayerController();
 
-  private IFeatureController activeController = radioController;
-
-  private int activeControllerId = 1;
+  //radio controller is default
+  private UIController activeController = radioController;
 
   private UIStateController() {
     borderPane = new BorderPane();
@@ -45,7 +42,7 @@ public class UIStateController {
   }
 
   public void showDefault() {
-    activeController.showDefault(borderPane);
+    activeController.display(borderPane);
   }
 
   public void showNext() {
@@ -57,40 +54,43 @@ public class UIStateController {
   }
 
   public void push() {
-    footer.switchTab();
-
-    activeControllerId+=1;
-    if(activeControllerId > 3) {
-      activeControllerId = 1;
-    }
-
-    final Node center = activeController.getTabRoot();
-    final FadeTransition outFader = UIUtil.createOutFader(center);
-    outFader.onFinishedProperty().set(new EventHandler<ActionEvent>() {
-      @Override
-      public void handle(ActionEvent actionEvent) {
-        switch(activeControllerId) {
-          case 1: {
-            activeController = radioController;
-            break;
-          }
-          case 2: {
-            activeController = weatherController;
-            break;
-          }
-          case 3: {
-            activeController = googleController;
-            break;
-          }
-        }
-        activeController.showDefault(borderPane);
-      }
-    });
-    outFader.play();
-
+    activeController = (UIController) activeController.push();
   }
 
   public void longPush() {
-    activeController.push();
+    footer.switchTab();
+    UIController newController = (UIController) activeController.longPush();
+    if(!newController.equals(activeController)) {
+      activeController = newController;
+      final Node center = activeController.getTabRoot();
+      final FadeTransition outFader = UIUtil.createOutFader(center);
+      outFader.onFinishedProperty().set(new EventHandler<ActionEvent>() {
+        @Override
+        public void handle(ActionEvent actionEvent) {
+          activeController.display(borderPane);
+        }
+      });
+      outFader.play();
+    }
+  }
+
+  public WeatherUIController getWeatherController() {
+    return weatherController;
+  }
+
+  public GoogleUINaviController getGoogleNaviController() {
+    return googleNaviController;
+  }
+
+  public GoogleUIPlayerController getGooglePlayerController() {
+    return googlePlayerController;
+  }
+
+  public RadioUIController getRadioController() {
+    return radioController;
+  }
+
+  public void display(UIController controller) {
+    controller.display(borderPane);
   }
 }

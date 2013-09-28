@@ -101,7 +101,8 @@ public class UIUtil {
             imageUrl = image.toURI().toURL().toString();
           }
           else {
-            URL imgUrl = new URL(url);
+            imageUrl = imageUrl.replaceAll("s130", "s100"); //scale to used size
+            URL imgUrl = new URL(imageUrl);
             BufferedImage image = ImageIO.read(imgUrl);
             File target = new File(IMAGE_CACHE_DIR, id + ".png");
             ImageIO.write(image, "png", target);
@@ -154,6 +155,22 @@ public class UIUtil {
         .node(node)
         .fromValue(1)
         .toValue(0)
+        .autoReverse(false)
+        .build();
+  }
+
+  /**
+   * Creates a fade out effect without playing it
+   *
+   * @param node
+   * @return
+   */
+  public static FadeTransition createInFader(Node node) {
+    return FadeTransitionBuilder.create()
+        .duration(Duration.millis(300))
+        .node(node)
+        .fromValue(0)
+        .toValue(1)
         .autoReverse(false)
         .build();
   }

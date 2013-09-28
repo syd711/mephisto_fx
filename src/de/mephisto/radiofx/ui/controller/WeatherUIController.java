@@ -1,9 +1,11 @@
 package de.mephisto.radiofx.ui.controller;
 
+import de.mephisto.radiofx.services.IService;
 import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.services.ServiceRegistry;
 import de.mephisto.radiofx.services.weather.WeatherInfo;
 import de.mephisto.radiofx.ui.Pager;
+import de.mephisto.radiofx.ui.UIStateController;
 import de.mephisto.radiofx.util.UIUtil;
 import javafx.animation.FadeTransition;
 import javafx.event.ActionEvent;
@@ -42,6 +44,10 @@ public class WeatherUIController extends PageableUIController {
   private HBox mainSection;
   private WeatherInfo activeModel;
 
+  public WeatherUIController() {
+    super(ServiceRegistry.getWeatherService());
+  }
+
   @Override
   public BorderPane init() {
     locationText = new Text(0, 0, "");
@@ -69,7 +75,7 @@ public class WeatherUIController extends PageableUIController {
     createDefaultInfo();
 
     //add page
-    Pager pager = new Pager(tabRoot, ServiceRegistry.getWeatherService(), this);
+    Pager pager = new Pager(tabRoot, ServiceRegistry.getWeatherService().getServiceData());
     super.setPager(pager);
     super.setTabRoot(tabRoot);
 
@@ -200,9 +206,8 @@ public class WeatherUIController extends PageableUIController {
   }
 
   @Override
-  public void push() {
+  public IRotaryControllable push() {
     forecastMode = !forecastMode;
-
     final FadeTransition outFader = UIUtil.createOutFader(mainSection);
     outFader.onFinishedProperty().set(new EventHandler<ActionEvent>() {
       @Override
@@ -219,5 +224,11 @@ public class WeatherUIController extends PageableUIController {
       }
     });
     outFader.play();
+    return this;
+  }
+
+  @Override
+  public IRotaryControllable longPush() {
+    return UIStateController.getInstance().getGoogleNaviController();
   }
 }

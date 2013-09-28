@@ -1,9 +1,11 @@
 package de.mephisto.radiofx.ui.controller;
 
+import de.mephisto.radiofx.services.IService;
 import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.services.ServiceRegistry;
 import de.mephisto.radiofx.services.mpd.StationInfo;
 import de.mephisto.radiofx.ui.Pager;
+import de.mephisto.radiofx.ui.UIStateController;
 import de.mephisto.radiofx.util.UIUtil;
 import javafx.geometry.Insets;
 import javafx.scene.layout.BorderPane;
@@ -23,6 +25,10 @@ public class RadioUIController extends PageableUIController {
   private Text stationText;
   private Text trackText;
   private Text urlText;
+
+  public RadioUIController() {
+    super(ServiceRegistry.getMpdService());
+  }
 
   @Override
   public BorderPane init() {
@@ -49,7 +55,7 @@ public class RadioUIController extends PageableUIController {
 
     verticalRoot.getChildren().add(urlText);
 
-    super.setPager(new Pager(tabRoot, ServiceRegistry.getMpdService(), this));
+    super.setPager(new Pager(tabRoot, ServiceRegistry.getMpdService().getServiceData()));
     super.setTabRoot(tabRoot);
 
     updatePage(ServiceRegistry.getMpdService().getServiceData().get(0));
@@ -85,5 +91,15 @@ public class RadioUIController extends PageableUIController {
       value = value.substring(0, length) + "...";
     }
     return value;
+  }
+
+  @Override
+  public IRotaryControllable push() {
+    return this;
+  }
+
+  @Override
+  public IRotaryControllable longPush() {
+    return UIStateController.getInstance().getWeatherController();
   }
 }

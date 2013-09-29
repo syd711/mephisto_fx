@@ -46,31 +46,51 @@ public class UIStateController {
   }
 
   public void showNext() {
-    activeController.next();
+    UIController newController = (UIController) activeController.next();
+    updateActiveController(newController);
   }
 
   public void showPrevious() {
-    activeController.prev();
+    UIController newController = (UIController) activeController.prev();
+    updateActiveController(newController);
   }
 
   public void push() {
-    activeController = (UIController) activeController.push();
+    UIController newController = (UIController) activeController.push();
+    updateActiveController(newController);
   }
 
   public void longPush() {
     footer.switchTab();
     UIController newController = (UIController) activeController.longPush();
+    updateActiveController(newController);
+  }
+
+  /**
+   * Checks if the active controller has changed.
+   * The events are delegated to the new controller in this case.
+   * @param newController
+   */
+  private synchronized void updateActiveController(final UIController newController) {
     if(!newController.equals(activeController)) {
+
+      //check if the controller creates a new UI
+      if(newController.getTabRoot() != null && activeController.getTabRoot() != null) {
+        final Node center = newController.getTabRoot();
+        final FadeTransition outFader = UIUtil.createOutFader(center);
+        outFader.onFinishedProperty().set(new EventHandler<ActionEvent>() {
+          @Override
+          public void handle(ActionEvent actionEvent) {
+            newController.display(borderPane);
+          }
+        });
+        outFader.play();
+      }
+      else {
+        newController.onDisplay();
+      }
+
       activeController = newController;
-      final Node center = activeController.getTabRoot();
-      final FadeTransition outFader = UIUtil.createOutFader(center);
-      outFader.onFinishedProperty().set(new EventHandler<ActionEvent>() {
-        @Override
-        public void handle(ActionEvent actionEvent) {
-          activeController.display(borderPane);
-        }
-      });
-      outFader.play();
     }
   }
 

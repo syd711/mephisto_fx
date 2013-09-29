@@ -1,29 +1,31 @@
 package de.mephisto.radiofx.ui.controller;
 
-import de.mephisto.radiofx.resources.ResourceLoader;
 import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.services.ServiceRegistry;
 import de.mephisto.radiofx.services.google.Album;
 import de.mephisto.radiofx.services.google.IGoogleMusicService;
 import de.mephisto.radiofx.services.google.Song;
-import de.mephisto.radiofx.ui.Pager;
 import de.mephisto.radiofx.ui.UIStateController;
 import de.mephisto.radiofx.util.UIUtil;
+import javafx.animation.FadeTransition;
+import javafx.animation.TranslateTransition;
 import javafx.animation.TranslateTransitionBuilder;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
-import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -36,24 +38,19 @@ public class GoogleUIPlayerController extends PageableUIController {
   public static final String STYLE_ACTIVE = "-fx-background-color: " + UIUtil.HEX_COLOR_INACTIVE + ";-fx-border-color: " + UIUtil.HEX_COLOR_SEPARATOR +
       " " + UIUtil.HEX_COLOR_SEPARATOR + " " + UIUtil.HEX_COLOR_SEPARATOR + " " + UIUtil.HEX_COLOR_SEPARATOR + ";";
 
-  private final static int COVER_SIZE = 100;
   private final static int VISIBLE_ITEM_COUNT = 3;
-  private final static int SCROLL_DELAY = 300;
-  private final static int SCROLL_LENGTH = 29;
+  private final static int SCROLL_DELAY = 400;
+  private final static int SCROLL_LEFT_LENGTH = 29;
 
   private int scrollPos = 0;
 
-  private Text artistText;
-  private Text albumText;
-
   private Album album;
-  private boolean backSelected;
 
   private VBox songBox;
-  private HBox backBox;
   private Node lastSongSelection;
-  private ScrollPane centerRegion;
-  private Pager pager;
+  private Pane albumNode;
+
+  private ScrollPane songScroller;
 
   public GoogleUIPlayerController() {
     super(ServiceRegistry.getGoogleService());
@@ -62,134 +59,215 @@ public class GoogleUIPlayerController extends PageableUIController {
 
   @Override
   public BorderPane init() {
-    BorderPane tabRoot = new BorderPane();
-    tabRoot.setMinHeight(UIUtil.MIN_MAIN_HEIGHT);
-    IGoogleMusicService service = ServiceRegistry.getGoogleService();
-    List<Album> albums = service.getAlbums();
-
-    VBox vMain = new VBox(5);
-    vMain.setPadding(new Insets(5, 0, 0, 0));
-    vMain.setAlignment(Pos.CENTER_LEFT);
-
-    HBox topBox = new HBox(5);
-    topBox.setPadding(new Insets(0, 0, 0, 15));
-
-    HBox selectionBox = new HBox();
-    selectionBox.setMinWidth(419);
-    topBox.getChildren().add(selectionBox);
-
-    //title text
-    artistText = new Text(0, 0, "");
-    artistText.setFont(UIUtil.FONT_BOLD_14);
-    artistText.setFill(UIUtil.COLOR_DARK_HEADER);
-    albumText = new Text(0, 0, "");
-    albumText.setFont(UIUtil.FONT_NORMAL_14);
-    albumText.setFill(UIUtil.COLOR_DARK_HEADER);
-    selectionBox.getChildren().add(artistText);
-    selectionBox.getChildren().add(albumText);
-
-    //back button
-    backBox = new HBox();
-    backBox.setAlignment(Pos.CENTER);
-    backBox.setMinWidth(30);
-    backBox.setMinHeight(20);
-    backBox.setStyle(GoogleUIPlayerController.STYLE_INACTIVE);
-    final Canvas imageCanvas = UIUtil.createImageCanvas(ResourceLoader.getResource("backward.png"), 16, 16);
-    backBox.getChildren().add(imageCanvas);
-    topBox.getChildren().add(backBox);
-    backBox.setVisible(false);
-
-    //add the top navi to the root
-    vMain.getChildren().add(topBox);
-    tabRoot.setCenter(vMain);
-
-    centerRegion = new ScrollPane();
-    centerRegion.setMinHeight(153);
-    centerRegion.setStyle("-fx-background-color:transparent;");
-    centerRegion.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-    vMain.getChildren().add(centerRegion);
-
-    pager = new Pager(tabRoot, new ArrayList<IServiceModel>(), true, false);
-    this.album = (Album) pager.getActiveModel();
-
-    super.setPager(pager);
-    super.setTabRoot(tabRoot);
-
-    UIUtil.fadeInComponent(tabRoot);
-    if (!albums.isEmpty()) {
-      updatePage(albums.get(0));
-    }
-
-    return tabRoot;
+    return null; //component does only modify the current UI and re-uses the pager.
   }
 
 
   @Override
   public void onDisplay() {
-    album = UIStateController.getInstance().getGoogleNaviController().getActiveAlbum();
-    //apply header texts
-    artistText.setText(album.getArtist()+ ": ");
-    albumText.setText(album.getName());
-    //apply default value for pager
+    GoogleUINaviController naviController = UIStateController.getInstance().getGoogleNaviController();
+    album = naviController.getActiveAlbum();
     album.setActiveSong(album.getSongs().get(0));
-    //apply models to pager
-    pager.setModels(new ArrayList<IServiceModel>(album.getSongs()), album.getActiveSong());
-    display();
+    setPager(naviController.getPager());
+
+    albumNode = (Pane) naviController.getSelectedAlbumNode();
+    albumNode.setStyle(GoogleUINaviController.STYLE_INACTIVE);
+
+    showPlayerMode(true);
+    updatePage(album.getActiveSong());
   }
+
+  private void showPlayerMode(final boolean show) {
+    getPager().toggleMode();
+    if (show) {
+      getPager().setModels(new ArrayList<IServiceModel>(album.getSongs()), album.getActiveSong());
+    }
+    else {
+      IGoogleMusicService service = ServiceRegistry.getGoogleService();
+      List<Album> albums = service.getAlbums();
+      getPager().setModels(new ArrayList<IServiceModel>(albums), album);
+    }
+
+    Pane centerRegion = UIStateController.getInstance().getGoogleNaviController().getCenterRegion();
+
+    final ObservableList<Node> children = ((Pane) centerRegion.getChildren().get(0)).getChildren();
+    List<Node> nodes = new ArrayList<Node>();
+    int count = children.indexOf(albumNode)+1;
+    for (int i = count; i < count+4; i++) {
+      if (children.size()>i) {
+        nodes.add(children.get(i));
+      }
+    }
+
+    if(!show) {
+      final FadeTransition outFader = UIUtil.createOutFader(songScroller);
+      outFader.setOnFinished(new EventHandler<ActionEvent>() {
+        @Override
+        public void handle(ActionEvent actionEvent) {
+          albumNode.getChildren().remove(songScroller);
+        }
+      });
+      outFader.play();
+    }
+
+    int scrollPos = (int) UIStateController.getInstance().getGoogleNaviController().getScrollPos();
+    for (Node node : nodes) {
+      int from = 0;
+      int playerOffset = children.indexOf(albumNode)*110+450;
+      int to = (scrollPos + playerOffset);
+      if (!show) {
+        to = 0;
+        from = (scrollPos + playerOffset);
+      }
+      TranslateTransitionBuilder.create()
+          .duration(Duration.millis(SCROLL_DELAY))
+          .node(node)
+          .fromX(from)
+          .toX(to)
+          .autoReverse(false)
+          .build().play();
+    }
+
+    int from = scrollPos;
+    int to = (scrollPos - 175);
+    if (!show) {
+      to = scrollPos;
+      from = (scrollPos - 175);
+    }
+    final TranslateTransition build = TranslateTransitionBuilder.create()
+        .duration(Duration.millis(SCROLL_DELAY))
+        .node(centerRegion)
+        .fromX(from)
+        .toX(to)
+        .autoReverse(false)
+        .build();
+
+    build.setOnFinished(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent actionEvent) {
+        if (show) {
+          display();
+
+          UIUtil.fadeInComponent(songScroller);
+        }
+        else {
+          albumNode.setStyle(GoogleUINaviController.STYLE_ACTIVE);
+        }
+      }
+    });
+
+    build.play();
+  }
+
+
+  @Override
+  public IRotaryControllable prev() {
+    if (getPager().isAtStart()) {
+      showPlayerMode(false);
+      return UIStateController.getInstance().getGoogleNaviController();
+    }
+
+    super.prev();
+    album.setActiveSong((Song) getPager().getActiveModel());
+
+    if (album.getActiveSongIndex() > (album.getSize() - VISIBLE_ITEM_COUNT)) {
+      return this;
+    }
+
+    if (scrollPos < 0) {
+      TranslateTransitionBuilder.create()
+          .duration(Duration.millis(SCROLL_DELAY))
+          .node(songBox)
+          .fromY(scrollPos)
+          .toY(scrollPos + SCROLL_LEFT_LENGTH)
+          .autoReverse(false)
+          .build().play();
+
+      scrollPos += SCROLL_LEFT_LENGTH;
+    }
+    return this;
+  }
+
+  @Override
+  public IRotaryControllable next() {
+    if (getPager().isAtEnd()) {
+      showPlayerMode(false);
+      return UIStateController.getInstance().getGoogleNaviController();
+    }
+    super.next();
+
+    if (album.getActiveSongIndex() < (VISIBLE_ITEM_COUNT - 1)) {
+      return this;
+    }
+    if (album.getActiveSongIndex() > ((album.getSize()) - VISIBLE_ITEM_COUNT)) {
+      return this;
+    }
+
+    TranslateTransitionBuilder.create()
+        .duration(Duration.millis(SCROLL_DELAY))
+        .node(songBox)
+        .fromY(scrollPos)
+        .toY(scrollPos - SCROLL_LEFT_LENGTH)
+        .autoReverse(false)
+        .build().play();
+    scrollPos -= SCROLL_LEFT_LENGTH;
+    return this;
+  }
+
+  @Override
+  public IRotaryControllable longPush() {
+    return UIStateController.getInstance().getRadioController();
+  }
+
+  @Override
+  public IRotaryControllable push() {
+    return UIStateController.getInstance().getGooglePlayerController();
+  }
+
+  @Override
+  public void updatePage(IServiceModel model) {
+    if (model instanceof Song) {
+      album.setActiveSong((Song) getPager().getActiveModel());
+
+      if (lastSongSelection != null) {
+        lastSongSelection.setStyle(STYLE_INACTIVE);
+      }
+
+      if (songBox != null) {
+        final ObservableList<Node> children = songBox.getChildren();
+        for (Node node : children) {
+          String id = node.getId();
+          if (id.equals(String.valueOf(album.getActiveSong().getMID()))) {
+            lastSongSelection = node;
+            lastSongSelection.setStyle(STYLE_ACTIVE);
+            break;
+          }
+        }
+      }
+    }
+  }
+
 
   /**
    * Creates the album playback view.
    */
   private void display() {
-    backBox.setVisible(true);
     scrollPos = 0;
 
-    HBox playbackBox = new HBox(5);
-    playbackBox.setAlignment(Pos.TOP_LEFT);
-
-    VBox vbox = new VBox(1);
-    vbox.setAlignment(Pos.TOP_RIGHT);
-    vbox.setPadding(new Insets(2, 10, 2, 12));
-    vbox.setId(String.valueOf(album.getMID()));
-
-    if (!StringUtils.isEmpty(album.getArtUrl())) {
-      Canvas cover = UIUtil.createLazyLoadingImageCanvas(album.getCoverId(), album.getArtUrl(), COVER_SIZE, COVER_SIZE);
-      vbox.getChildren().add(cover);
-    }
-    else {
-      String url = ResourceLoader.getResource("cover.png");
-      Canvas cover = UIUtil.createImageCanvas(url, COVER_SIZE, COVER_SIZE);
-      vbox.getChildren().add(cover);
-    }
-
-    Text text = new Text(0, 0, album.getSize() + " tracks");
-    text.setFont(UIUtil.FONT_NORMAL_12);
-    text.setFill(UIUtil.COLOR_DARK_HEADER);
-    vbox.getChildren().add(text);
-
-    if (album.getYear() > 0) {
-      text = new Text(0, 0, String.valueOf(album.getYear()));
-      text.setFill(UIUtil.COLOR_DARK_HEADER);
-      text.setFont(UIUtil.FONT_NORMAL_12);
-      vbox.getChildren().add(text);
-    }
-
-    playbackBox.getChildren().add(vbox);
-
-    ScrollPane songScroller = new ScrollPane();
-    songScroller.setMinHeight(148);
-    songScroller.setMinWidth(350);
+    songScroller = new ScrollPane();
+    songScroller.setMaxHeight(130);
+    songScroller.setMinWidth(370);
     songScroller.setStyle("-fx-background-color:transparent;");
     songScroller.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
     songBox = new VBox(4);
-    songBox.setPadding(new Insets(2, 2, 2, 2));
+    songBox.setPadding(new Insets(3, 2, 2, 2));
     int track = 1;
     for (Song song : album.getSongs()) {
       HBox trackBox = new HBox();
 
       trackBox.setId(String.valueOf(song.getMID()));
-      trackBox.setMinWidth(330);
+//      trackBox.setMinWidth(330);
       trackBox.setAlignment(Pos.BASELINE_LEFT);
       trackBox.setPadding(new Insets(3, 5, 3, 5));
       if (track == 1) {
@@ -205,7 +283,7 @@ public class GoogleUIPlayerController extends PageableUIController {
       posBox.getChildren().add(createTrackText(track + "."));
       innerTrackBox.setLeft(posBox);
       HBox nameBox = new HBox(5);
-      nameBox.setMinWidth(270);
+      nameBox.setMinWidth(280);
 
       String name = song.getName();
       if (name.endsWith(".mp3")) {
@@ -221,100 +299,11 @@ public class GoogleUIPlayerController extends PageableUIController {
       track++;
     }
 
+    songScroller.setOpacity(0);
     songScroller.setContent(songBox);
-
-    playbackBox.getChildren().add(songScroller);
-    centerRegion.setContent(playbackBox);
+    albumNode.getChildren().add(songScroller);
 
     updatePage(album.getActiveSong());
-  }
-
-  @Override
-  public void prev() {
-    selectBackButton(false);
-    if (album.getActiveSongIndex() == 0) {
-      selectBackButton(true);
-      return;
-    }
-
-    album.setActiveSong((Song) pager.getActiveModel());
-
-    if (album.getActiveSongIndex() > (album.getSize() - VISIBLE_ITEM_COUNT)) {
-      return;
-    }
-
-    if (scrollPos < 0) {
-      TranslateTransitionBuilder.create()
-          .duration(Duration.millis(SCROLL_DELAY))
-          .node(songBox)
-          .fromY(scrollPos)
-          .toY(scrollPos + SCROLL_LENGTH)
-          .autoReverse(false)
-          .build().play();
-
-      scrollPos += SCROLL_LENGTH;
-    }
-  }
-
-  @Override
-  public void next() {
-    selectBackButton(false);
-    if (album.getActiveSongIndex() >= (album.getSize() - 1)) {
-      selectBackButton(true);
-      return;
-    }
-    super.next();
-    album.setActiveSong((Song) pager.getActiveModel());
-
-    if (album.getActiveSongIndex() < (VISIBLE_ITEM_COUNT - 1)) {
-      return;
-    }
-    if (album.getActiveSongIndex() > ((album.getSize() - 1) - VISIBLE_ITEM_COUNT)) {
-      return;
-    }
-
-    TranslateTransitionBuilder.create()
-        .duration(Duration.millis(SCROLL_DELAY))
-        .node(songBox)
-        .fromY(scrollPos)
-        .toY(scrollPos - SCROLL_LENGTH)
-        .autoReverse(false)
-        .build().play();
-    scrollPos -= SCROLL_LENGTH;
-  }
-
-  @Override
-  public void updatePage(IServiceModel model) {
-    if (lastSongSelection != null) {
-      lastSongSelection.setStyle(STYLE_INACTIVE);
-    }
-
-    if(songBox != null) {
-      final ObservableList<Node> children = songBox.getChildren();
-      for (Node node : children) {
-        String id = node.getId();
-        if (!backSelected && id.equals(String.valueOf(album.getActiveSong().getMID())) ) {
-          lastSongSelection = node;
-          lastSongSelection.setStyle(STYLE_ACTIVE);
-          break;
-        }
-      }
-    }
-  }
-
-  /**
-   * Selects the back button for push events.
-   *
-   * @param select
-   */
-  private void selectBackButton(boolean select) {
-    this.backSelected = select;
-    if (backSelected) {
-      backBox.setStyle(STYLE_ACTIVE);
-    }
-    else {
-      backBox.setStyle(STYLE_INACTIVE);
-    }
   }
 
   /**
@@ -324,22 +313,11 @@ public class GoogleUIPlayerController extends PageableUIController {
    * @return
    */
   private Text createTrackText(String label) {
-    if(label.length() > 30) {
+    if (label.length() > 30) {
       label = label.substring(0, 29) + "...";
     }
     Text text = new Text(label);
     text.setFont(UIUtil.FONT_NORMAL_14);
     return text;
-  }
-
-
-  @Override
-  public IRotaryControllable longPush() {
-    return UIStateController.getInstance().getRadioController();
-  }
-
-  @Override
-  public IRotaryControllable push() {
-    return UIStateController.getInstance().getGooglePlayerController();
   }
 }

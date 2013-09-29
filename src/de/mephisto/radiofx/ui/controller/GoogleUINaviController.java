@@ -8,12 +8,8 @@ import de.mephisto.radiofx.services.google.IGoogleMusicService;
 import de.mephisto.radiofx.ui.Pager;
 import de.mephisto.radiofx.ui.UIStateController;
 import de.mephisto.radiofx.util.UIUtil;
-import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransitionBuilder;
-import javafx.application.Platform;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -32,8 +28,8 @@ import java.util.List;
  * Controls the UI for the google music
  */
 public class GoogleUINaviController extends PageableUIController {
-  private static final String STYLE_ACTIVE = "-fx-background-color:" + UIUtil.HEX_COLOR_INACTIVE + ";";
-  private static final String STYLE_INACTIVE = "-fx-background-color: transparent;";
+  public static final String STYLE_ACTIVE = "-fx-background-color:" + UIUtil.HEX_COLOR_INACTIVE + ";";
+  public static final String STYLE_INACTIVE = "-fx-background-color: transparent;";
 
   public static final int COVER_SIZE = 100;
   private static final int SCROLL_DELAY = 200;
@@ -45,7 +41,7 @@ public class GoogleUINaviController extends PageableUIController {
   private HBox centerRegion;
   private Pager pager;
 
-  private Node lastAlbumSelection;
+  private Node selectedAlbumNode;
   private HBox hBoxAlbums;
   private double scrollPos;
   private Album activeAlbum;
@@ -117,10 +113,12 @@ public class GoogleUINaviController extends PageableUIController {
     centerRegion.setPadding(new Insets(0,185,0,185));
 
     for (Album album : albums) {
+      HBox albumRoot = new HBox(0);
+      albumRoot.setId(String.valueOf(album.getMID()));
+
       VBox vbox = new VBox(2);
       vbox.setMaxWidth(COVER_SIZE);
       vbox.setPadding(new Insets(3, 3, 3, 3));
-      vbox.setId(String.valueOf(album.getMID()));
 
       if (!StringUtils.isEmpty(album.getArtUrl())) {
         Canvas cover = UIUtil.createLazyLoadingImageCanvas(album.getCoverId(), album.getArtUrl(), COVER_SIZE, COVER_SIZE);
@@ -142,7 +140,8 @@ public class GoogleUINaviController extends PageableUIController {
       text.setFill(UIUtil.COLOR_DARK_HEADER);
       vbox.getChildren().add(text);
 
-      hBoxAlbums.getChildren().add(vbox);
+      albumRoot.getChildren().add(vbox);
+      hBoxAlbums.getChildren().add(albumRoot);
     }
   }
 
@@ -152,25 +151,23 @@ public class GoogleUINaviController extends PageableUIController {
     albumText.setText(album.getName());
     artistText.setText(album.getArtist() + ": ");
 
-    if (lastAlbumSelection != null) {
-      lastAlbumSelection.setStyle(STYLE_INACTIVE);
+    if (selectedAlbumNode != null) {
+      selectedAlbumNode.setStyle(STYLE_INACTIVE);
     }
 
     final ObservableList<Node> children = hBoxAlbums.getChildren();
     for (Node node : children) {
       String id = node.getId();
       if (id.equals(String.valueOf(album.getMID()))) {
-        lastAlbumSelection = node;
-        lastAlbumSelection.setStyle(STYLE_ACTIVE);
+        selectedAlbumNode = node;
+        selectedAlbumNode.setStyle(STYLE_ACTIVE);
         break;
       }
     }
   }
 
   @Override
-  public void next() {
-    super.next();
-
+  public IRotaryControllable next() {
     if(!pager.isAtEnd()) {
       TranslateTransitionBuilder.create()
           .duration(Duration.millis(SCROLL_DELAY))
@@ -182,13 +179,13 @@ public class GoogleUINaviController extends PageableUIController {
 
       scrollPos-=SCROLL_WIDTH;
     }
+    super.next();
     activeAlbum = (Album) pager.getActiveModel();
+    return this;
   }
 
   @Override
-  public void prev() {
-    super.prev();
-
+  public IRotaryControllable prev() {
     if(!pager.isAtStart()) {
       TranslateTransitionBuilder.create()
           .duration(Duration.millis(SCROLL_DELAY))
@@ -201,26 +198,27 @@ public class GoogleUINaviController extends PageableUIController {
       scrollPos+=SCROLL_WIDTH;
     }
 
+    super.prev();
     activeAlbum = (Album) pager.getActiveModel();
+    return this;
   }
 
   @Override
   public IRotaryControllable push() {
-//    final FadeTransition outFader = UIUtil.createOutFader(centerRegion);
-//    outFader.onFinishedProperty().set(new EventHandler<ActionEvent>() {
-//      @Override
-//      public void handle(ActionEvent actionEvent) {
-//        UIStateController.getInstance().display(UIStateController.getInstance().getGooglePlayerController());
-//      }
-//    });
-//    outFader.play();
-
     return UIStateController.getInstance().getGooglePlayerController();
   }
 
   @Override
   public IRotaryControllable longPush() {
     return UIStateController.getInstance().getRadioController();
+  }
+
+  /**
+   * Returns the container of the active selection.
+   * @return
+   */
+  public Node getSelectedAlbumNode() {
+    return selectedAlbumNode;
   }
 
   /**
@@ -240,5 +238,13 @@ public class GoogleUINaviController extends PageableUIController {
 
   public Album getActiveAlbum() {
     return activeAlbum;
+  }
+
+  public HBox getCenterRegion() {
+    return centerRegion;
+  }
+
+  public double getScrollPos() {
+    return scrollPos;
   }
 }

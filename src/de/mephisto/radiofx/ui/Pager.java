@@ -65,7 +65,7 @@ public class Pager {
         bubbleRadius = 4;
       }
       box = new HBox(margin);
-      box.setAlignment(Pos.BASELINE_CENTER);
+      box.setAlignment(Pos.BASELINE_LEFT);
       for (IServiceModel model : models) {
         Circle selectorCircle = new Circle(bubbleRadius, bubbleRadius, bubbleRadius, UIUtil.COLOR_DARK_HEADER);
         selectorCircle.setStrokeWidth(STROKE_WIDTH);
@@ -221,5 +221,10 @@ public class Pager {
    */
   public boolean isAtEnd() {
     return models.indexOf(activeModel) == (models.size()-1);
+  }
+
+  public void toggleMode() {
+    this.bubbleMode = !bubbleMode;
+    updateUI();
   }
 }

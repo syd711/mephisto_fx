@@ -91,6 +91,9 @@ public class WeatherUIController extends PageableUIController {
    */
   private void createDefaultInfo() {
     WeatherInfo currentWeatherInfo = ServiceRegistry.getWeatherService().getDefaultWeather();
+    if(currentWeatherInfo == null) {
+      return;
+    }
 
     //image
     String url = currentWeatherInfo.getImageUrl();

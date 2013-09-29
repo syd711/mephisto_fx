@@ -31,10 +31,13 @@ public abstract class PageableUIController extends UIController implements IServ
     this.pager = pager;
   }
 
+  public Pager getPager() {
+    return this.pager;
+  }
 
   @Override
   public void serviceDataChanged(IServiceModel model) {
-    if (pager.getActiveModel() != null && pager.getActiveModel().equals(model)) {
+    if (pager != null && pager.getActiveModel() != null && pager.getActiveModel().equals(model)) {
       updatePage(model);
     }
   }
@@ -43,21 +46,23 @@ public abstract class PageableUIController extends UIController implements IServ
    * Slides to the next weather info
    */
   @Override
-  public void next() {
+  public IRotaryControllable next() {
     IServiceModel info = pager.next();
     UIUtil.fadeOutComponent(pagingRoot);
     updatePage(info);
     UIUtil.fadeInComponent(pagingRoot);
+    return this;
   }
 
   /**
    * Slides to the previous weather info
    */
   @Override
-  public void prev() {
+  public IRotaryControllable prev() {
     IServiceModel info = pager.prev();
     UIUtil.fadeOutComponent(pagingRoot);
     updatePage(info);
     UIUtil.fadeInComponent(pagingRoot);
+    return this;
   }
 }

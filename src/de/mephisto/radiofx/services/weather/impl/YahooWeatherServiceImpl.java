@@ -277,7 +277,7 @@ public class YahooWeatherServiceImpl extends RefreshingService implements IWeath
     if (code < 5 || (code >= 37 && code <= 39) || code == 45) {
       img = IMG_STORMY;
     }
-    else if ((code >= 5 && code < 9) || code == 17 || code == 18 || code == 13 || code == 14 || code == 46) {
+    else if ((code >= 5 && code < 9) || code == 17 || code == 18 || code == 13 || code == 14 || code == 46 || code == 47) {
       img = IMG_SNOW_RAINY;
     }
     else if ((code >= 15 && code <= 16) || (code >= 40 && code <= 43)) {

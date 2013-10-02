@@ -31,6 +31,7 @@ public class Pager {
   private boolean circle;
   private GraphicsContext gc;
   private Pane root;
+  private HBox bubbleBox;
 
   public Pager(Pane root, List<IServiceModel> models) {
     this(root, models, true, true);
@@ -64,15 +65,19 @@ public class Pager {
         margin = 2;
         bubbleRadius = 4;
       }
-      box = new HBox(margin);
+      box = new HBox(0);
       box.setAlignment(Pos.BASELINE_LEFT);
+      bubbleBox = new HBox(margin);
+      bubbleBox.setMinWidth(UIUtil.WIDTH);
+      bubbleBox.setAlignment(Pos.CENTER);
       for (IServiceModel model : models) {
         Circle selectorCircle = new Circle(bubbleRadius, bubbleRadius, bubbleRadius, UIUtil.COLOR_DARK_HEADER);
         selectorCircle.setStrokeWidth(STROKE_WIDTH);
         selectorCircle.setStroke(UIUtil.COLOR_DARK_HEADER);
         selectorCircle.setUserData(model);
-        box.getChildren().add(selectorCircle);
+        bubbleBox.getChildren().add(selectorCircle);
       }
+      box.getChildren().add(bubbleBox);
     }
     else {
       bubbleRadius = 6;
@@ -89,8 +94,6 @@ public class Pager {
 
       box.getChildren().add(progress);
     }
-
-    box.setMaxHeight(10);
 
     if(root instanceof BorderPane) {
       ((BorderPane)root).setBottom(box);
@@ -167,7 +170,7 @@ public class Pager {
    */
   private void updateActivity() {
     if (bubbleMode) {
-      final ObservableList<Node> children = this.box.getChildren();
+      final ObservableList<Node> children = this.bubbleBox.getChildren();
       for (Node child : children) {
         Circle circle = (Circle) child;
         IServiceModel model = (IServiceModel) circle.getUserData();

@@ -31,10 +31,10 @@ public class MephistoRadioFX extends Application {
 
   @Override
   public void start(final Stage primaryStage) {
-    ServiceRegistry.init();
     instance = this;
     this.stage = primaryStage;
     primaryStage.show();
+    ServiceRegistry.init();
 
     final UIState state = new UIState();
 

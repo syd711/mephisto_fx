@@ -8,8 +8,6 @@ import de.mephisto.radiofx.services.google.Song;
 import de.mephisto.radiofx.ui.UIStateController;
 import de.mephisto.radiofx.util.UIUtil;
 import javafx.animation.FadeTransition;
-import javafx.animation.TranslateTransition;
-import javafx.animation.TranslateTransitionBuilder;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -22,10 +20,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.util.Duration;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -38,7 +34,7 @@ public class GoogleUIPlayerController extends PageableUIController {
   public static final String STYLE_ACTIVE = "-fx-background-color: " + UIUtil.HEX_COLOR_INACTIVE + ";-fx-border-color: " + UIUtil.HEX_COLOR_SEPARATOR +
       " " + UIUtil.HEX_COLOR_SEPARATOR + " " + UIUtil.HEX_COLOR_SEPARATOR + " " + UIUtil.HEX_COLOR_SEPARATOR + ";";
 
-  private final static int VISIBLE_ITEM_COUNT = 3;
+  private final static int VISIBLE_ITEM_COUNT = 4;
   private final static int SCROLL_DELAY = 400;
   private final static int SCROLL_LEFT_LENGTH = 29;
 
@@ -112,37 +108,10 @@ public class GoogleUIPlayerController extends PageableUIController {
 
     int scrollPos = (int) UIStateController.getInstance().getGoogleNaviController().getScrollPos();
     for (Node node : nodes) {
-      int from = 0;
-      int playerOffset = children.indexOf(albumNode)*110+450;
-      int to = (scrollPos + playerOffset);
-      if (!show) {
-        to = 0;
-        from = (scrollPos + playerOffset);
-      }
-      TranslateTransitionBuilder.create()
-          .duration(Duration.millis(SCROLL_DELAY))
-          .node(node)
-          .fromX(from)
-          .toX(to)
-          .autoReverse(false)
-          .build().play();
+      UIUtil.moveNodeX(node, 0, children.indexOf(albumNode) * 110 + 450, !show, SCROLL_DELAY);
     }
 
-    int from = scrollPos;
-    int to = (scrollPos - 175);
-    if (!show) {
-      to = scrollPos;
-      from = (scrollPos - 175);
-    }
-    final TranslateTransition build = TranslateTransitionBuilder.create()
-        .duration(Duration.millis(SCROLL_DELAY))
-        .node(centerRegion)
-        .fromX(from)
-        .toX(to)
-        .autoReverse(false)
-        .build();
-
-    build.setOnFinished(new EventHandler<ActionEvent>() {
+    final EventHandler<ActionEvent> eventHandler = new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent actionEvent) {
         if (show) {
@@ -154,9 +123,9 @@ public class GoogleUIPlayerController extends PageableUIController {
           albumNode.setStyle(GoogleUINaviController.STYLE_ACTIVE);
         }
       }
-    });
+    };
 
-    build.play();
+    UIUtil.moveNode(centerRegion, scrollPos, (scrollPos - 175), !show, SCROLL_DELAY, eventHandler, true);
   }
 
 
@@ -175,14 +144,7 @@ public class GoogleUIPlayerController extends PageableUIController {
     }
 
     if (scrollPos < 0) {
-      TranslateTransitionBuilder.create()
-          .duration(Duration.millis(SCROLL_DELAY))
-          .node(songBox)
-          .fromY(scrollPos)
-          .toY(scrollPos + SCROLL_LEFT_LENGTH)
-          .autoReverse(false)
-          .build().play();
-
+      UIUtil.moveNodeY(songBox, scrollPos, scrollPos + SCROLL_LEFT_LENGTH, false, SCROLL_DELAY);
       scrollPos += SCROLL_LEFT_LENGTH;
     }
     return this;
@@ -203,13 +165,7 @@ public class GoogleUIPlayerController extends PageableUIController {
       return this;
     }
 
-    TranslateTransitionBuilder.create()
-        .duration(Duration.millis(SCROLL_DELAY))
-        .node(songBox)
-        .fromY(scrollPos)
-        .toY(scrollPos - SCROLL_LEFT_LENGTH)
-        .autoReverse(false)
-        .build().play();
+    UIUtil.moveNodeY(songBox, scrollPos, scrollPos - SCROLL_LEFT_LENGTH, false, SCROLL_DELAY);
     scrollPos -= SCROLL_LEFT_LENGTH;
     return this;
   }
@@ -255,7 +211,6 @@ public class GoogleUIPlayerController extends PageableUIController {
     scrollPos = 0;
 
     songScroller = new ScrollPane();
-    songScroller.setMaxHeight(130);
     songScroller.setMinWidth(370);
     songScroller.setStyle("-fx-background-color:transparent;");
     songScroller.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -267,9 +222,8 @@ public class GoogleUIPlayerController extends PageableUIController {
       HBox trackBox = new HBox();
 
       trackBox.setId(String.valueOf(song.getMID()));
-//      trackBox.setMinWidth(330);
       trackBox.setAlignment(Pos.BASELINE_LEFT);
-      trackBox.setPadding(new Insets(3, 5, 3, 5));
+      trackBox.setPadding(new Insets(2, 5, 2, 5));
       if (track == 1) {
         trackBox.setStyle(STYLE_ACTIVE);
       }

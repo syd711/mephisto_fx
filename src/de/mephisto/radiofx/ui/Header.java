@@ -44,8 +44,9 @@ public class Header implements IServiceInfoListener {
     topRoot = new HBox();
 
     HBox hbox = new HBox(12);
-    hbox.setAlignment(Pos.CENTER);
-    hbox.setPadding(new Insets(11, 120, 11, 15));
+    hbox.setAlignment(Pos.CENTER_LEFT);
+    hbox.setPadding(new Insets(11, 0, 11, 15));
+    hbox.setMinWidth(360);
     hbox.setStyle("-fx-background-color: " + UIUtil.HEX_COLOR_DARK + ";");
     root.setTop(topRoot);
     topRoot.getChildren().add(hbox);
@@ -53,7 +54,7 @@ public class Header implements IServiceInfoListener {
     final List<IServiceModel> serviceData = ServiceRegistry.getTimeService().getServiceData();
     final DateTimeInfo dateTimeInfo = (DateTimeInfo) serviceData.get(0);
     Date date = dateTimeInfo.getDate();
-    String dateString = new SimpleDateFormat("d. MMMMMMMMMMMM yyyy").format(date);
+    String dateString = new SimpleDateFormat("d. MMMMMMMMMMMM yyyy", Locale.US).format(date);
     dateText = new Text(0, 0, dateString);
     dateText.setFont(HEADER_LABEL_FONT);
     dateText.setFill(Color.WHITE);

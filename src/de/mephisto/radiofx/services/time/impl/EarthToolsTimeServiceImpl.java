@@ -56,7 +56,7 @@ public class EarthToolsTimeServiceImpl extends RefreshingService {
       while ((inputLine = in.readLine()) != null) {
         if(inputLine.contains("localtime")) {
           String date = inputLine.substring(inputLine.indexOf(">")+1, inputLine.lastIndexOf("<"));
-          localTime = new SimpleDateFormat("d MMM yyyy hh:mm:ss", Locale.getDefault()).parse(date);
+          localTime = new SimpleDateFormat("d MMM yyyy hh:mm:ss", Locale.US).parse(date);
           DateTimeInfo info = new DateTimeInfo();
           info.setDate(localTime);
           data.add(info);

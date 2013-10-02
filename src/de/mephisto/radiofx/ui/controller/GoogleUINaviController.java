@@ -58,10 +58,10 @@ public class GoogleUINaviController extends PageableUIController {
     List<Album> albums = service.getAlbums();
 
     VBox vMain = new VBox(5);
-    vMain.setAlignment(Pos.CENTER_LEFT);
+    vMain.setAlignment(Pos.TOP_LEFT);
 
     HBox topBox = new HBox(5);
-    topBox.setPadding(new Insets(0, 0, 0, 15));
+    topBox.setPadding(new Insets(5, 0, 0, 15));
 
     HBox selectionBox = new HBox();
     selectionBox.setMinWidth(420);
@@ -131,7 +131,7 @@ public class GoogleUINaviController extends PageableUIController {
       }
 
       Text text = new Text(0, 0, formatLabel(album.getArtist(), 13));
-      text.setFont(UIUtil.FONT_NORMAL_12);
+      text.setFont(UIUtil.FONT_BOLD_12);
       text.setFill(UIUtil.COLOR_DARK_HEADER);
       vbox.getChildren().add(text);
 

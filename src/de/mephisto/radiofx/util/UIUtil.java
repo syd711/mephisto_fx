@@ -4,6 +4,10 @@ import de.mephisto.radiofx.MephistoRadioFX;
 import de.mephisto.radiofx.resources.ResourceLoader;
 import javafx.animation.FadeTransition;
 import javafx.animation.FadeTransitionBuilder;
+import javafx.animation.TranslateTransition;
+import javafx.animation.TranslateTransitionBuilder;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -82,6 +86,57 @@ public class UIUtil {
     }
   }
 
+  public static void moveNode(Node node, int from, int to, boolean reverse, long delay, EventHandler<ActionEvent> e, boolean moveX) {
+    if(reverse) {
+      int tmp = to;
+      to = from;
+      from = tmp;
+    }
+    TranslateTransition build = TranslateTransitionBuilder.create()
+        .duration(Duration.millis(delay))
+        .node(node)
+        .fromX(from)
+        .toX(to)
+        .autoReverse(false)
+        .build();
+    if(!moveX) {
+      build = TranslateTransitionBuilder.create()
+          .duration(Duration.millis(delay))
+          .node(node)
+          .fromY(from)
+          .toY(to)
+          .autoReverse(false)
+          .build();
+    }
+    if(e != null) {
+      build.setOnFinished(e);
+    }
+    build.play();
+  }
+
+  /**
+   * Moves the given node from x to y.
+   * @param node
+   * @param from
+   * @param to
+   * @param reverse
+   * @param delay
+   */
+  public static void moveNodeX(Node node, int from, int to, boolean reverse, long delay) {
+    moveNode(node, from, to, reverse, delay, null, true);
+  }
+
+  public static void moveNodeY(Node node, int from, int to, boolean reverse, long delay) {
+    moveNode(node, from, to, reverse, delay, null, false);
+  }
+
+  /**
+   * Creates an image canvas with the given widht and height.
+   * @param url
+   * @param width
+   * @param height
+   * @return
+   */
   public static Canvas createImageCanvas(String url, int width, int height) {
     ImageView img = new ImageView(new Image(url, width, height, false, true));
     final Canvas canvas = new Canvas(width, height);

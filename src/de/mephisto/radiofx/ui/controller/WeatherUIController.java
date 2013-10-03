@@ -58,7 +58,6 @@ public class WeatherUIController extends PageableUIController {
     tabRoot.setMinHeight(UIUtil.MIN_MAIN_HEIGHT);
 
     VBox verticalRoot = new VBox(5);
-    verticalRoot.setAlignment(Pos.TOP_CENTER);
     verticalRoot.setPadding(new Insets(5, 0, 5, 0));
     tabRoot.setCenter(verticalRoot);
     verticalRoot.setAlignment(Pos.CENTER);
@@ -67,9 +66,9 @@ public class WeatherUIController extends PageableUIController {
     super.setPagingRoot(verticalRoot);
 
     mainSection = new HBox(15);
-    mainSection.setAlignment(Pos.CENTER);
+    mainSection.setAlignment(Pos.TOP_CENTER);
     mainSection.setPadding(new Insets(0, 0, 0, 10));
-    mainSection.setMinHeight(125);
+    mainSection.setMinHeight(130);
     verticalRoot.getChildren().add(mainSection);
 
     createDefaultInfo();
@@ -81,8 +80,6 @@ public class WeatherUIController extends PageableUIController {
 
     WeatherInfo currentWeatherInfo = ServiceRegistry.getWeatherService().getDefaultWeather();
     updatePage(currentWeatherInfo);
-
-    UIUtil.fadeInComponent(tabRoot);
     return tabRoot;
   }
 

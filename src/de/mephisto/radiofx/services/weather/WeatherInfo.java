@@ -201,4 +201,14 @@ public class WeatherInfo implements IServiceModel {
   public void setIconBlackUrl(String iconBlackUrl) {
     this.iconBlackUrl = iconBlackUrl;
   }
+
+  @Override
+  public void setActive(boolean b) {
+    //not used
+  }
+
+  @Override
+  public boolean isActive() {
+    return false;  //not used
+  }
 }

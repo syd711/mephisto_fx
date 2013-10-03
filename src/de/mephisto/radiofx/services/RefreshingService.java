@@ -24,6 +24,11 @@ public abstract class RefreshingService implements IService {
     this.refreshThread.start();
   }
 
+  @Override
+  public void forceRefresh() {
+    getServiceData();
+  }
+
   /**
    * Registers a new listener that fires once the controller service info changes.
    * @param listener

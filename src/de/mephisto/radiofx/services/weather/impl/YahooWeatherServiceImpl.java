@@ -13,6 +13,7 @@ import de.mephisto.radiofx.services.RefreshingService;
 import de.mephisto.radiofx.services.ServiceRegistry;
 import de.mephisto.radiofx.services.weather.IWeatherService;
 import de.mephisto.radiofx.services.weather.WeatherInfo;
+import de.mephisto.radiofx.ui.SplashScreen;
 import de.mephisto.radiofx.util.Config;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -126,6 +127,11 @@ public class YahooWeatherServiceImpl extends RefreshingService implements IWeath
     }
 
     return infoList;
+  }
+
+  @Override
+  public void initService(SplashScreen splashScreen) {
+    //no update necessary for weather
   }
 
   /**
@@ -255,6 +261,7 @@ public class YahooWeatherServiceImpl extends RefreshingService implements IWeath
 
             int code = Integer.parseInt(element.getAttribute("code").getValue());
             String imageUrl = convertTypeCodeImage(code);
+            LOG.info("Weather code for " + info.getCity() + " is " + code);
             info.setImageUrl(WeatherBigResourceLoader.getResource(imageUrl));
             info.setIconWhiteUrl(WeatherSmallWhiteResourceLoader.getResource(imageUrl));
           } catch (ParseException e) {

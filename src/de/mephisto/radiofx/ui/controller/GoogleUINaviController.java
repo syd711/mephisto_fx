@@ -93,7 +93,6 @@ public class GoogleUINaviController extends PageableUIController {
     super.setPager(pager);
     super.setTabRoot(tabRoot);
 
-    UIUtil.fadeInComponent(tabRoot);
     if (!albums.isEmpty()) {
       updatePage(albums.get(0));
     }

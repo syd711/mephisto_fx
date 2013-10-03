@@ -22,6 +22,7 @@ public abstract class UIController implements IRotaryControllable {
    * @param root
    */
   public void display(BorderPane root) {
+    tabRoot.setOpacity(0);
     root.setCenter(tabRoot);
     onDisplay();
     UIUtil.fadeInComponent(tabRoot);
@@ -46,6 +47,12 @@ public abstract class UIController implements IRotaryControllable {
     //not used here
   }
 
+  /**
+   * Calls once the controller changes, allows to dispose some other components first.
+   */
+  public void onDispose() {
+    //not used here
+  }
 
   /**
    * Creates the default UI for the controller.

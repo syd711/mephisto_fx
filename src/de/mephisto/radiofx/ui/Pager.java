@@ -11,6 +11,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 
@@ -168,7 +169,7 @@ public class Pager {
   /**
    * Updates the circle selection
    */
-  private void updateActivity() {
+  public void updateActivity() {
     if (bubbleMode) {
       final ObservableList<Node> children = this.bubbleBox.getChildren();
       for (Node child : children) {
@@ -178,6 +179,11 @@ public class Pager {
           circle.setStrokeWidth(STROKE_WIDTH);
           circle.setStroke(UIUtil.COLOR_DARK_HEADER);
           circle.setFill(null);
+        }
+        else if (model.isActive()) {
+          circle.setStrokeWidth(STROKE_WIDTH);
+          circle.setStroke(UIUtil.COLOR_DARK_HEADER);
+          circle.setFill(Color.valueOf(UIUtil.HEX_COLOR_INACTIVE));
         }
         else {
           circle.setFill(UIUtil.COLOR_DARK_HEADER);
@@ -229,5 +235,10 @@ public class Pager {
   public void toggleMode() {
     this.bubbleMode = !bubbleMode;
     updateUI();
+  }
+
+  public void select(IServiceModel model) {
+    this.activeModel = model;
+    updateActivity();
   }
 }

@@ -73,6 +73,13 @@ public class GoogleUIPlayerController extends PageableUIController {
     updatePage(album.getActiveSong());
   }
 
+  @Override
+  public void onDispose() {
+    GoogleUINaviController naviController = UIStateController.getInstance().getGoogleNaviController();
+    showPlayerMode(false);
+    setPager(naviController.getPager());
+  }
+
   private void showPlayerMode(final boolean show) {
     getPager().toggleMode();
     if (show) {
@@ -161,7 +168,7 @@ public class GoogleUIPlayerController extends PageableUIController {
     if (album.getActiveSongIndex() < (VISIBLE_ITEM_COUNT - 1)) {
       return this;
     }
-    if (album.getActiveSongIndex() > ((album.getSize()) - VISIBLE_ITEM_COUNT)) {
+    if (album.getActiveSongIndex() > ((album.getSize()+1) - VISIBLE_ITEM_COUNT)) {
       return this;
     }
 

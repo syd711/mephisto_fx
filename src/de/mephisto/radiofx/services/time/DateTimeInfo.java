@@ -22,4 +22,14 @@ public class DateTimeInfo implements IServiceModel{
   public boolean equals(Object obj) {
     return obj != null && obj instanceof DateTimeInfo && ((DateTimeInfo)obj).getDate().getTime() == date.getTime();
   }
+
+  @Override
+  public void setActive(boolean b) {
+    //not used
+  }
+
+  @Override
+  public boolean isActive() {
+    return false;  //not used
+  }
 }

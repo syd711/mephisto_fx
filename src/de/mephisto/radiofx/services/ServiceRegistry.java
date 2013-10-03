@@ -7,6 +7,8 @@ import de.mephisto.radiofx.services.mpd.impl.MpdServiceImpl;
 import de.mephisto.radiofx.services.time.impl.EarthToolsTimeServiceImpl;
 import de.mephisto.radiofx.services.weather.IWeatherService;
 import de.mephisto.radiofx.services.weather.impl.YahooWeatherServiceImpl;
+import de.mephisto.radiofx.ui.SplashScreen;
+import de.mephisto.radiofx.ui.UIStateController;
 
 /**
  * Factory class for retrieving the service classes.
@@ -17,11 +19,30 @@ public class ServiceRegistry {
   private static IMpdService mpdService;
   private static IGoogleMusicService googleService;
 
-  public static void init() {
-    weatherService = new YahooWeatherServiceImpl();
-    timeService = new EarthToolsTimeServiceImpl();
-    mpdService = new MpdServiceImpl();
-    googleService = new GoogleServiceImpl();
+  public static void init(final SplashScreen splashScene) {
+    new Thread() {
+      @Override
+      public void run() {
+        googleService = new GoogleServiceImpl();
+        googleService.initService(splashScene);
+
+        weatherService = new YahooWeatherServiceImpl();
+        weatherService.initService(splashScene);
+
+        timeService = new EarthToolsTimeServiceImpl();
+        timeService.initService(splashScene);
+
+        mpdService = new MpdServiceImpl();
+        mpdService.initService(splashScene);
+
+        splashScene.setMessage("Creating UI Controllers...", 0.9);
+        UIStateController.getInstance().createControllers();
+
+        splashScene.setMessage("Finished Initialization", 1.0);
+
+        splashScene.dispose();
+      }
+    }.start();
   }
 
   /**

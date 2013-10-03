@@ -2,24 +2,33 @@ package de.mephisto.radiofx.util;
 
 import de.mephisto.radiofx.MephistoRadioFX;
 import de.mephisto.radiofx.resources.ResourceLoader;
-import javafx.animation.FadeTransition;
-import javafx.animation.FadeTransitionBuilder;
-import javafx.animation.TranslateTransition;
-import javafx.animation.TranslateTransitionBuilder;
+import de.mephisto.radiofx.ui.SplashScreen;
+import de.mephisto.radiofx.ui.UIState;
+import javafx.animation.*;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
@@ -30,7 +39,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -43,6 +54,7 @@ public class UIUtil {
   private final static Logger LOG = LoggerFactory.getLogger(UIUtil.class);
 
   public static final Font FONT_NORMAL_12 = Font.font("Tahoma", FontWeight.NORMAL, 12);
+  public static final Font FONT_NORMAL_10 = Font.font("Tahoma", FontWeight.NORMAL, 10);
   public static final Font FONT_BOLD_12 = Font.font("Tahoma", FontWeight.BOLD, 12);
   public static final Font FONT_NORMAL_14 = Font.font("Tahoma", FontWeight.NORMAL, 14);
   public static final Font FONT_BOLD_14 = Font.font("Tahoma", FontWeight.BOLD, 14);
@@ -189,14 +201,56 @@ public class UIUtil {
     root.getChildren().add(borderPane);
     Stage primaryStage = MephistoRadioFX.getInstance().getStage();
     if (primaryStage.getScene() == null) {
-      Scene scene = new Scene(root, UIUtil.WIDTH, UIUtil.HEIGHT, Color.valueOf("#DACEB8"));
+      Scene scene = new Scene(root, UIUtil.WIDTH, UIUtil.HEIGHT, Color.valueOf(HEX_COLOR_BACKGROUND));
       scene.getStylesheets().add(ResourceLoader.getResource("theme.css"));
-      primaryStage.setScene(scene);
     }
     else {
       primaryStage.getScene().setRoot(root);
     }
   }
+
+
+
+  public static SplashScreen createSplashScene() {
+    Group root = new Group();
+    VBox vbox = new VBox(20);
+    vbox.setAlignment(Pos.CENTER);
+    root.getChildren().add(vbox);
+    Canvas logoCanvas = createImageCanvas(ResourceLoader.getResource("logo.png"), WIDTH, 150);
+    vbox.getChildren().add(logoCanvas);
+
+    double y = WIDTH-50;
+    ProgressBar loadingBar = new ProgressBar();
+    loadingBar.setMinWidth(WIDTH - 100);
+    loadingBar.setStyle("-fx-accent: " + HEX_COLOR_DARK_2 + ";");
+    loadingBar.setLayoutY(y);
+    vbox.getChildren().add(loadingBar);
+
+    Text loadingMsg = new Text("Initializing...");
+    loadingMsg.setFont(FONT_NORMAL_14);
+    vbox.getChildren().add(loadingMsg);
+
+    try {
+      HBox ipBox = new HBox();
+      ipBox.setPadding(new Insets(17, 5, 5, 0));
+      ipBox.setAlignment(Pos.BASELINE_RIGHT);
+      Text ip = new Text("IP: " + Inet4Address.getLocalHost().getHostAddress());
+      ip.setFont(FONT_NORMAL_10);
+      ipBox.getChildren().add(ip);
+      vbox.getChildren().add(ipBox);
+    } catch (UnknownHostException e) {
+      e.printStackTrace();
+    }
+
+
+    Stage primaryStage = MephistoRadioFX.getInstance().getStage();
+    Scene scene = new Scene(root, UIUtil.WIDTH, UIUtil.HEIGHT, Color.valueOf(HEX_COLOR_BACKGROUND));
+    primaryStage.setScene(scene);
+
+    SplashScreen sp = new SplashScreen(vbox, loadingBar, loadingMsg);
+    return sp;
+  }
+
 
   /**
    * Creates a fade out effect without playing it
@@ -227,6 +281,23 @@ public class UIUtil {
         .fromValue(0)
         .toValue(1)
         .autoReverse(false)
+        .build();
+  }
+
+  /**
+   * Creates a fade out effect without playing it
+   *
+   * @param node
+   * @return
+   */
+  public static FadeTransition createBlink(Node node) {
+    return FadeTransitionBuilder.create()
+        .duration(Duration.millis(400))
+        .node(node)
+        .fromValue(0.1)
+        .cycleCount(Timeline.INDEFINITE)
+        .toValue(1)
+        .autoReverse(true)
         .build();
   }
 
@@ -264,4 +335,54 @@ public class UIUtil {
     fadeTransition.play();
   }
 
+  public static void addStateListener(Stage primaryStage) {
+    final UIState state = new UIState();
+
+    primaryStage.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+      @Override
+      public void handle(KeyEvent keyEvent) {
+        if (keyEvent.getCode() == KeyCode.RIGHT) {
+          Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+              state.right();
+            }
+          });
+
+        }
+        if (keyEvent.getCode() == KeyCode.DOWN) {
+          Platform.runLater(new Runnable() {
+            @Override public void run() {
+              state.push();
+            }
+          });
+        }
+        if (keyEvent.getCode() == KeyCode.UP) {
+          Platform.runLater(new Runnable() {
+            @Override public void run() {
+              state.longPush();
+            }
+          });
+        }
+        if (keyEvent.getCode() == KeyCode.LEFT) {
+          Platform.runLater(new Runnable() {
+            @Override public void run() {
+              state.left();
+            }
+          });
+        }
+      }
+    });
+  }
+
+  public static void addDisposeListener(Stage primaryStage) {
+    //ensures that the process is terminated on window dispose
+    primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+      @Override
+      public void handle(WindowEvent windowEvent) {
+        Platform.exit();
+        System.exit(0);
+      }
+    });
+  }
 }

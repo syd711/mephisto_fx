@@ -16,4 +16,14 @@ public class MModel implements IServiceModel {
   public void setMID(int mId) {
     this.mId = mId;
   }
+
+  @Override
+  public void setActive(boolean b) {
+    //not used
+  }
+
+  @Override
+  public boolean isActive() {
+    return false;  //not used
+  }
 }

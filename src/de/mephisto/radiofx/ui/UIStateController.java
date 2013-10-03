@@ -1,5 +1,6 @@
 package de.mephisto.radiofx.ui;
 
+import de.mephisto.radiofx.services.ServiceRegistry;
 import de.mephisto.radiofx.ui.controller.*;
 import de.mephisto.radiofx.util.UIUtil;
 import javafx.animation.FadeTransition;
@@ -17,20 +18,21 @@ public class UIStateController {
   private BorderPane borderPane;
   private Footer footer;
 
-  private RadioUIController radioController = new RadioUIController();
-  private WeatherUIController weatherController = new WeatherUIController();
-  private GoogleUINaviController googleNaviController = new GoogleUINaviController();
-  private GoogleUIPlayerController googlePlayerController = new GoogleUIPlayerController();
+  private RadioUIController radioController;
+  private WeatherUIController weatherController;
+  private GoogleUINaviController googleNaviController;
+  private GoogleUIPlayerController googlePlayerController;
 
   //radio controller is default
   private UIController activeController = radioController;
 
   private UIStateController() {
     borderPane = new BorderPane();
-    UIUtil.createScene(borderPane);
+    borderPane.setOpacity(1);
+  }
 
-    new Header(borderPane);
-    footer = new Footer(borderPane);
+  public BorderPane getBorderPane() {
+    return borderPane;
   }
 
   /**
@@ -41,8 +43,28 @@ public class UIStateController {
     return instance;
   }
 
+  public void showSplashScreen() {
+    final SplashScreen splashScene = UIUtil.createSplashScene();
+    ServiceRegistry.init(splashScene);
+  }
+
+  public void createControllers() {
+    radioController = new RadioUIController();
+    weatherController = new WeatherUIController();
+    googleNaviController = new GoogleUINaviController();
+    googlePlayerController = new GoogleUIPlayerController();
+  }
+
   public void showDefault() {
+    activeController = radioController;
+
+    new Header(borderPane);
+    footer = new Footer(borderPane);
+
+    UIUtil.createScene(borderPane);
     activeController.display(borderPane);
+
+    UIUtil.fadeInComponent(borderPane);
   }
 
   public void showNext() {
@@ -76,6 +98,7 @@ public class UIStateController {
 
       //check if the controller creates a new UI
       if(newController.getTabRoot() != null && activeController.getTabRoot() != null) {
+        activeController.onDispose();
         final Node center = newController.getTabRoot();
         final FadeTransition outFader = UIUtil.createOutFader(center);
         outFader.onFinishedProperty().set(new EventHandler<ActionEvent>() {

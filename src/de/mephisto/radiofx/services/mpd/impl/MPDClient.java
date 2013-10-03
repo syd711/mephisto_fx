@@ -20,6 +20,7 @@ public class MPDClient {
   private boolean localModeEnabled;
   private String host;
   private int port;
+  private TelnetReader outputStream;
 
   public MPDClient(String host, int port) {
     this.host = host;
@@ -40,6 +41,9 @@ public class MPDClient {
       client = new TelnetClient();
       localModeEnabled = host.equalsIgnoreCase("localhost");
       client.connect(host, port);
+
+      outputStream = new TelnetReader(client);
+      outputStream.start();
       in = client.getInputStream();
       LOG.info("Initialized " + this);
     } catch (Exception e) {
@@ -48,31 +52,21 @@ public class MPDClient {
   }
 
   /**
-   * Waits until an acknowledge flag is logged by the mpc.
+   * Playback of the given URL.
    *
-   * @return
+   * @param url
    */
-  private boolean awaitOk() {
+  public void play(String url) {
     try {
-//      do {
-//        ret_read = in.read(buff);
-//        if (ret_read > 0) {
-//          String msg = new String(buff, 0, ret_read).trim();
-//          LOG.info("MPD: " + msg);
-//          if (msg.contains("OK")) {
-//            return true;
-//          }
-//        }
-//      }
-//      while (ret_read >= 0);
+      executeTelnetCommand("clear");
       Thread.sleep(100);
+      executeTelnetCommand("add " + url);
+      Thread.sleep(100);
+      executeTelnetCommand("play");
     } catch (Exception e) {
-      LOG.error("Exception while reading from MPD:" + e.getMessage());
-      this.client = null;
+      LOG.error("Error executing playback of URL " + url + ": " + e.getMessage(), e);
     }
-    return false;
   }
-
 
   /**
    * Executes a MPD command via telnet.
@@ -81,9 +75,9 @@ public class MPDClient {
    */
   public void executeTelnetCommand(String cmd) {
     try {
-      LOG.info("Executing telnet command '" + cmd + "'");
+//      LOG.info("Executing telnet command '" + cmd + "'");
       cmd += "\n";
-      if(client == null || client.getOutputStream() == null) {
+      if (client == null || client.getOutputStream() == null) {
         connect();
       }
 
@@ -94,8 +88,6 @@ public class MPDClient {
       else {
         LOG.error("Exception executing MPD telnet command: Could not acquire telnet output steam, please check the MPD server connection.");
       }
-
-      awaitOk();
     } catch (IOException e) {
       LOG.error("Exception executing MPD telnet command '" + cmd + "':" + e.getMessage());
       this.client = null;
@@ -136,5 +128,12 @@ public class MPDClient {
   @Override
   public String toString() {
     return "MPCClient for " + host + ":" + port;
+  }
+
+  public PlaylistInfo playlistInfo() {
+    executeTelnetCommand("playlistinfo");
+    String output = outputStream.getLastCommand();
+//    LOG.info("Resolved playlist info: " + output.trim());
+    return new PlaylistInfo(output);
   }
 }

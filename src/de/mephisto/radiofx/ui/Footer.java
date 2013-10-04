@@ -14,17 +14,22 @@ import javafx.scene.text.Text;
  */
 public class Footer {
   private static Font TAB_FONT = Font.font("Tahoma", FontWeight.NORMAL, 16);
-  private static final String STYLE_INACTIVE = "-fx-border-color: " + UIUtil.HEX_COLOR_SEPARATOR + " " + UIUtil.HEX_COLOR_SEPARATOR + " transparent "
+  private static final String STYLE_INACTIVE = "-fx-border-color: " + UIUtil.HEX_COLOR_SEPARATOR + " transparent transparent "
       + UIUtil.HEX_COLOR_SEPARATOR + ";-fx-background-color: " + UIUtil.HEX_COLOR_INACTIVE + ";";
-  private static final String STYLE_ACTIVE = "-fx-background-color: " + UIUtil.HEX_COLOR_BACKGROUND + ";-fx-border-color: transparent transparent transparent transparent";
+  private static final String STYLE_ACTIVE = "-fx-background-color: " + UIUtil.HEX_COLOR_BACKGROUND + ";-fx-border-color: transparent transparent transparent " + UIUtil.HEX_COLOR_SEPARATOR + ";";
+  private static final String STYLE_ACTIVE_1 = "-fx-background-color: " + UIUtil.HEX_COLOR_BACKGROUND + ";-fx-border-color: transparent transparent transparent transparent;";
 
   private static final int TOP_TAB_PADDING = 4;
+
+  public static final int FOOTER_RADIO = 0;
+  public static final int FOOTER_WEATHER = 1;
+  public static final int FOOTER_MUSIC = 2;
 
   private HBox tab1;
   private HBox tab2;
   private HBox tab3;
 
-  private int activeTab = 1;
+  private int activeTab = FOOTER_RADIO;
 
   public Footer(BorderPane root) {
     HBox main = new HBox(0);
@@ -73,26 +78,26 @@ public class Footer {
     main.getChildren().add(tab3);
   }
 
-  public void switchTab() {
-    activeTab+=1;
-    if(activeTab > 3) {
-      activeTab = 1;
+  public void switchTab(int footerId) {
+    if(activeTab == footerId) {
+      return;
     }
+    activeTab = footerId;
 
     switch (activeTab) {
-      case 1: {
-        tab1.setStyle(STYLE_ACTIVE);
+      case FOOTER_RADIO: {
+        tab1.setStyle(STYLE_ACTIVE_1);
         tab2.setStyle(STYLE_INACTIVE);
         tab3.setStyle(STYLE_INACTIVE);
         return;
       }
-      case 2: {
+      case FOOTER_WEATHER: {
         tab2.setStyle(STYLE_ACTIVE);
         tab1.setStyle(STYLE_INACTIVE);
         tab3.setStyle(STYLE_INACTIVE);
         return;
       }
-      case 3: {
+      case FOOTER_MUSIC: {
         tab3.setStyle(STYLE_ACTIVE);
         tab2.setStyle(STYLE_INACTIVE);
         tab1.setStyle(STYLE_INACTIVE);

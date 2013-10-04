@@ -65,4 +65,11 @@ public abstract class UIController implements IRotaryControllable {
    * @param model
    */
   public abstract void updatePage(IServiceModel model);
+
+
+  /**
+   * Returns the id of the footer to display.
+   * @return
+   */
+  public abstract int getFooterId();
 }

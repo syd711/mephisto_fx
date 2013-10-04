@@ -5,6 +5,7 @@ import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.services.ServiceRegistry;
 import de.mephisto.radiofx.services.google.Album;
 import de.mephisto.radiofx.services.google.IGoogleMusicService;
+import de.mephisto.radiofx.ui.Footer;
 import de.mephisto.radiofx.ui.Pager;
 import de.mephisto.radiofx.ui.UIStateController;
 import de.mephisto.radiofx.util.UIUtil;
@@ -82,10 +83,9 @@ public class GoogleUINaviController extends PageableUIController {
     tabRoot.setCenter(vMain);
 
     centerRegion = new HBox();
-//    centerRegion.setMaxHeight(153);
     vMain.getChildren().add(centerRegion);
 
-    pager = new Pager(tabRoot, new ArrayList<IServiceModel>(ServiceRegistry.getGoogleService().getAlbums()), false, false);
+    pager = new Pager(tabRoot, new ArrayList<IServiceModel>(ServiceRegistry.getGoogleService().getAlbums()), false, true);
     this.activeAlbum = (Album) pager.getActiveModel();
 
     display();
@@ -109,7 +109,7 @@ public class GoogleUINaviController extends PageableUIController {
 
     hBoxAlbums = new HBox(4);
     centerRegion.getChildren().add(hBoxAlbums);
-    centerRegion.setPadding(new Insets(0,185,0,185));
+    centerRegion.setPadding(new Insets(0, 185, 0, 185));
 
     for (Album album : albums) {
       HBox albumRoot = new HBox(0);
@@ -166,18 +166,29 @@ public class GoogleUINaviController extends PageableUIController {
   }
 
   @Override
-  public IRotaryControllable next() {
-    if(!pager.isAtEnd()) {
-      TranslateTransitionBuilder.create()
-          .duration(Duration.millis(SCROLL_DELAY))
-          .node(centerRegion)
-          .fromX(scrollPos)
-          .toX(scrollPos - SCROLL_WIDTH)
-          .autoReverse(false)
-          .build().play();
+  public int getFooterId() {
+    return Footer.FOOTER_MUSIC;
+  }
 
-      scrollPos-=SCROLL_WIDTH;
+  @Override
+  public IRotaryControllable next() {
+    double scrollTo = scrollPos;
+    if (!pager.isAtEnd()) {
+      scrollTo = scrollPos -= SCROLL_WIDTH;
     }
+    else {
+      scrollTo = 0;
+    }
+
+    TranslateTransitionBuilder.create()
+        .duration(Duration.millis(SCROLL_DELAY))
+        .node(centerRegion)
+        .fromX(scrollPos)
+        .toX(scrollTo)
+        .autoReverse(false)
+        .build().play();
+    scrollPos = scrollTo;
+
     super.next();
     activeAlbum = (Album) pager.getActiveModel();
     return this;
@@ -185,18 +196,22 @@ public class GoogleUINaviController extends PageableUIController {
 
   @Override
   public IRotaryControllable prev() {
-    if(!pager.isAtStart()) {
-      TranslateTransitionBuilder.create()
-          .duration(Duration.millis(SCROLL_DELAY))
-          .node(centerRegion)
-          .fromX(scrollPos)
-          .toX(scrollPos + SCROLL_WIDTH)
-          .autoReverse(false)
-          .build().play();
-
-      scrollPos+=SCROLL_WIDTH;
+    double scrollTo = scrollPos;
+    if (!pager.isAtStart()) {
+      scrollTo = scrollPos += SCROLL_WIDTH;
+    }
+    else {
+      scrollTo = -((getPager().size()-1) * SCROLL_WIDTH);
     }
 
+    TranslateTransitionBuilder.create()
+        .duration(Duration.millis(SCROLL_DELAY))
+        .node(centerRegion)
+        .fromX(scrollPos)
+        .toX(scrollTo)
+        .autoReverse(false)
+        .build().play();
+    scrollPos = scrollTo;
     super.prev();
     activeAlbum = (Album) pager.getActiveModel();
     return this;
@@ -214,6 +229,7 @@ public class GoogleUINaviController extends PageableUIController {
 
   /**
    * Returns the container of the active selection.
+   *
    * @return
    */
   public Node getSelectedAlbumNode() {

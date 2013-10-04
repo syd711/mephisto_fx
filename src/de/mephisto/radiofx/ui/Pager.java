@@ -241,4 +241,12 @@ public class Pager {
     this.activeModel = model;
     updateActivity();
   }
+
+  /**
+   * Returns the amount of pageable items.
+   * @return
+   */
+  public int size() {
+    return models.size();
+  }
 }

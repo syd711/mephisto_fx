@@ -48,10 +48,14 @@ public class UIStateController {
     ServiceRegistry.init(splashScene);
   }
 
-  public void createControllers() {
+  public void createControllers(SplashScreen splashScene) {
+    splashScene.setMessage("Creating Radio Controller...", 0.9);
     radioController = new RadioUIController();
+    splashScene.setMessage("Creating Weather Controller...", 0.92);
     weatherController = new WeatherUIController();
+    splashScene.setMessage("Creating Google Navi Controller...", 0.94);
     googleNaviController = new GoogleUINaviController();
+    splashScene.setMessage("Creating Google Player Controller...", 0.96);
     googlePlayerController = new GoogleUIPlayerController();
   }
 
@@ -83,7 +87,6 @@ public class UIStateController {
   }
 
   public void longPush() {
-    footer.switchTab();
     UIController newController = (UIController) activeController.longPush();
     updateActiveController(newController);
   }
@@ -95,10 +98,11 @@ public class UIStateController {
    */
   private synchronized void updateActiveController(final UIController newController) {
     if(!newController.equals(activeController)) {
+      footer.switchTab(newController.getFooterId());
+      activeController.onDispose();
 
       //check if the controller creates a new UI
       if(newController.getTabRoot() != null && activeController.getTabRoot() != null) {
-        activeController.onDispose();
         final Node center = newController.getTabRoot();
         final FadeTransition outFader = UIUtil.createOutFader(center);
         outFader.onFinishedProperty().set(new EventHandler<ActionEvent>() {

@@ -4,6 +4,7 @@ import de.mephisto.radiofx.services.IService;
 import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.services.ServiceRegistry;
 import de.mephisto.radiofx.services.weather.WeatherInfo;
+import de.mephisto.radiofx.ui.Footer;
 import de.mephisto.radiofx.ui.Pager;
 import de.mephisto.radiofx.ui.UIStateController;
 import de.mephisto.radiofx.util.UIUtil;
@@ -203,6 +204,11 @@ public class WeatherUIController extends PageableUIController {
     else {
       //no refresh for forecast
     }
+  }
+
+  @Override
+  public int getFooterId() {
+    return Footer.FOOTER_WEATHER;
   }
 
   @Override

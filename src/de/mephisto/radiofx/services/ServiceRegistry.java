@@ -35,10 +35,9 @@ public class ServiceRegistry {
         mpdService = new MpdServiceImpl();
         mpdService.initService(splashScene);
 
-        splashScene.setMessage("Creating UI Controllers...", 0.9);
-        UIStateController.getInstance().createControllers();
+        UIStateController.getInstance().createControllers(splashScene);
 
-        splashScene.setMessage("Finished Initialization", 1.0);
+        splashScene.setMessage("Wait for it...", 1.0);
 
         splashScene.dispose();
       }

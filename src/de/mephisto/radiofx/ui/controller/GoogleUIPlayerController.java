@@ -5,6 +5,7 @@ import de.mephisto.radiofx.services.ServiceRegistry;
 import de.mephisto.radiofx.services.google.Album;
 import de.mephisto.radiofx.services.google.IGoogleMusicService;
 import de.mephisto.radiofx.services.google.Song;
+import de.mephisto.radiofx.ui.Footer;
 import de.mephisto.radiofx.ui.UIStateController;
 import de.mephisto.radiofx.util.UIUtil;
 import javafx.animation.FadeTransition;
@@ -139,7 +140,6 @@ public class GoogleUIPlayerController extends PageableUIController {
   @Override
   public IRotaryControllable prev() {
     if (getPager().isAtStart()) {
-      showPlayerMode(false);
       return UIStateController.getInstance().getGoogleNaviController();
     }
 
@@ -160,7 +160,6 @@ public class GoogleUIPlayerController extends PageableUIController {
   @Override
   public IRotaryControllable next() {
     if (getPager().isAtEnd()) {
-      showPlayerMode(false);
       return UIStateController.getInstance().getGoogleNaviController();
     }
     super.next();
@@ -179,7 +178,7 @@ public class GoogleUIPlayerController extends PageableUIController {
 
   @Override
   public IRotaryControllable longPush() {
-    return UIStateController.getInstance().getRadioController();
+    return UIStateController.getInstance().getGoogleNaviController();
   }
 
   @Override
@@ -208,6 +207,11 @@ public class GoogleUIPlayerController extends PageableUIController {
         }
       }
     }
+  }
+
+  @Override
+  public int getFooterId() {
+    return Footer.FOOTER_MUSIC;
   }
 
 

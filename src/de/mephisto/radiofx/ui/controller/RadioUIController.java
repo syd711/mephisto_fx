@@ -4,6 +4,7 @@ import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.services.ServiceRegistry;
 import de.mephisto.radiofx.services.mpd.IMpdService;
 import de.mephisto.radiofx.services.mpd.StationInfo;
+import de.mephisto.radiofx.ui.Footer;
 import de.mephisto.radiofx.ui.Pager;
 import de.mephisto.radiofx.ui.UIStateController;
 import de.mephisto.radiofx.util.UIUtil;
@@ -16,17 +17,19 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import org.apache.commons.lang.StringUtils;
 
+import java.util.Date;
 import java.util.List;
 
 /**
  * Controls the UI for the radio
  */
 public class RadioUIController extends PageableUIController {
-  private static final Font RADIO_STATION_FONT = Font.font("Tahoma", FontWeight.BOLD, 32);
+  private static final Font RADIO_STATION_FONT = Font.font("Tahoma", FontWeight.BOLD, 30);
   private static final Font RADIO_TRACK_FONT= Font.font("Tahoma", FontWeight.NORMAL, 18);
   private static final Font RADIO_URL_FONT= Font.font("Tahoma", FontWeight.NORMAL, 12);
 
   private static final String LOADING_MSG = "Resolving Station Info...";
+  private static final int REFRESH_TIMEOUT = 8000;
 
   private Text stationText;
   private Text trackText;
@@ -36,6 +39,7 @@ public class RadioUIController extends PageableUIController {
   private StationInfo activeStation;
 
   private IMpdService mpdService;
+  private long selectionTime = new Date().getTime();
 
   public RadioUIController() {
     super(ServiceRegistry.getMpdService());
@@ -97,21 +101,38 @@ public class RadioUIController extends PageableUIController {
    */
   @Override
   public void updatePage(IServiceModel model) {
+    if(!model.equals(getPager().getActiveModel())) {
+      return;
+    }
+
     StationInfo info = (StationInfo) model;
-    stationText.setText(formatValue(info.getName(), 26));
+    stationText.setText(formatValue(info.getName(), 22));
     if(StringUtils.isEmpty(info.getTrack())) {
       if(info.isActive()) {
-        trackText.setText(LOADING_MSG);
+        long current = new Date().getTime();
+        if(current-selectionTime > REFRESH_TIMEOUT) {
+          trackText.setText("- not station info available -");
+          stopBlink();
+        }
+        else {
+          trackText.setText(LOADING_MSG);
+        }
       }
       else {
         trackText.setText("");
       }
     }
     else {
-      trackText.setText(formatValue(info.getTrack(), 44));
+
+      trackText.setText(formatValue(info.getTrack(), 42));
       stopBlink();
     }
     urlText.setText(formatValue(info.getUrl(), 70));
+  }
+
+  @Override
+  public int getFooterId() {
+    return Footer.FOOTER_RADIO;
   }
 
   private void stopBlink() {
@@ -128,7 +149,7 @@ public class RadioUIController extends PageableUIController {
   private String formatValue(String value, int length)  {
     if(value != null && value.length() > length) {
       int lastWhitespace = value.lastIndexOf(" ");
-      if(lastWhitespace < length) {
+      if(lastWhitespace > 0 && lastWhitespace < length) {
         length = lastWhitespace;
       }
       value = value.substring(0, length) + "...";
@@ -138,6 +159,7 @@ public class RadioUIController extends PageableUIController {
 
   private void playStation(StationInfo info) {
     if(info != null && !info.equals(activeStation)) {
+      selectionTime = new Date().getTime();
       trackText.setText(LOADING_MSG);
       blink.play();
       this.activeStation = info;

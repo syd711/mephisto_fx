@@ -58,6 +58,7 @@ public class MPDClient {
    */
   public void play(String url) {
     try {
+      LOG.info("Playback of URL " + url);
       executeTelnetCommand("clear");
       Thread.sleep(100);
       executeTelnetCommand("add " + url);

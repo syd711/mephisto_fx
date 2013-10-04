@@ -81,6 +81,9 @@ public class MpdServiceImpl extends RefreshingService implements IMpdService {
         if (streamConfig.containsKey(nameKey)) {
           info.setName(streamConfig.getString(nameKey));
         }
+        else {
+          info.setName(url);
+        }
 
         stations.add(info);
       }

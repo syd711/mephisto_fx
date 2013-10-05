@@ -74,10 +74,8 @@ public class GoogleUINaviController extends PageableUIController {
     //title text
     artistText = new Text(0, 0, "");
     artistText.setFont(Fonts.FONT_BOLD_14);
-    artistText.setFill(Colors.COLOR_DARK_HEADER);
     albumText = new Text(0, 0, "");
     albumText.setFont(Fonts.FONT_NORMAL_14);
-    albumText.setFill(Colors.COLOR_DARK_HEADER);
     selectionBox.getChildren().add(artistText);
     selectionBox.getChildren().add(albumText);
 
@@ -175,12 +173,9 @@ public class GoogleUINaviController extends PageableUIController {
 
   @Override
   public IRotaryControllable next() {
-    double scrollTo = scrollPos;
+    double scrollTo = 0;
     if (!pager.isAtEnd()) {
       scrollTo = scrollPos -= SCROLL_WIDTH;
-    }
-    else {
-      scrollTo = 0;
     }
 
     TranslateTransitionBuilder.create()
@@ -199,12 +194,9 @@ public class GoogleUINaviController extends PageableUIController {
 
   @Override
   public IRotaryControllable prev() {
-    double scrollTo = scrollPos;
+    double scrollTo = -((getPager().size()-1) * SCROLL_WIDTH);
     if (!pager.isAtStart()) {
       scrollTo = scrollPos += SCROLL_WIDTH;
-    }
-    else {
-      scrollTo = -((getPager().size()-1) * SCROLL_WIDTH);
     }
 
     TranslateTransitionBuilder.create()

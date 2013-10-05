@@ -48,9 +48,7 @@ public abstract class PageableUIController extends UIController implements IServ
   @Override
   public IRotaryControllable next() {
     IServiceModel info = pager.next();
-    TransitionUtil.fadeOutComponent(pagingRoot);
-    updatePage(info);
-    TransitionUtil.fadeInComponent(pagingRoot);
+    refresh(info);
     return this;
   }
 
@@ -60,9 +58,18 @@ public abstract class PageableUIController extends UIController implements IServ
   @Override
   public IRotaryControllable prev() {
     IServiceModel info = pager.prev();
-    TransitionUtil.fadeOutComponent(pagingRoot);
-    updatePage(info);
-    TransitionUtil.fadeInComponent(pagingRoot);
+    refresh(info);
     return this;
+  }
+
+  /**
+   * Refreshes the current page
+   *
+   * @param model
+   */
+  private void refresh(final IServiceModel model) {
+    TransitionUtil.createOutFader(pagingRoot);
+    updatePage(model);
+    TransitionUtil.fadeInComponent(pagingRoot);
   }
 }

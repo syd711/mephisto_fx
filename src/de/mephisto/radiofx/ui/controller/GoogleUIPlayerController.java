@@ -301,6 +301,10 @@ public class GoogleUIPlayerController extends PageableUIController {
     }
   }
 
+  /**
+   * Toogles the view between navigation view and playback mode.
+   * @param show
+   */
   private void showPlayerMode(final boolean show) {
     getPager().toggleMode();
     if (show) {

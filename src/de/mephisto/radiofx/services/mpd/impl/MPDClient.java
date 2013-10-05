@@ -78,7 +78,6 @@ public class MPDClient {
    */
   public void executeTelnetCommand(String cmd) {
     try {
-//      LOG.info("Executing telnet command '" + cmd + "'");
       cmd += "\n";
       if (client == null || client.getOutputStream() == null) {
         connect();
@@ -128,21 +127,27 @@ public class MPDClient {
     return localModeEnabled;
   }
 
-  @Override
-  public String toString() {
-    return "MPCClient for " + host + ":" + port;
-  }
 
+  /**
+   * Executes the playlistinfo command and applies
+   * the result string to the current station.
+   * @return
+   */
   public PlaylistInfo playlistInfo() {
     if(client != null && client.isConnected()) {
       executeTelnetCommand("playlistinfo");
       String output = outputStream.getLastCommand();
-//    LOG.info("Resolved playlist info: " + output.trim());
       return new PlaylistInfo(output);
     }
     else {
       LOG.error("Failed to retrieve mpc playlist info: telnet client is not connected.");
     }
     return null;
+  }
+
+
+  @Override
+  public String toString() {
+    return "MPCClient for " + host + ":" + port;
   }
 }

@@ -104,29 +104,6 @@ public class Playlist extends MModel {
     return null;
   }
 
-  /**
-   * Returns the previous song or null if there is no previous song.
-   * @return
-   */
-//  public Song previousSong() {
-//    Iterator<Song> it = getSongs().iterator();
-//    if(activeSong == null) {
-//      activeSong = it.next();
-//      return activeSong;
-//    }
-//    Song prev = null;
-//    while(it.hasNext()) {
-//      Song next = it.next();
-//      if(next.equals(activeSong)) {
-//        activeSong = prev;
-//        return activeSong;
-//      }
-//      prev = next;
-//    }
-//    activeSong = null;
-//    return null;
-//  }
-
   public Song getActiveSong() {
     for(Song song : getSongs()) {
       if(song.isActive()) {

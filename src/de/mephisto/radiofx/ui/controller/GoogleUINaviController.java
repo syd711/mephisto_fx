@@ -8,7 +8,10 @@ import de.mephisto.radiofx.services.google.IGoogleMusicService;
 import de.mephisto.radiofx.ui.Footer;
 import de.mephisto.radiofx.ui.Pager;
 import de.mephisto.radiofx.ui.UIStateController;
-import de.mephisto.radiofx.util.UIUtil;
+import de.mephisto.radiofx.util.Colors;
+import de.mephisto.radiofx.util.Fonts;
+import de.mephisto.radiofx.util.ImageCache;
+import de.mephisto.radiofx.util.TransitionUtil;
 import javafx.animation.TranslateTransitionBuilder;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -29,7 +32,7 @@ import java.util.List;
  * Controls the UI for the google music
  */
 public class GoogleUINaviController extends PageableUIController {
-  public static final String STYLE_ACTIVE = "-fx-background-color:" + UIUtil.HEX_COLOR_INACTIVE + ";";
+  public static final String STYLE_ACTIVE = "-fx-background-color:" + Colors.HEX_COLOR_INACTIVE + ";";
   public static final String STYLE_INACTIVE = "-fx-background-color: transparent;";
 
   public static final int COVER_SIZE = 100;
@@ -54,7 +57,7 @@ public class GoogleUINaviController extends PageableUIController {
   @Override
   public BorderPane init() {
     BorderPane tabRoot = new BorderPane();
-    tabRoot.setMinHeight(UIUtil.MIN_MAIN_HEIGHT);
+    tabRoot.setMinHeight(TransitionUtil.MIN_MAIN_HEIGHT);
     IGoogleMusicService service = ServiceRegistry.getGoogleService();
     List<Album> albums = service.getAlbums();
 
@@ -70,11 +73,11 @@ public class GoogleUINaviController extends PageableUIController {
 
     //title text
     artistText = new Text(0, 0, "");
-    artistText.setFont(UIUtil.FONT_BOLD_14);
-    artistText.setFill(UIUtil.COLOR_DARK_HEADER);
+    artistText.setFont(Fonts.FONT_BOLD_14);
+    artistText.setFill(Colors.COLOR_DARK_HEADER);
     albumText = new Text(0, 0, "");
-    albumText.setFont(UIUtil.FONT_NORMAL_14);
-    albumText.setFill(UIUtil.COLOR_DARK_HEADER);
+    albumText.setFont(Fonts.FONT_NORMAL_14);
+    albumText.setFill(Colors.COLOR_DARK_HEADER);
     selectionBox.getChildren().add(artistText);
     selectionBox.getChildren().add(albumText);
 
@@ -120,23 +123,23 @@ public class GoogleUINaviController extends PageableUIController {
       vbox.setPadding(new Insets(3, 3, 3, 3));
 
       if (!StringUtils.isEmpty(album.getArtUrl())) {
-        Canvas cover = UIUtil.createLazyLoadingImageCanvas(album.getCoverId(), album.getArtUrl(), COVER_SIZE, COVER_SIZE);
+        Canvas cover = ImageCache.createLazyLoadingImageCanvas(album.getCoverId(), album.getArtUrl(), COVER_SIZE, COVER_SIZE);
         vbox.getChildren().add(cover);
       }
       else {
         String url = ResourceLoader.getResource("cover.png");
-        Canvas cover = UIUtil.createImageCanvas(url, COVER_SIZE, COVER_SIZE);
+        Canvas cover = TransitionUtil.createImageCanvas(url, COVER_SIZE, COVER_SIZE);
         vbox.getChildren().add(cover);
       }
 
       Text text = new Text(0, 0, formatLabel(album.getArtist(), 13));
-      text.setFont(UIUtil.FONT_BOLD_12);
-      text.setFill(UIUtil.COLOR_DARK_HEADER);
+      text.setFont(Fonts.FONT_BOLD_12);
+      text.setFill(Colors.COLOR_DARK_HEADER);
       vbox.getChildren().add(text);
 
       text = new Text(0, 0, formatLabel(album.getName(), 15));
-      text.setFont(UIUtil.FONT_NORMAL_12);
-      text.setFill(UIUtil.COLOR_DARK_HEADER);
+      text.setFont(Fonts.FONT_NORMAL_12);
+      text.setFill(Colors.COLOR_DARK_HEADER);
       vbox.getChildren().add(text);
 
       albumRoot.getChildren().add(vbox);

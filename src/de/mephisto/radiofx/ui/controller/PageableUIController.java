@@ -4,7 +4,7 @@ import de.mephisto.radiofx.services.IService;
 import de.mephisto.radiofx.services.IServiceInfoListener;
 import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.ui.Pager;
-import de.mephisto.radiofx.util.UIUtil;
+import de.mephisto.radiofx.util.TransitionUtil;
 import javafx.scene.Node;
 
 /**
@@ -48,9 +48,9 @@ public abstract class PageableUIController extends UIController implements IServ
   @Override
   public IRotaryControllable next() {
     IServiceModel info = pager.next();
-    UIUtil.fadeOutComponent(pagingRoot);
+    TransitionUtil.fadeOutComponent(pagingRoot);
     updatePage(info);
-    UIUtil.fadeInComponent(pagingRoot);
+    TransitionUtil.fadeInComponent(pagingRoot);
     return this;
   }
 
@@ -60,9 +60,9 @@ public abstract class PageableUIController extends UIController implements IServ
   @Override
   public IRotaryControllable prev() {
     IServiceModel info = pager.prev();
-    UIUtil.fadeOutComponent(pagingRoot);
+    TransitionUtil.fadeOutComponent(pagingRoot);
     updatePage(info);
-    UIUtil.fadeInComponent(pagingRoot);
+    TransitionUtil.fadeInComponent(pagingRoot);
     return this;
   }
 }

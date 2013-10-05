@@ -3,6 +3,7 @@ package de.mephisto.radiofx.services.mpd.impl;
 import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.services.RefreshingService;
 import de.mephisto.radiofx.services.google.Album;
+import de.mephisto.radiofx.services.google.Song;
 import de.mephisto.radiofx.services.mpd.IMpdService;
 import de.mephisto.radiofx.services.mpd.StationInfo;
 import de.mephisto.radiofx.ui.SplashScreen;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -25,6 +27,11 @@ import java.util.List;
 public class MpdServiceImpl extends RefreshingService implements IMpdService {
   private final static Logger LOG = LoggerFactory.getLogger(MpdServiceImpl.class);
 
+  private final static int MODE_RADIO = 0;
+  private final static int MODE_MUSIC = 1;
+
+
+
   private final static String CONFIG_NAME = "mpd.properties";
   private final static String CONFIG_FILE = "conf/streams.properties";
 
@@ -33,14 +40,18 @@ public class MpdServiceImpl extends RefreshingService implements IMpdService {
 
   private final static String PROPERTY_ACTIVE_STATION = "active.station";
 
-  private final static int REFRESH_INTERVAL = 3000;
+  private final static int REFRESH_INTERVAL = 2000;
 
   private MPDClient client;
 
   private StationInfo activeStation;
-  private PropertiesConfiguration streamConfig;
+  private Album activeAlbum;
 
   private List<IServiceModel> stations = new ArrayList<IServiceModel>();
+
+  private PropertiesConfiguration streamConfig;
+  private long playbackTime = 0l;
+  private int mode = MODE_RADIO;
 
   public MpdServiceImpl() {
     super(REFRESH_INTERVAL);
@@ -116,10 +127,31 @@ public class MpdServiceImpl extends RefreshingService implements IMpdService {
       StationInfo info = (StationInfo) model;
       if (info.isActive()) {
         PlaylistInfo current = client.playlistInfo();
-        boolean modifiedName = info.applyPlaylistInfo(current);
-        if (modifiedName) {
-          saveStations();
+        if(current != null) {
+          boolean modifiedName = info.applyPlaylistInfo(current);
+          if (modifiedName) {
+            saveStations();
+          }
         }
+      }
+    }
+  }
+
+  /**
+   * Resolves the active MPD playback and applies it to the album.
+   */
+  private void refreshAlbum() {
+    long currentDuration = new Date().getTime()-playbackTime;
+    Song activeSong = activeAlbum.getActiveSong();
+    if(activeSong != null && currentDuration > activeSong.getDurationMillis()) {
+      Song song = activeAlbum.nextSong();
+      activeSong.setActive(false);
+      if(song != null) {
+        LOG.info("Playing next song: " + song);
+        playAlbum(activeAlbum);
+      }
+      else {
+        LOG.info("Reached on of playback for " + activeAlbum);
       }
     }
   }
@@ -151,8 +183,24 @@ public class MpdServiceImpl extends RefreshingService implements IMpdService {
 
   @Override
   public List<IServiceModel> getServiceData() {
-    refreshStations();
-    return stations;
+    //this is a little bit tricky here since we use this service by to UI controller
+    //this call maybe a delegation of another service controller to fix the thread refresh.
+    if(mode == MODE_RADIO) {
+      refreshStations();
+      return stations;
+    }
+    else {
+      refreshAlbum();
+      return new ArrayList<IServiceModel>(activeAlbum.getSongs());
+    }
+  }
+
+  /**
+   * Switches the service to different modes.
+   * @param mode
+   */
+  private void setMode(int mode) {
+    this.mode = mode;
   }
 
   @Override
@@ -164,12 +212,35 @@ public class MpdServiceImpl extends RefreshingService implements IMpdService {
     activeStation.setTrack("");
     info.setActive(true);
     saveStations();
+
+    //switch at this point to avoid too early refresh with wrong station.
+    setMode(MODE_RADIO);
     String url = info.getUrl();
     client.play(url);
   }
 
   @Override
   public void playAlbum(Album album) {
-    //To change body of implemented methods use File | Settings | File Templates.
+    if(activeAlbum != null) {
+      activeAlbum.setActive(false);
+    }
+    activeAlbum = album;
+    activeAlbum.setActive(true);
+    Song song = activeAlbum.getActiveSong();
+    song.setActive(true);
+
+    //switch at this point to avoid too early refresh with empty active song.
+    setMode(MODE_MUSIC);
+    try {
+      final String playbackUrl = song.getPlaybackUrl();
+      playbackTime = client.play(playbackUrl);
+    } catch (Exception e) {
+      LOG.error("Error executing playback of '" + song.getName() + "': " + e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public boolean isRadioMode() {
+    return mode == MODE_RADIO;
   }
 }

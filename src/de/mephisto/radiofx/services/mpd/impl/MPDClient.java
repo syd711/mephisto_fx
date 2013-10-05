@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Date;
 
 /**
  * Utility methods for handling the MPD.
@@ -56,7 +57,7 @@ public class MPDClient {
    *
    * @param url
    */
-  public void play(String url) {
+  public long play(String url) {
     try {
       LOG.info("Playback of URL " + url);
       executeTelnetCommand("clear");
@@ -67,6 +68,7 @@ public class MPDClient {
     } catch (Exception e) {
       LOG.error("Error executing playback of URL " + url + ": " + e.getMessage(), e);
     }
+    return new Date().getTime();
   }
 
   /**
@@ -132,9 +134,15 @@ public class MPDClient {
   }
 
   public PlaylistInfo playlistInfo() {
-    executeTelnetCommand("playlistinfo");
-    String output = outputStream.getLastCommand();
+    if(client != null && client.isConnected()) {
+      executeTelnetCommand("playlistinfo");
+      String output = outputStream.getLastCommand();
 //    LOG.info("Resolved playlist info: " + output.trim());
-    return new PlaylistInfo(output);
+      return new PlaylistInfo(output);
+    }
+    else {
+      LOG.error("Failed to retrieve mpc playlist info: telnet client is not connected.");
+    }
+    return null;
   }
 }

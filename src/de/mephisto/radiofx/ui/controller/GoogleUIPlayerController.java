@@ -5,9 +5,12 @@ import de.mephisto.radiofx.services.ServiceRegistry;
 import de.mephisto.radiofx.services.google.Album;
 import de.mephisto.radiofx.services.google.IGoogleMusicService;
 import de.mephisto.radiofx.services.google.Song;
+import de.mephisto.radiofx.services.mpd.IMpdService;
 import de.mephisto.radiofx.ui.Footer;
 import de.mephisto.radiofx.ui.UIStateController;
-import de.mephisto.radiofx.util.UIUtil;
+import de.mephisto.radiofx.util.Colors;
+import de.mephisto.radiofx.util.Fonts;
+import de.mephisto.radiofx.util.TransitionUtil;
 import javafx.animation.FadeTransition;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -29,15 +32,15 @@ import java.util.List;
  *
  */
 public class GoogleUIPlayerController extends PageableUIController {
-  public static final String STYLE_INACTIVE = "-fx-background-color: " + UIUtil.HEX_COLOR_BACKGROUND + ";-fx-border-color: " + UIUtil.HEX_COLOR_SEPARATOR +
-      " " + UIUtil.HEX_COLOR_SEPARATOR + " " + UIUtil.HEX_COLOR_SEPARATOR + " " + UIUtil.HEX_COLOR_SEPARATOR + ";";
+  public static final String STYLE_INACTIVE = "-fx-background-color: " + Colors.HEX_COLOR_BACKGROUND + ";-fx-border-color: " + Colors.HEX_COLOR_SEPARATOR +
+      " " + Colors.HEX_COLOR_SEPARATOR + " " + Colors.HEX_COLOR_SEPARATOR + " " + Colors.HEX_COLOR_SEPARATOR + ";";
 
-  public static final String STYLE_ACTIVE = "-fx-background-color: " + UIUtil.HEX_COLOR_INACTIVE + ";-fx-border-color: " + UIUtil.HEX_COLOR_SEPARATOR +
-      " " + UIUtil.HEX_COLOR_SEPARATOR + " " + UIUtil.HEX_COLOR_SEPARATOR + " " + UIUtil.HEX_COLOR_SEPARATOR + ";";
+  public static final String STYLE_ACTIVE = "-fx-background-color: " + Colors.HEX_COLOR_INACTIVE + ";-fx-border-color: " + Colors.HEX_COLOR_SEPARATOR +
+      " " + Colors.HEX_COLOR_SEPARATOR + " " + Colors.HEX_COLOR_SEPARATOR + " " + Colors.HEX_COLOR_SEPARATOR + ";";
 
   private final static int VISIBLE_ITEM_COUNT = 4;
   private final static int SCROLL_DELAY = 400;
-  private final static int SCROLL_LEFT_LENGTH = 29;
+  private final static int SCROLL_LEFT_LENGTH = 27;
 
   private int scrollPos = 0;
 
@@ -48,14 +51,20 @@ public class GoogleUIPlayerController extends PageableUIController {
   private Pane albumNode;
 
   private ScrollPane songScroller;
+  private IMpdService mpdService;
+
+  private FadeTransition blink;
+  private Node lastBlinkNode;
 
   public GoogleUIPlayerController() {
-    super(ServiceRegistry.getGoogleService());
+    //the player does not use the mpd service!
+    super(ServiceRegistry.getMpdService());
   }
 
 
   @Override
   public BorderPane init() {
+    mpdService = ServiceRegistry.getMpdService();
     return null; //component does only modify the current UI and re-uses the pager.
   }
 
@@ -64,7 +73,6 @@ public class GoogleUIPlayerController extends PageableUIController {
   public void onDisplay() {
     GoogleUINaviController naviController = UIStateController.getInstance().getGoogleNaviController();
     album = naviController.getActiveAlbum();
-    album.setActiveSong(album.getSongs().get(0));
     setPager(naviController.getPager());
 
     albumNode = (Pane) naviController.getSelectedAlbumNode();
@@ -81,62 +89,6 @@ public class GoogleUIPlayerController extends PageableUIController {
     setPager(naviController.getPager());
   }
 
-  private void showPlayerMode(final boolean show) {
-    getPager().toggleMode();
-    if (show) {
-      getPager().setModels(new ArrayList<IServiceModel>(album.getSongs()), album.getActiveSong());
-    }
-    else {
-      IGoogleMusicService service = ServiceRegistry.getGoogleService();
-      List<Album> albums = service.getAlbums();
-      getPager().setModels(new ArrayList<IServiceModel>(albums), album);
-    }
-
-    Pane centerRegion = UIStateController.getInstance().getGoogleNaviController().getCenterRegion();
-
-    final ObservableList<Node> children = ((Pane) centerRegion.getChildren().get(0)).getChildren();
-    List<Node> nodes = new ArrayList<Node>();
-    int count = children.indexOf(albumNode)+1;
-    for (int i = count; i < count+4; i++) {
-      if (children.size()>i) {
-        nodes.add(children.get(i));
-      }
-    }
-
-    if(!show) {
-      final FadeTransition outFader = UIUtil.createOutFader(songScroller);
-      outFader.setOnFinished(new EventHandler<ActionEvent>() {
-        @Override
-        public void handle(ActionEvent actionEvent) {
-          albumNode.getChildren().remove(songScroller);
-        }
-      });
-      outFader.play();
-    }
-
-    int scrollPos = (int) UIStateController.getInstance().getGoogleNaviController().getScrollPos();
-    for (Node node : nodes) {
-      UIUtil.moveNodeX(node, 0, children.indexOf(albumNode) * 110 + 450, !show, SCROLL_DELAY);
-    }
-
-    final EventHandler<ActionEvent> eventHandler = new EventHandler<ActionEvent>() {
-      @Override
-      public void handle(ActionEvent actionEvent) {
-        if (show) {
-          display();
-
-          UIUtil.fadeInComponent(songScroller);
-        }
-        else {
-          albumNode.setStyle(GoogleUINaviController.STYLE_ACTIVE);
-        }
-      }
-    };
-
-    UIUtil.moveNode(centerRegion, scrollPos, (scrollPos - 175), !show, SCROLL_DELAY, eventHandler, true);
-  }
-
-
   @Override
   public IRotaryControllable prev() {
     if (getPager().isAtStart()) {
@@ -144,14 +96,13 @@ public class GoogleUIPlayerController extends PageableUIController {
     }
 
     super.prev();
-    album.setActiveSong((Song) getPager().getActiveModel());
 
-    if (album.getActiveSongIndex() > (album.getSize() - VISIBLE_ITEM_COUNT)) {
+    if (getPager().getPosition() > (getPager().size() - VISIBLE_ITEM_COUNT)) {
       return this;
     }
 
     if (scrollPos < 0) {
-      UIUtil.moveNodeY(songBox, scrollPos, scrollPos + SCROLL_LEFT_LENGTH, false, SCROLL_DELAY);
+      TransitionUtil.moveNodeY(songBox, scrollPos, scrollPos + SCROLL_LEFT_LENGTH, false, SCROLL_DELAY);
       scrollPos += SCROLL_LEFT_LENGTH;
     }
     return this;
@@ -164,14 +115,14 @@ public class GoogleUIPlayerController extends PageableUIController {
     }
     super.next();
 
-    if (album.getActiveSongIndex() < (VISIBLE_ITEM_COUNT - 1)) {
+    if (getPager().getPosition() < (VISIBLE_ITEM_COUNT - 1)) {
       return this;
     }
-    if (album.getActiveSongIndex() > ((album.getSize()+1) - VISIBLE_ITEM_COUNT)) {
+    if (getPager().getPosition() > ((getPager().size()+1) - VISIBLE_ITEM_COUNT)) {
       return this;
     }
 
-    UIUtil.moveNodeY(songBox, scrollPos, scrollPos - SCROLL_LEFT_LENGTH, false, SCROLL_DELAY);
+    TransitionUtil.moveNodeY(songBox, scrollPos, scrollPos - SCROLL_LEFT_LENGTH, false, SCROLL_DELAY);
     scrollPos -= SCROLL_LEFT_LENGTH;
     return this;
   }
@@ -183,13 +134,40 @@ public class GoogleUIPlayerController extends PageableUIController {
 
   @Override
   public IRotaryControllable push() {
+    Song song = (Song) getPager().getActiveModel();
+    album.reset();
+    song.setActive(true);
+    mpdService.playAlbum(album);
+    Node node = getNodeForSong(song);
+    updateBlink(node);
     return UIStateController.getInstance().getGooglePlayerController();
   }
 
   @Override
+  public void serviceDataChanged(IServiceModel model) {
+    if(model instanceof Song) {
+      if(getPager() != null) {
+        getPager().updateActivity(); //the activity status may have changed by the backend.
+      }
+      updatePage(model);
+    }
+  }
+
+  @Override
   public void updatePage(IServiceModel model) {
+    if(getPager() == null) {   //maybe null during init
+      return;
+    }
     if (model instanceof Song) {
-      album.setActiveSong((Song) getPager().getActiveModel());
+      Song song = (Song) model;
+      if(album.getActiveSong() == null) {
+        updateBlink(null);
+      }
+      if(song.isActive()) {
+        Node container = getNodeForSong(song);
+        updateBlink(container);
+      }
+
 
       if (lastSongSelection != null) {
         lastSongSelection.setStyle(STYLE_INACTIVE);
@@ -199,10 +177,11 @@ public class GoogleUIPlayerController extends PageableUIController {
         final ObservableList<Node> children = songBox.getChildren();
         for (Node node : children) {
           String id = node.getId();
-          if (id.equals(String.valueOf(album.getActiveSong().getMID()))) {
-            lastSongSelection = node;
-            lastSongSelection.setStyle(STYLE_ACTIVE);
-            break;
+          if(getPager().getActiveModel() instanceof Song) {
+            if (id.equals(String.valueOf(((Song)getPager().getActiveModel()).getMID()))) {
+              lastSongSelection = node;
+              lastSongSelection.setStyle(STYLE_ACTIVE);
+            }
           }
         }
       }
@@ -237,6 +216,7 @@ public class GoogleUIPlayerController extends PageableUIController {
       trackBox.setPadding(new Insets(2, 5, 2, 5));
       if (track == 1) {
         trackBox.setStyle(STYLE_ACTIVE);
+        lastSongSelection = trackBox;
       }
       else {
         trackBox.setStyle(STYLE_INACTIVE);
@@ -267,8 +247,6 @@ public class GoogleUIPlayerController extends PageableUIController {
     songScroller.setOpacity(0);
     songScroller.setContent(songBox);
     albumNode.getChildren().add(songScroller);
-
-    updatePage(album.getActiveSong());
   }
 
   /**
@@ -282,7 +260,102 @@ public class GoogleUIPlayerController extends PageableUIController {
       label = label.substring(0, 29) + "...";
     }
     Text text = new Text(label);
-    text.setFont(UIUtil.FONT_NORMAL_14);
+    text.setFont(Fonts.FONT_NORMAL_14);
     return text;
   }
+
+
+  /**
+   * Returns the row for the given song.
+   * @param song
+   * @return
+   */
+  private Node getNodeForSong(Song song) {
+    final ObservableList<Node> children = songBox.getChildren();
+    for (Node node : children) {
+      String id = node.getId();
+      if (id.equals(String.valueOf(song.getMID()))) {
+        return node;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Updates the UI for the active Track.
+   * @param node
+   */
+  private void updateBlink(Node node) {
+    if(node == null && lastBlinkNode != null) {
+      lastBlinkNode.setOpacity(1);
+      blink.stop();
+    }
+    if(lastBlinkNode == null || lastBlinkNode != node) {
+      if(lastBlinkNode != null) {
+        lastBlinkNode.setOpacity(1);
+        blink.stop();
+      }
+      lastBlinkNode = node;
+      blink = TransitionUtil.createBlink(node);
+      blink.play();
+    }
+  }
+
+  private void showPlayerMode(final boolean show) {
+    getPager().toggleMode();
+    if (show) {
+      getPager().setModels(new ArrayList<IServiceModel>(album.getSongs()), album.getSongs().get(0));
+    }
+    else {
+      IGoogleMusicService service = ServiceRegistry.getGoogleService();
+      List<Album> albums = service.getAlbums();
+      getPager().setModels(new ArrayList<IServiceModel>(albums), album);
+    }
+
+    Pane centerRegion = UIStateController.getInstance().getGoogleNaviController().getCenterRegion();
+
+    final ObservableList<Node> children = ((Pane) centerRegion.getChildren().get(0)).getChildren();
+    List<Node> nodes = new ArrayList<Node>();
+    int count = children.indexOf(albumNode)+1;
+    for (int i = count; i < count+4; i++) {
+      if (children.size()>i) {
+        nodes.add(children.get(i));
+      }
+    }
+
+    if(!show) {
+      final FadeTransition outFader = TransitionUtil.createOutFader(songScroller);
+      outFader.setOnFinished(new EventHandler<ActionEvent>() {
+        @Override
+        public void handle(ActionEvent actionEvent) {
+          albumNode.getChildren().remove(songScroller);
+        }
+      });
+      outFader.play();
+    }
+
+    int scrollPos = (int) UIStateController.getInstance().getGoogleNaviController().getScrollPos();
+    for (Node node : nodes) {
+      TransitionUtil.moveNodeX(node, 0, children.indexOf(albumNode) * 110 + 450, !show, SCROLL_DELAY);
+    }
+
+    final EventHandler<ActionEvent> eventHandler = new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent actionEvent) {
+        if (show) {
+          display();
+
+          TransitionUtil.fadeInComponent(songScroller);
+        }
+        else {
+          if(UIStateController.getInstance().getActiveController() != GoogleUIPlayerController.this) {
+            albumNode.setStyle(GoogleUINaviController.STYLE_ACTIVE);
+          }
+        }
+      }
+    };
+
+    TransitionUtil.moveNode(centerRegion, scrollPos, (scrollPos - 175), !show, SCROLL_DELAY, eventHandler, true);
+  }
+
 }

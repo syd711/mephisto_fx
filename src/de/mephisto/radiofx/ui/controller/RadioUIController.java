@@ -7,7 +7,8 @@ import de.mephisto.radiofx.services.mpd.StationInfo;
 import de.mephisto.radiofx.ui.Footer;
 import de.mephisto.radiofx.ui.Pager;
 import de.mephisto.radiofx.ui.UIStateController;
-import de.mephisto.radiofx.util.UIUtil;
+import de.mephisto.radiofx.util.Colors;
+import de.mephisto.radiofx.util.TransitionUtil;
 import javafx.animation.FadeTransition;
 import javafx.geometry.Insets;
 import javafx.scene.layout.BorderPane;
@@ -36,10 +37,9 @@ public class RadioUIController extends PageableUIController {
   private Text urlText;
   private FadeTransition blink;
 
-  private StationInfo activeStation;
-
   private IMpdService mpdService;
   private long selectionTime = new Date().getTime();
+  private StationInfo activeStation;
 
   public RadioUIController() {
     super(ServiceRegistry.getMpdService());
@@ -50,7 +50,7 @@ public class RadioUIController extends PageableUIController {
     this.mpdService = ServiceRegistry.getMpdService();
 
     BorderPane tabRoot = new BorderPane();
-    tabRoot.setMinHeight(UIUtil.MIN_MAIN_HEIGHT);
+    tabRoot.setMinHeight(TransitionUtil.MIN_MAIN_HEIGHT);
 
     VBox verticalRoot = new VBox(20);
     verticalRoot.setPadding(new Insets(30, 0, 0, 20));
@@ -58,20 +58,20 @@ public class RadioUIController extends PageableUIController {
 
     stationText = new Text(0, 0, "");
     stationText.setFont(RADIO_STATION_FONT);
-    stationText.setFill(UIUtil.COLOR_DARK_HEADER);
+    stationText.setFill(Colors.COLOR_DARK_HEADER);
     verticalRoot.getChildren().add(stationText);
 
     trackText = new Text(0, 0, "");
     trackText.setFont(RADIO_TRACK_FONT);
-    trackText.setFill(UIUtil.COLOR_DARK_HEADER);
+    trackText.setFill(Colors.COLOR_DARK_HEADER);
     verticalRoot.getChildren().add(trackText);
 
-    blink = UIUtil.createBlink(trackText);
+    blink = TransitionUtil.createBlink(trackText);
     blink.play();
 
     urlText = new Text(0, 0, "");
     urlText.setFont(RADIO_URL_FONT);
-    urlText.setFill(UIUtil.COLOR_DARK_HEADER);
+    urlText.setFill(Colors.COLOR_DARK_HEADER);
 
     verticalRoot.getChildren().add(urlText);
 
@@ -80,7 +80,6 @@ public class RadioUIController extends PageableUIController {
 
     final List<IServiceModel> serviceData = ServiceRegistry.getMpdService().getServiceData();
     if(!serviceData.isEmpty()) {
-      activeStation = (StationInfo) serviceData.get(0);
       for(IServiceModel model : serviceData) {
         StationInfo info = (StationInfo) model;
         if(info.isActive())  {
@@ -89,7 +88,7 @@ public class RadioUIController extends PageableUIController {
           break;
         }
       }
-      updatePage(activeStation);
+      updatePage(serviceData.get(0));
     }
 
     return tabRoot;
@@ -135,6 +134,26 @@ public class RadioUIController extends PageableUIController {
     return Footer.FOOTER_RADIO;
   }
 
+  @Override
+  public IRotaryControllable push() {
+    StationInfo info = (StationInfo) getPager().getActiveModel();
+    playStation(info);
+    return this;
+  }
+
+  @Override
+  public IRotaryControllable longPush() {
+    return UIStateController.getInstance().getWeatherController();
+  }
+
+  @Override
+  public void onDisplay() {
+    if(!mpdService.isRadioMode()) {
+      activeStation.setActive(false);
+    }
+    getPager().updateActivity();
+  }
+
   private void stopBlink() {
     blink.stop();
     trackText.setOpacity(1);
@@ -158,26 +177,12 @@ public class RadioUIController extends PageableUIController {
   }
 
   private void playStation(StationInfo info) {
-    if(info != null && !info.equals(activeStation)) {
-      selectionTime = new Date().getTime();
-      trackText.setText(LOADING_MSG);
-      blink.play();
-      this.activeStation = info;
-      mpdService.playStation(info);
-      mpdService.forceRefresh();
-      getPager().updateActivity();
-    }
-  }
-
-  @Override
-  public IRotaryControllable push() {
-    StationInfo info = (StationInfo) getPager().getActiveModel();
-    playStation(info);
-    return this;
-  }
-
-  @Override
-  public IRotaryControllable longPush() {
-    return UIStateController.getInstance().getWeatherController();
+    this.activeStation = info;
+    selectionTime = new Date().getTime();
+    trackText.setText(LOADING_MSG);
+    blink.play();
+    mpdService.playStation(info);
+    mpdService.forceRefresh();
+    getPager().updateActivity();
   }
 }

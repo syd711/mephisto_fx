@@ -88,7 +88,7 @@ public class GoogleServiceImpl extends RefreshingService implements IGoogleMusic
    * @return The converted song.
    */
   private de.mephisto.radiofx.services.google.Song songFor(Song song) {
-    de.mephisto.radiofx.services.google.Song mSong = new de.mephisto.radiofx.services.google.Song();
+    de.mephisto.radiofx.services.google.Song mSong = new de.mephisto.radiofx.services.google.Song(api);
     mSong.setOriginalModel(song);
 
     mSong.setId(song.getId());

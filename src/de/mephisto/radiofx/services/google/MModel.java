@@ -8,6 +8,7 @@ import de.mephisto.radiofx.services.IServiceModel;
 public class MModel implements IServiceModel {
   //the unique mephisto id
   private int mId;
+  private boolean active = false;
 
   public int getMID() {
     return mId;
@@ -19,11 +20,11 @@ public class MModel implements IServiceModel {
 
   @Override
   public void setActive(boolean b) {
-    //not used
+    active = b;
   }
 
   @Override
   public boolean isActive() {
-    return false;  //not used
+    return active;
   }
 }

@@ -1,13 +1,14 @@
 package de.mephisto.radiofx.ui.controller;
 
-import de.mephisto.radiofx.services.IService;
 import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.services.ServiceRegistry;
 import de.mephisto.radiofx.services.weather.WeatherInfo;
 import de.mephisto.radiofx.ui.Footer;
 import de.mephisto.radiofx.ui.Pager;
 import de.mephisto.radiofx.ui.UIStateController;
-import de.mephisto.radiofx.util.UIUtil;
+import de.mephisto.radiofx.util.Colors;
+import de.mephisto.radiofx.util.Fonts;
+import de.mephisto.radiofx.util.TransitionUtil;
 import javafx.animation.FadeTransition;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -52,11 +53,11 @@ public class WeatherUIController extends PageableUIController {
   @Override
   public BorderPane init() {
     locationText = new Text(0, 0, "");
-    locationText.setFont(UIUtil.FONT_BOLD_22);
-    locationText.setFill(UIUtil.COLOR_DARK_HEADER);
+    locationText.setFont(Fonts.FONT_BOLD_22);
+    locationText.setFill(Colors.COLOR_DARK_HEADER);
 
     BorderPane tabRoot = new BorderPane();
-    tabRoot.setMinHeight(UIUtil.MIN_MAIN_HEIGHT);
+    tabRoot.setMinHeight(TransitionUtil.MIN_MAIN_HEIGHT);
 
     VBox verticalRoot = new VBox(5);
     verticalRoot.setPadding(new Insets(5, 0, 5, 0));
@@ -95,21 +96,21 @@ public class WeatherUIController extends PageableUIController {
 
     //image
     String url = currentWeatherInfo.getImageUrl();
-    this.weatherIconCanvas = UIUtil.createImageCanvas(url, IMAGE_SIZE, IMAGE_SIZE);
+    this.weatherIconCanvas = TransitionUtil.createImageCanvas(url, IMAGE_SIZE, IMAGE_SIZE);
     mainSection.getChildren().add(weatherIconCanvas);
 
     VBox centerVertical = new VBox(5);
     centerVertical.setAlignment(Pos.CENTER);
 
     tempText = new Text(0, 0, "");
-    tempText.setFont(UIUtil.FONT_NORMAL_60);
-    tempText.setFill(UIUtil.COLOR_DARK_HEADER);
+    tempText.setFont(Fonts.FONT_NORMAL_60);
+    tempText.setFill(Colors.COLOR_DARK_HEADER);
     centerVertical.getChildren().add(tempText);
     mainSection.getChildren().add(centerVertical);
 
     descriptionText = new Text(0, 0, currentWeatherInfo.getDescription());
-    descriptionText.setFont(UIUtil.FONT_NORMAL_14);
-    descriptionText.setFill(UIUtil.COLOR_DARK_HEADER);
+    descriptionText.setFont(Fonts.FONT_NORMAL_14);
+    descriptionText.setFill(Colors.COLOR_DARK_HEADER);
     centerVertical.getChildren().add(descriptionText);
 
     //detail info
@@ -118,23 +119,23 @@ public class WeatherUIController extends PageableUIController {
     temps.setPadding(new Insets(20, 20, 0, 15));
 
     minTempText = new Text(0, 0, "");
-    minTempText.setFont(UIUtil.FONT_NORMAL_14);
-    minTempText.setFill(UIUtil.COLOR_DARK_HEADER);
+    minTempText.setFont(Fonts.FONT_NORMAL_14);
+    minTempText.setFill(Colors.COLOR_DARK_HEADER);
     temps.getChildren().add(minTempText);
 
     maxTempText = new Text(0, 0, "");
-    maxTempText.setFont(UIUtil.FONT_NORMAL_14);
-    maxTempText.setFill(UIUtil.COLOR_DARK_HEADER);
+    maxTempText.setFont(Fonts.FONT_NORMAL_14);
+    maxTempText.setFill(Colors.COLOR_DARK_HEADER);
     temps.getChildren().add(maxTempText);
 
     sunriseText = new Text(0, 0, "");
-    sunriseText.setFont(UIUtil.FONT_NORMAL_14);
-    sunriseText.setFill(UIUtil.COLOR_DARK_HEADER);
+    sunriseText.setFont(Fonts.FONT_NORMAL_14);
+    sunriseText.setFill(Colors.COLOR_DARK_HEADER);
     temps.getChildren().add(sunriseText);
 
     sunsetText = new Text(0, 0, "");
-    sunsetText.setFont(UIUtil.FONT_NORMAL_14);
-    sunsetText.setFill(UIUtil.COLOR_DARK_HEADER);
+    sunsetText.setFont(Fonts.FONT_NORMAL_14);
+    sunsetText.setFill(Colors.COLOR_DARK_HEADER);
     temps.getChildren().add(sunsetText);
 
     mainSection.getChildren().add(temps);
@@ -151,18 +152,18 @@ public class WeatherUIController extends PageableUIController {
       infoBox.setAlignment(Pos.CENTER);
 
       Text dayText = new Text();
-      dayText.setFill(UIUtil.COLOR_DARK_HEADER);
-      dayText.setFont(UIUtil.FONT_NORMAL_16);
+      dayText.setFill(Colors.COLOR_DARK_HEADER);
+      dayText.setFont(Fonts.FONT_NORMAL_16);
       SimpleDateFormat format = new SimpleDateFormat("EEE");
       dayText.setText(format.format(info.getForecastDate()));
       infoBox.getChildren().add(dayText);
 
-      final Canvas imageCanvas = UIUtil.createImageCanvas(info.getIconBlackUrl(), 32, 32);
+      final Canvas imageCanvas = TransitionUtil.createImageCanvas(info.getIconBlackUrl(), 32, 32);
       infoBox.getChildren().add(imageCanvas);
 
       Text tempText = new Text();
-      tempText.setFill(UIUtil.COLOR_DARK_HEADER);
-      tempText.setFont(UIUtil.FONT_NORMAL_14);
+      tempText.setFill(Colors.COLOR_DARK_HEADER);
+      tempText.setFont(Fonts.FONT_NORMAL_14);
       tempText.setText(info.getLowTemp() + "-" + info.getHighTemp() + " °C");
       infoBox.getChildren().add(tempText);
 
@@ -214,7 +215,7 @@ public class WeatherUIController extends PageableUIController {
   @Override
   public IRotaryControllable push() {
     forecastMode = !forecastMode;
-    final FadeTransition outFader = UIUtil.createOutFader(mainSection);
+    final FadeTransition outFader = TransitionUtil.createOutFader(mainSection);
     outFader.onFinishedProperty().set(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent actionEvent) {
@@ -226,7 +227,7 @@ public class WeatherUIController extends PageableUIController {
           createDefaultInfo();
         }
         updatePage(activeModel);
-        UIUtil.fadeInComponent(mainSection);
+        TransitionUtil.fadeInComponent(mainSection);
       }
     });
     outFader.play();

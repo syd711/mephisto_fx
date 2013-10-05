@@ -41,7 +41,7 @@ public abstract class RefreshingService implements IService {
    * Called once the server has some data change.
    * @param model
    */
-  protected void notifyDataChange(final IServiceModel model) {
+  protected synchronized void notifyDataChange(final IServiceModel model) {
     for(final IServiceInfoListener listener : listeners) {
       Platform.runLater(new Runnable() {
         @Override

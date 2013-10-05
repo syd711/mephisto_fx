@@ -2,7 +2,8 @@ package de.mephisto.radiofx.ui;
 
 import de.mephisto.radiofx.services.ServiceRegistry;
 import de.mephisto.radiofx.ui.controller.*;
-import de.mephisto.radiofx.util.UIUtil;
+import de.mephisto.radiofx.util.SceneUtil;
+import de.mephisto.radiofx.util.TransitionUtil;
 import javafx.animation.FadeTransition;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -44,7 +45,7 @@ public class UIStateController {
   }
 
   public void showSplashScreen() {
-    final SplashScreen splashScene = UIUtil.createSplashScene();
+    final SplashScreen splashScene = SceneUtil.createSplashScene();
     ServiceRegistry.init(splashScene);
   }
 
@@ -65,10 +66,10 @@ public class UIStateController {
     new Header(borderPane);
     footer = new Footer(borderPane);
 
-    UIUtil.createScene(borderPane);
+    SceneUtil.createNavigationScene(borderPane);
     activeController.display(borderPane);
 
-    UIUtil.fadeInComponent(borderPane);
+    TransitionUtil.fadeInComponent(borderPane);
   }
 
   public void showNext() {
@@ -104,7 +105,7 @@ public class UIStateController {
       //check if the controller creates a new UI
       if(newController.getTabRoot() != null && activeController.getTabRoot() != null) {
         final Node center = newController.getTabRoot();
-        final FadeTransition outFader = UIUtil.createOutFader(center);
+        final FadeTransition outFader = TransitionUtil.createOutFader(center);
         outFader.onFinishedProperty().set(new EventHandler<ActionEvent>() {
           @Override
           public void handle(ActionEvent actionEvent) {
@@ -137,7 +138,7 @@ public class UIStateController {
     return radioController;
   }
 
-  public void display(UIController controller) {
-    controller.display(borderPane);
+  public UIController getActiveController() {
+    return this.activeController;
   }
 }

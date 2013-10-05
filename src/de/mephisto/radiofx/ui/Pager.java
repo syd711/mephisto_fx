@@ -1,7 +1,8 @@
 package de.mephisto.radiofx.ui;
 
 import de.mephisto.radiofx.services.IServiceModel;
-import de.mephisto.radiofx.util.UIUtil;
+import de.mephisto.radiofx.util.Colors;
+import de.mephisto.radiofx.util.TransitionUtil;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -69,12 +70,12 @@ public class Pager {
       box = new HBox(0);
       box.setAlignment(Pos.BASELINE_LEFT);
       bubbleBox = new HBox(margin);
-      bubbleBox.setMinWidth(UIUtil.WIDTH);
+      bubbleBox.setMinWidth(TransitionUtil.WIDTH);
       bubbleBox.setAlignment(Pos.CENTER);
       for (IServiceModel model : models) {
-        Circle selectorCircle = new Circle(bubbleRadius, bubbleRadius, bubbleRadius, UIUtil.COLOR_DARK_HEADER);
+        Circle selectorCircle = new Circle(bubbleRadius, bubbleRadius, bubbleRadius, Colors.COLOR_DARK_HEADER);
         selectorCircle.setStrokeWidth(STROKE_WIDTH);
-        selectorCircle.setStroke(UIUtil.COLOR_DARK_HEADER);
+        selectorCircle.setStroke(Colors.COLOR_DARK_HEADER);
         selectorCircle.setUserData(model);
         bubbleBox.getChildren().add(selectorCircle);
       }
@@ -88,9 +89,9 @@ public class Pager {
 
       Canvas progress = new Canvas(PAGER_WIDTH, bubbleRadius*2+2);
       gc = progress.getGraphicsContext2D();
-      gc.setFill(Paint.valueOf(UIUtil.HEX_COLOR_INACTIVE));
+      gc.setFill(Paint.valueOf(Colors.HEX_COLOR_INACTIVE));
       gc.fillRoundRect(0, 0, PAGER_WIDTH, bubbleRadius*2+2, bubbleRadius*2+2, bubbleRadius*2+2);
-      gc.setFill(Paint.valueOf(UIUtil.HEX_COLOR_DARK));
+      gc.setFill(Paint.valueOf(Colors.HEX_COLOR_DARK));
       gc.fillOval(2, 0, bubbleRadius*2, bubbleRadius*2);
 
       box.getChildren().add(progress);
@@ -177,24 +178,24 @@ public class Pager {
         IServiceModel model = (IServiceModel) circle.getUserData();
         if (model.equals(activeModel)) {
           circle.setStrokeWidth(STROKE_WIDTH);
-          circle.setStroke(UIUtil.COLOR_DARK_HEADER);
+          circle.setStroke(Colors.COLOR_DARK_HEADER);
           circle.setFill(null);
         }
         else if (model.isActive()) {
           circle.setStrokeWidth(STROKE_WIDTH);
-          circle.setStroke(UIUtil.COLOR_DARK_HEADER);
-          circle.setFill(Color.valueOf(UIUtil.HEX_COLOR_INACTIVE));
+          circle.setStroke(Colors.COLOR_DARK_HEADER);
+          circle.setFill(Color.valueOf(Colors.HEX_COLOR_INACTIVE));
         }
         else {
-          circle.setFill(UIUtil.COLOR_DARK_HEADER);
+          circle.setFill(Colors.COLOR_DARK_HEADER);
         }
       }
     }
     else {
       gc.clearRect(0, 0, PAGER_WIDTH, bubbleRadius*2+2);
-      gc.setFill(Paint.valueOf(UIUtil.HEX_COLOR_INACTIVE));
+      gc.setFill(Paint.valueOf(Colors.HEX_COLOR_INACTIVE));
       gc.fillRoundRect(0, 0, PAGER_WIDTH, bubbleRadius*2+2, bubbleRadius*2+2, bubbleRadius*2+2);
-      gc.setFill(Paint.valueOf(UIUtil.HEX_COLOR_DARK));
+      gc.setFill(Paint.valueOf(Colors.HEX_COLOR_DARK));
 
       double pos = new Double(PAGER_WIDTH-bubbleRadius*2) / models.size();
       pos = (pos * models.indexOf(activeModel)) + 2;
@@ -230,6 +231,14 @@ public class Pager {
    */
   public boolean isAtEnd() {
     return models.indexOf(activeModel) == (models.size()-1);
+  }
+
+  /**
+   * Returns the position of the active selection.
+   * @return
+   */
+  public int getPosition() {
+    return models.indexOf(activeModel);
   }
 
   public void toggleMode() {

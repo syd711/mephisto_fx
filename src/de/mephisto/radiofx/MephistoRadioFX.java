@@ -1,9 +1,14 @@
 package de.mephisto.radiofx;
 
+import de.mephisto.radiofx.ui.UIState;
 import de.mephisto.radiofx.ui.UIStateController;
-import de.mephisto.radiofx.util.UIUtil;
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 
 public class MephistoRadioFX extends Application {
@@ -31,11 +36,64 @@ public class MephistoRadioFX extends Application {
 
     UIStateController.getInstance().showSplashScreen();
 
-    UIUtil.addStateListener(primaryStage);
-    UIUtil.addDisposeListener(primaryStage);
+    addStateListener(primaryStage);
+    addDisposeListener(primaryStage);
   }
 
   public Stage getStage() {
     return stage;
+  }
+
+
+
+  private static void addStateListener(Stage primaryStage) {
+    final UIState state = new UIState();
+
+    primaryStage.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+      @Override
+      public void handle(KeyEvent keyEvent) {
+        if (keyEvent.getCode() == KeyCode.RIGHT) {
+          Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+              state.right();
+            }
+          });
+
+        }
+        if (keyEvent.getCode() == KeyCode.DOWN) {
+          Platform.runLater(new Runnable() {
+            @Override public void run() {
+              state.push();
+            }
+          });
+        }
+        if (keyEvent.getCode() == KeyCode.UP) {
+          Platform.runLater(new Runnable() {
+            @Override public void run() {
+              state.longPush();
+            }
+          });
+        }
+        if (keyEvent.getCode() == KeyCode.LEFT) {
+          Platform.runLater(new Runnable() {
+            @Override public void run() {
+              state.left();
+            }
+          });
+        }
+      }
+    });
+  }
+
+  private static void addDisposeListener(Stage primaryStage) {
+    //ensures that the process is terminated on window dispose
+    primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+      @Override
+      public void handle(WindowEvent windowEvent) {
+        Platform.exit();
+        System.exit(0);
+      }
+    });
   }
 }

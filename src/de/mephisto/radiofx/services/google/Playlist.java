@@ -16,7 +16,6 @@ public class Playlist extends MModel {
   private String name;
   private String artUrl;
   private int playlistSize = -1;
-  private Song activeSong;
 
   public Playlist(String name) {
     this.name = name;
@@ -86,18 +85,22 @@ public class Playlist extends MModel {
    */
   public Song nextSong() {
     Iterator<Song> it = getSongs().iterator();
+    Song activeSong = getActiveSong();
     if(activeSong == null) {
-      activeSong = it.next();
-      return activeSong;
+      Song song  = it.next();
+      song.setActive(true);
+      return song;
     }
+
     while(it.hasNext()) {
       Song next = it.next();
       if(next.equals(activeSong) && it.hasNext()) {
+        activeSong.setActive(false);
         activeSong = it.next();
+        activeSong.setActive(true);
         return activeSong;
       }
     }
-    activeSong = null;
     return null;
   }
 
@@ -105,36 +108,28 @@ public class Playlist extends MModel {
    * Returns the previous song or null if there is no previous song.
    * @return
    */
-  public Song previousSong() {
-    Iterator<Song> it = getSongs().iterator();
-    if(activeSong == null) {
-      activeSong = it.next();
-      return activeSong;
-    }
-    Song prev = null;
-    while(it.hasNext()) {
-      Song next = it.next();
-      if(next.equals(activeSong)) {
-        activeSong = prev;
-        return activeSong;
-      }
-      prev = next;
-    }
-    activeSong = null;
-    return null;
-  }
-
-  public void setActiveSong(Song activeSong) {
-    this.activeSong = activeSong;
-  }
+//  public Song previousSong() {
+//    Iterator<Song> it = getSongs().iterator();
+//    if(activeSong == null) {
+//      activeSong = it.next();
+//      return activeSong;
+//    }
+//    Song prev = null;
+//    while(it.hasNext()) {
+//      Song next = it.next();
+//      if(next.equals(activeSong)) {
+//        activeSong = prev;
+//        return activeSong;
+//      }
+//      prev = next;
+//    }
+//    activeSong = null;
+//    return null;
+//  }
 
   public Song getActiveSong() {
-    return activeSong;
-  }
-
-  public Song getSong(int id) {
-    for(Song song : songs) {
-      if(song.getMID() == id) {
+    for(Song song : getSongs()) {
+      if(song.isActive()) {
         return song;
       }
     }
@@ -144,9 +139,5 @@ public class Playlist extends MModel {
   @Override
   public boolean equals(Object obj) {
     return obj instanceof Playlist && ((Playlist)obj).getMID() == this.getMID();
-  }
-
-  public int getActiveSongIndex() {
-    return songs.indexOf(activeSong);
   }
 }

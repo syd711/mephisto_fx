@@ -1,7 +1,7 @@
 package de.mephisto.radiofx.ui.controller;
 
 import de.mephisto.radiofx.services.IServiceModel;
-import de.mephisto.radiofx.util.UIUtil;
+import de.mephisto.radiofx.util.TransitionUtil;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 
@@ -25,7 +25,7 @@ public abstract class UIController implements IRotaryControllable {
     tabRoot.setOpacity(0);
     root.setCenter(tabRoot);
     onDisplay();
-    UIUtil.fadeInComponent(tabRoot);
+    TransitionUtil.fadeInComponent(tabRoot);
   }
 
   public Node getTabRoot() {

@@ -13,8 +13,6 @@ public class StationInfo implements IServiceModel {
   private String url;
   private int id;
 
-  private boolean playable = true;
-  private boolean infoAvailable = true;
   private boolean active;
 
   public StationInfo(int id) {
@@ -43,22 +41,6 @@ public class StationInfo implements IServiceModel {
 
   public void setUrl(String url) {
     this.url = url;
-  }
-
-  public boolean isPlayable() {
-    return playable;
-  }
-
-  public void setPlayable(boolean playable) {
-    this.playable = playable;
-  }
-
-  public boolean isInfoAvailable() {
-    return infoAvailable;
-  }
-
-  public void setInfoAvailable(boolean infoAvailable) {
-    this.infoAvailable = infoAvailable;
   }
 
   @Override

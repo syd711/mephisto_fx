@@ -1,11 +1,11 @@
 package de.mephisto.radiofx.ui;
 
-import de.mephisto.radiofx.util.UIUtil;
+import de.mephisto.radiofx.util.SceneUtil;
+import de.mephisto.radiofx.util.TransitionUtil;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.text.Text;
@@ -42,11 +42,11 @@ public class SplashScreen {
   }
 
   public void dispose() {
-    final FadeTransition outFader = UIUtil.createOutFader(root);
+    final FadeTransition outFader = TransitionUtil.createOutFader(root);
     outFader.setOnFinished(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent actionEvent) {
-        UIUtil.createScene(UIStateController.getInstance().getBorderPane());
+        SceneUtil.createNavigationScene(UIStateController.getInstance().getBorderPane());
         UIStateController.getInstance().showDefault();
       }
     });

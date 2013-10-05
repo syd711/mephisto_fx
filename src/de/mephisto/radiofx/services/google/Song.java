@@ -1,6 +1,10 @@
 package de.mephisto.radiofx.services.google;
 
+import gmusic.api.impl.GoogleMusicAPI;
 import org.apache.commons.lang.time.DateFormatUtils;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 /**
  * The model that represents a song.
@@ -22,6 +26,11 @@ public class Song extends MModel implements Comparable<Song> {
 
   private byte[] artwork;
 
+  private GoogleMusicAPI api;
+
+  public Song(GoogleMusicAPI api) {
+    this.api = api;
+  }
 
   public void setId(String id) {
     this.id = id;
@@ -49,7 +58,7 @@ public class Song extends MModel implements Comparable<Song> {
 
   @Override
   public String toString() {
-    return "'" + name + "' by " + artist;
+    return "'" + name + "' by " + artist + "(active: " + isActive() + ")";
   }
 
   public String getGenre() {
@@ -142,5 +151,9 @@ public class Song extends MModel implements Comparable<Song> {
 
   public void setArtwork(byte[] artwork) {
     this.artwork = artwork;
+  }
+
+  public String getPlaybackUrl() throws IOException, URISyntaxException {
+    return api.getSongURL((gmusic.api.model.Song)this.originalModel).toURL().toString();
   }
 }

@@ -1,8 +1,5 @@
 package de.mephisto.radiofx.services.google;
 
-import de.mephisto.radiofx.services.ServiceRegistry;
-import de.mephisto.radiofx.services.mpd.IMpdService;
-
 /**
  * The model that represents an album.
  */
@@ -60,8 +57,9 @@ public class Album extends Playlist {
     this.year = year;
   }
 
-  public void play() {
-    IMpdService service = ServiceRegistry.getMpdService();
-    service.playAlbum(this);
+  public void reset() {
+    for(Song song : getSongs()) {
+      song.setActive(false);
+    }
   }
 }

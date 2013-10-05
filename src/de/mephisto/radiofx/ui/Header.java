@@ -6,7 +6,8 @@ import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.services.ServiceRegistry;
 import de.mephisto.radiofx.services.time.DateTimeInfo;
 import de.mephisto.radiofx.services.weather.WeatherInfo;
-import de.mephisto.radiofx.util.UIUtil;
+import de.mephisto.radiofx.util.Colors;
+import de.mephisto.radiofx.util.TransitionUtil;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
@@ -47,7 +48,7 @@ public class Header implements IServiceInfoListener {
     hbox.setAlignment(Pos.CENTER_LEFT);
     hbox.setPadding(new Insets(11, 0, 11, 15));
     hbox.setMinWidth(360);
-    hbox.setStyle("-fx-background-color: " + UIUtil.HEX_COLOR_DARK + ";");
+    hbox.setStyle("-fx-background-color: " + Colors.HEX_COLOR_DARK + ";");
     root.setTop(topRoot);
     topRoot.getChildren().add(hbox);
 
@@ -64,32 +65,32 @@ public class Header implements IServiceInfoListener {
     timeText.setFont(HEADER_LABEL_BOLD_FONT);
     timeText.setFill(Color.WHITE);
 
-    final Canvas imageCanvas = UIUtil.createImageCanvas(ResourceLoader.getResource("time.png"), 16, 16);
+    final Canvas imageCanvas = TransitionUtil.createImageCanvas(ResourceLoader.getResource("time.png"), 16, 16);
     hbox.getChildren().add(imageCanvas);
     hbox.getChildren().add(timeText);
     hbox.getChildren().add(dateText);
 
     HBox iconBox = new HBox(12);
     iconBox.setPadding(new Insets(5, 15, 0, 15));
-    iconBox.setStyle("-fx-background-color: " + UIUtil.HEX_COLOR_DARK_2 + ";");
+    iconBox.setStyle("-fx-background-color: " + Colors.HEX_COLOR_DARK_2 + ";");
     topRoot.getChildren().add(iconBox);
 
 
     WeatherInfo defaultInfo = ServiceRegistry.getWeatherService().getDefaultWeather();
     String url = defaultInfo.getIconWhiteUrl();
-    weatherIconCanvas = UIUtil.createImageCanvas(url, 32, 32);
+    weatherIconCanvas = TransitionUtil.createImageCanvas(url, 32, 32);
     iconBox.getChildren().add(weatherIconCanvas);
 
     HBox tempBox= new HBox(10);
     tempBox.setPadding(new Insets(11, 25, 11, 0));
-    tempBox.setStyle("-fx-background-color: " + UIUtil.HEX_COLOR_DARK_2 + ";");
+    tempBox.setStyle("-fx-background-color: " + Colors.HEX_COLOR_DARK_2 + ";");
     topRoot.getChildren().add(tempBox);
     tempText = new Text(0, 0, defaultInfo.getTemp() + " °C");
     tempText.setFont(HEADER_LABEL_FONT);
     tempText.setFill(Color.WHITE);
 
     tempBox.getChildren().add(tempText);
-    UIUtil.fadeInComponent(topRoot);
+    TransitionUtil.fadeInComponent(topRoot);
 
     ServiceRegistry.getWeatherService().addServiceListener(this);
     ServiceRegistry.getTimeService().addServiceListener(this);
@@ -107,7 +108,7 @@ public class Header implements IServiceInfoListener {
       String temp = info.getTemp();
       tempText.setText(temp + " °C");
 
-      weatherIconCanvas.getGraphicsContext2D().clearRect(0, 0, UIUtil.WIDTH, UIUtil.HEIGHT);
+      weatherIconCanvas.getGraphicsContext2D().clearRect(0, 0, TransitionUtil.WIDTH, TransitionUtil.HEIGHT);
       String url = info.getIconWhiteUrl();
       ImageView weatherImage = new ImageView(new Image(url, 32, 32, false, true));
       weatherIconCanvas.getGraphicsContext2D().drawImage(weatherImage.getImage(), 0, 0);

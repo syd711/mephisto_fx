@@ -11,4 +11,6 @@ import java.util.List;
 public interface IMpdService extends IService {
   void playStation(StationInfo info);
   void playAlbum(Album album);
+
+  boolean isRadioMode();
 }

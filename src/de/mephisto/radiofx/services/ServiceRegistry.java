@@ -2,6 +2,7 @@ package de.mephisto.radiofx.services;
 
 import de.mephisto.radiofx.services.google.IGoogleMusicService;
 import de.mephisto.radiofx.services.google.impl.GoogleServiceImpl;
+import de.mephisto.radiofx.services.gpio.RotaryEncoderService;
 import de.mephisto.radiofx.services.mpd.IMpdService;
 import de.mephisto.radiofx.services.mpd.impl.MpdServiceImpl;
 import de.mephisto.radiofx.services.time.impl.EarthToolsTimeServiceImpl;
@@ -18,6 +19,7 @@ public class ServiceRegistry {
   private static RefreshingService timeService;
   private static IMpdService mpdService;
   private static IGoogleMusicService googleService;
+  private static RotaryEncoderService rotaryEncoderService;
 
   public static void init(final SplashScreen splashScene) {
     new Thread() {
@@ -34,6 +36,8 @@ public class ServiceRegistry {
 
         mpdService = new MpdServiceImpl();
         mpdService.initService(splashScene);
+
+        rotaryEncoderService = new RotaryEncoderService(splashScene);
 
         UIStateController.getInstance().createControllers(splashScene);
 
@@ -86,5 +90,13 @@ public class ServiceRegistry {
       googleService = new GoogleServiceImpl();
     }
     return googleService;
+  }
+
+  /**
+   * Lazy loading of the rotaryEncoderService.
+   * @return
+   */
+  public static RotaryEncoderService getRotaryEncoderService() {
+    return rotaryEncoderService;
   }
 }

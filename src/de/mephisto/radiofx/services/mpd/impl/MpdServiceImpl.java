@@ -66,6 +66,7 @@ public class MpdServiceImpl extends RefreshingService implements IMpdService {
     Configuration config = Config.getConfiguration(CONFIG_NAME);
     String host = config.getString(PROPERTY_HOST);
     int port = config.getInt(PROPERTY_PORT, 6600);
+    LOG.info("Connecting to " + host + ":" + port);
     client = new MPDClient(host, port);
     client.connect();
 

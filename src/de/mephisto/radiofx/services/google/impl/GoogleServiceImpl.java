@@ -54,7 +54,7 @@ public class GoogleServiceImpl extends RefreshingService implements IGoogleMusic
         de.mephisto.radiofx.services.google.Playlist p = playlistFor(list);
         MusicDictionary.getInstance().addPlaylist(p);
       }
-      screen.setMessage("Creating Music Dictionary", 0.25);
+      screen.setMessage("Creating Music Dictionary (may take a while)", 0.25);
 
       Collection<Song> songs = api.getAllSongs();
       for (Song song : songs) {

@@ -1,20 +1,24 @@
 package de.mephisto.radiofx.ui;
 
 import de.mephisto.radiofx.services.ServiceRegistry;
+import de.mephisto.radiofx.services.gpio.RotaryEncoderListener;
 import de.mephisto.radiofx.ui.controller.*;
 import de.mephisto.radiofx.util.SceneUtil;
 import de.mephisto.radiofx.util.TransitionUtil;
 import javafx.animation.FadeTransition;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Screen;
 
 /**
  * The global UI controller, receives the input from the state machine that
  * can be triggered via GPIO or via keyboard inputs.
  */
-public class UIStateController {
+public class UIStateController implements RotaryEncoderListener{
   private static UIStateController instance = new UIStateController();
   private BorderPane borderPane;
   private Footer footer;
@@ -58,6 +62,8 @@ public class UIStateController {
     googleNaviController = new GoogleUINaviController();
     splashScene.setMessage("Creating Google Player Controller...", 0.96);
     googlePlayerController = new GoogleUIPlayerController();
+
+    ServiceRegistry.getRotaryEncoderService().addListener(this);
   }
 
   public void showDefault() {
@@ -140,5 +146,25 @@ public class UIStateController {
 
   public UIController getActiveController() {
     return this.activeController;
+  }
+
+  @Override
+  public void left() {
+    Platform.runLater(new Runnable() {
+      @Override
+      public void run() {
+        showPrevious();
+      }
+    });
+  }
+
+  @Override
+  public void right() {
+    Platform.runLater(new Runnable() {
+      @Override
+      public void run() {
+        showNext();
+      }
+    });
   }
 }

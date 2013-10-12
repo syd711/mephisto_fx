@@ -8,6 +8,8 @@ import de.mephisto.radiofx.ui.Footer;
 import de.mephisto.radiofx.ui.Pager;
 import de.mephisto.radiofx.ui.UIStateController;
 import de.mephisto.radiofx.util.Colors;
+import de.mephisto.radiofx.util.Fonts;
+import de.mephisto.radiofx.util.PaneUtil;
 import de.mephisto.radiofx.util.TransitionUtil;
 import javafx.animation.FadeTransition;
 import javafx.geometry.Insets;
@@ -25,9 +27,8 @@ import java.util.List;
  * Controls the UI for the radio
  */
 public class RadioUIController extends PageableUIController {
-  private static final Font RADIO_STATION_FONT = Font.font("Tahoma", FontWeight.BOLD, 30);
-  private static final Font RADIO_TRACK_FONT= Font.font("Tahoma", FontWeight.NORMAL, 18);
-  private static final Font RADIO_URL_FONT= Font.font("Tahoma", FontWeight.NORMAL, 12);
+  private static final Font RADIO_STATION_FONT = Font.font("Tahoma", FontWeight.BOLD, 32);
+  private static final Font RADIO_TRACK_FONT= Font.font("Tahoma", FontWeight.NORMAL, 24);
 
   private static final String LOADING_MSG = "Resolving Station Info...";
   private static final int REFRESH_TIMEOUT = 8000;
@@ -50,10 +51,10 @@ public class RadioUIController extends PageableUIController {
     this.mpdService = ServiceRegistry.getMpdService();
 
     BorderPane tabRoot = new BorderPane();
-    tabRoot.setMinHeight(TransitionUtil.MIN_MAIN_HEIGHT);
+    tabRoot.setMinHeight(PaneUtil.MIN_MAIN_HEIGHT);
 
     VBox verticalRoot = new VBox(20);
-    verticalRoot.setPadding(new Insets(30, 0, 0, 20));
+    verticalRoot.setPadding(new Insets(40, 0, 0, 20));
     tabRoot.setCenter(verticalRoot);
 
     stationText = new Text(0, 0, "");
@@ -70,7 +71,7 @@ public class RadioUIController extends PageableUIController {
     blink.play();
 
     urlText = new Text(0, 0, "");
-    urlText.setFont(RADIO_URL_FONT);
+    urlText.setFont(Fonts.FONT_NORMAL_16);
     urlText.setFill(Colors.COLOR_DARK_HEADER);
 
     verticalRoot.getChildren().add(urlText);
@@ -105,7 +106,7 @@ public class RadioUIController extends PageableUIController {
     }
 
     StationInfo info = (StationInfo) model;
-    stationText.setText(formatValue(info.getName(), 22));
+    stationText.setText(formatValue(info.getName(), 33));
     if(StringUtils.isEmpty(info.getTrack())) {
       if(info.isActive()) {
         long current = new Date().getTime();
@@ -123,10 +124,10 @@ public class RadioUIController extends PageableUIController {
     }
     else {
 
-      trackText.setText(formatValue(info.getTrack(), 42));
+      trackText.setText(formatValue(info.getTrack(), 52));
       stopBlink();
     }
-    urlText.setText(formatValue(info.getUrl(), 70));
+    urlText.setText(formatValue(info.getUrl(), 120));
   }
 
   @Override
@@ -137,6 +138,7 @@ public class RadioUIController extends PageableUIController {
   @Override
   public IRotaryControllable push() {
     StationInfo info = (StationInfo) getPager().getActiveModel();
+    TransitionUtil.createDoubleBlink(stationText);
     playStation(info);
     return this;
   }

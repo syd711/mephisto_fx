@@ -10,6 +10,7 @@ import de.mephisto.radiofx.ui.Footer;
 import de.mephisto.radiofx.ui.UIStateController;
 import de.mephisto.radiofx.util.Colors;
 import de.mephisto.radiofx.util.Fonts;
+import de.mephisto.radiofx.util.PaneUtil;
 import de.mephisto.radiofx.util.TransitionUtil;
 import javafx.animation.FadeTransition;
 import javafx.collections.ObservableList;
@@ -201,7 +202,7 @@ public class GoogleUIPlayerController extends PageableUIController {
     scrollPos = 0;
 
     songScroller = new ScrollPane();
-    songScroller.setMinWidth(370);
+    songScroller.setMinWidth(PaneUtil.WIDTH-GoogleUINaviController.COVER_SIZE-10);
     songScroller.setStyle("-fx-background-color:transparent;");
     songScroller.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
@@ -228,7 +229,7 @@ public class GoogleUIPlayerController extends PageableUIController {
       posBox.getChildren().add(createTrackText(track + "."));
       innerTrackBox.setLeft(posBox);
       HBox nameBox = new HBox(5);
-      nameBox.setMinWidth(280);
+      nameBox.setMinWidth(395);
 
       String name = song.getName();
       if (name.endsWith(".mp3")) {
@@ -256,11 +257,11 @@ public class GoogleUIPlayerController extends PageableUIController {
    * @return
    */
   private Text createTrackText(String label) {
-    if (label.length() > 30) {
-      label = label.substring(0, 29) + "...";
+    if (label.length() > 33) {
+      label = label.substring(0, 32) + "...";
     }
     Text text = new Text(label);
-    text.setFont(Fonts.FONT_NORMAL_14);
+    text.setFont(Fonts.FONT_NORMAL_20);
     return text;
   }
 
@@ -340,7 +341,7 @@ public class GoogleUIPlayerController extends PageableUIController {
 
     int scrollPos = (int) UIStateController.getInstance().getGoogleNaviController().getScrollPos();
     for (Node node : nodes) {
-      TransitionUtil.moveNodeX(node, 0, children.indexOf(albumNode) * 110 + 450, !show, SCROLL_DELAY);
+      TransitionUtil.moveNodeX(node, 0, children.indexOf(albumNode) * GoogleUINaviController.COVER_SIZE + 490, !show, SCROLL_DELAY);
     }
 
     final EventHandler<ActionEvent> eventHandler = new EventHandler<ActionEvent>() {
@@ -359,7 +360,7 @@ public class GoogleUIPlayerController extends PageableUIController {
       }
     };
 
-    TransitionUtil.moveNode(centerRegion, scrollPos, (scrollPos - 175), !show, SCROLL_DELAY, eventHandler, true);
+    TransitionUtil.moveNode(centerRegion, scrollPos, (scrollPos - 215), !show, SCROLL_DELAY, eventHandler, true);
   }
 
 }

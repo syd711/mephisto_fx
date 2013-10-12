@@ -2,7 +2,7 @@ package de.mephisto.radiofx.ui;
 
 import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.util.Colors;
-import de.mephisto.radiofx.util.TransitionUtil;
+import de.mephisto.radiofx.util.PaneUtil;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -22,10 +22,10 @@ import java.util.List;
  * Paging for pageable elements of the UI
  */
 public class Pager {
-  private final static int PAGER_WIDTH = 410;
+  private final static double PAGER_WIDTH = PaneUtil.WIDTH-40;
   private final static int STROKE_WIDTH = 2;
 
-  private int bubbleRadius= 6;
+  private int bubbleRadius= 12;
   private HBox box;
   private IServiceModel activeModel;
   private List<IServiceModel> models;
@@ -65,12 +65,12 @@ public class Pager {
       }
       if (models.size() > 25) {
         margin = 2;
-        bubbleRadius = 4;
+        bubbleRadius = 8;
       }
       box = new HBox(0);
       box.setAlignment(Pos.BASELINE_LEFT);
       bubbleBox = new HBox(margin);
-      bubbleBox.setMinWidth(TransitionUtil.WIDTH);
+      bubbleBox.setMinWidth(PaneUtil.WIDTH);
       bubbleBox.setAlignment(Pos.CENTER);
       for (IServiceModel model : models) {
         Circle selectorCircle = new Circle(bubbleRadius, bubbleRadius, bubbleRadius, Colors.COLOR_DARK_HEADER);
@@ -82,7 +82,7 @@ public class Pager {
       box.getChildren().add(bubbleBox);
     }
     else {
-      bubbleRadius = 6;
+      bubbleRadius = 12;
       box = new HBox(0);
       box.setAlignment(Pos.BASELINE_LEFT);
       box.setPadding(new Insets(0,0,0,30));

@@ -8,6 +8,7 @@ import de.mephisto.radiofx.ui.Pager;
 import de.mephisto.radiofx.ui.UIStateController;
 import de.mephisto.radiofx.util.Colors;
 import de.mephisto.radiofx.util.Fonts;
+import de.mephisto.radiofx.util.PaneUtil;
 import de.mephisto.radiofx.util.TransitionUtil;
 import javafx.animation.FadeTransition;
 import javafx.event.ActionEvent;
@@ -53,23 +54,20 @@ public class WeatherUIController extends PageableUIController {
   @Override
   public BorderPane init() {
     locationText = new Text(0, 0, "");
-    locationText.setFont(Fonts.FONT_BOLD_22);
+    locationText.setFont(Fonts.WEATHER_LOCATION_FONT);
     locationText.setFill(Colors.COLOR_DARK_HEADER);
 
     BorderPane tabRoot = new BorderPane();
-    tabRoot.setMinHeight(TransitionUtil.MIN_MAIN_HEIGHT);
+    tabRoot.setMinHeight(PaneUtil.MIN_MAIN_HEIGHT);
 
-    VBox verticalRoot = new VBox(5);
-    verticalRoot.setPadding(new Insets(5, 0, 5, 0));
+    VBox verticalRoot = PaneUtil.createVBox(15, Pos.TOP_CENTER, null, new Insets(15, 0, 5, 0));
     tabRoot.setCenter(verticalRoot);
-    verticalRoot.setAlignment(Pos.CENTER);
     verticalRoot.getChildren().add(locationText);
 
     super.setPagingRoot(verticalRoot);
 
-    mainSection = new HBox(15);
-    mainSection.setAlignment(Pos.TOP_CENTER);
-    mainSection.setPadding(new Insets(0, 0, 0, 10));
+
+    mainSection = PaneUtil.createHBox(15, Pos.TOP_CENTER, null, new Insets(0, 0, 0, 10));
     mainSection.setMinHeight(130);
     verticalRoot.getChildren().add(mainSection);
 
@@ -99,43 +97,35 @@ public class WeatherUIController extends PageableUIController {
     this.weatherIconCanvas = TransitionUtil.createImageCanvas(url, IMAGE_SIZE, IMAGE_SIZE);
     mainSection.getChildren().add(weatherIconCanvas);
 
-    VBox centerVertical = new VBox(5);
+    VBox centerVertical = new VBox(30);
     centerVertical.setAlignment(Pos.CENTER);
 
     tempText = new Text(0, 0, "");
-    tempText.setFont(Fonts.FONT_NORMAL_60);
+    tempText.setFont(Fonts.WEATHER_TEMP_FONT);
     tempText.setFill(Colors.COLOR_DARK_HEADER);
     centerVertical.getChildren().add(tempText);
     mainSection.getChildren().add(centerVertical);
 
     descriptionText = new Text(0, 0, currentWeatherInfo.getDescription());
-    descriptionText.setFont(Fonts.FONT_NORMAL_14);
+    descriptionText.setFont(Fonts.WEATHER_DESCR_FONT);
     descriptionText.setFill(Colors.COLOR_DARK_HEADER);
     centerVertical.getChildren().add(descriptionText);
 
     //detail info
-    VBox temps = new VBox(5);
+    VBox temps = new VBox(10);
     temps.setMinWidth(128);
     temps.setPadding(new Insets(20, 20, 0, 15));
 
-    minTempText = new Text(0, 0, "");
-    minTempText.setFont(Fonts.FONT_NORMAL_14);
-    minTempText.setFill(Colors.COLOR_DARK_HEADER);
+    minTempText = PaneUtil.createText("", Fonts.FONT_NORMAL_20);
     temps.getChildren().add(minTempText);
 
-    maxTempText = new Text(0, 0, "");
-    maxTempText.setFont(Fonts.FONT_NORMAL_14);
-    maxTempText.setFill(Colors.COLOR_DARK_HEADER);
+    maxTempText = PaneUtil.createText("", Fonts.FONT_NORMAL_20);
     temps.getChildren().add(maxTempText);
 
-    sunriseText = new Text(0, 0, "");
-    sunriseText.setFont(Fonts.FONT_NORMAL_14);
-    sunriseText.setFill(Colors.COLOR_DARK_HEADER);
+    sunriseText = PaneUtil.createText("", Fonts.FONT_NORMAL_20);
     temps.getChildren().add(sunriseText);
 
-    sunsetText = new Text(0, 0, "");
-    sunsetText.setFont(Fonts.FONT_NORMAL_14);
-    sunsetText.setFill(Colors.COLOR_DARK_HEADER);
+    sunsetText = PaneUtil.createText("", Fonts.FONT_NORMAL_20);
     temps.getChildren().add(sunsetText);
 
     mainSection.getChildren().add(temps);
@@ -148,22 +138,22 @@ public class WeatherUIController extends PageableUIController {
     final List<WeatherInfo> forecast = activeModel.getForecast();
     for(WeatherInfo info : forecast) {
       VBox infoBox = new VBox(15);
-      infoBox.setPadding(new Insets(0,10,0,10));
+      infoBox.setPadding(new Insets(0,20,0,20));
       infoBox.setAlignment(Pos.CENTER);
 
       Text dayText = new Text();
       dayText.setFill(Colors.COLOR_DARK_HEADER);
-      dayText.setFont(Fonts.FONT_NORMAL_16);
+      dayText.setFont(Fonts.FONT_NORMAL_20);
       SimpleDateFormat format = new SimpleDateFormat("EEE");
       dayText.setText(format.format(info.getForecastDate()));
       infoBox.getChildren().add(dayText);
 
-      final Canvas imageCanvas = TransitionUtil.createImageCanvas(info.getIconBlackUrl(), 32, 32);
+      final Canvas imageCanvas = TransitionUtil.createImageCanvas(info.getIconBlackUrl(), 64, 64);
       infoBox.getChildren().add(imageCanvas);
 
       Text tempText = new Text();
       tempText.setFill(Colors.COLOR_DARK_HEADER);
-      tempText.setFont(Fonts.FONT_NORMAL_14);
+      tempText.setFont(Fonts.FONT_NORMAL_20);
       tempText.setText(info.getLowTemp() + "-" + info.getHighTemp() + " °C");
       infoBox.getChildren().add(tempText);
 

@@ -5,7 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Abstract superclass for services that regularly refresh their data to send them to the UI.
@@ -13,7 +15,7 @@ import java.util.List;
 public abstract class RefreshingService implements IService {
   private static final Logger LOG = LoggerFactory.getLogger(RefreshingService.class);
 
-  private List<IServiceInfoListener> listeners = new ArrayList<IServiceInfoListener>();
+  private Collection<IServiceInfoListener> listeners = new ConcurrentLinkedQueue<IServiceInfoListener>();
 
   private long refreshInterval;
   private RefreshThread refreshThread;

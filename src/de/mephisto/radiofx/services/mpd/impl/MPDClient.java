@@ -140,7 +140,7 @@ public class MPDClient {
       return new PlaylistInfo(output);
     }
     else {
-      LOG.error("Failed to retrieve mpc playlist info: telnet client is not connected.");
+      LOG.error("Failed to retrieve mpc playlist info: " + this + " is not connected.");
     }
     return null;
   }
@@ -148,6 +148,6 @@ public class MPDClient {
 
   @Override
   public String toString() {
-    return "MPCClient for " + host + ":" + port;
+    return "MPD Client for " + host + ":" + port;
   }
 }

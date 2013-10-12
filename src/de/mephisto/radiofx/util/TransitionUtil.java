@@ -1,67 +1,20 @@
 package de.mephisto.radiofx.util;
 
-import de.mephisto.radiofx.MephistoRadioFX;
-import de.mephisto.radiofx.resources.ResourceLoader;
-import de.mephisto.radiofx.ui.SplashScreen;
-import de.mephisto.radiofx.ui.UIState;
 import javafx.animation.*;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import org.apache.commons.configuration.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Common UI helpers.
  */
 public class TransitionUtil {
-  private final static Logger LOG = LoggerFactory.getLogger(TransitionUtil.class);
-
-  public static int WIDTH;
-  public static int HEIGHT;
-  public static int MIN_MAIN_HEIGHT;
-
-  static {
-    final Configuration configuration = Config.getConfiguration("settings.properties");
-    WIDTH = configuration.getInt("screen.width");
-    HEIGHT = configuration.getInt("screen.height");
-
-    MIN_MAIN_HEIGHT = HEIGHT - 82;
-  }
 
   public static void moveNode(Node node, int from, int to, boolean reverse, long delay, EventHandler<ActionEvent> e, boolean moveX) {
     if(reverse) {
@@ -114,7 +67,7 @@ public class TransitionUtil {
    * @param height
    * @return
    */
-  public static Canvas createImageCanvas(String url, int width, int height) {
+  public static Canvas createImageCanvas(String url, double width, double height) {
     ImageView img = new ImageView(new Image(url, width, height, false, true));
     final Canvas canvas = new Canvas(width, height);
     final GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -151,6 +104,23 @@ public class TransitionUtil {
         .node(node)
         .fromValue(0.1)
         .cycleCount(Timeline.INDEFINITE)
+        .toValue(1)
+        .autoReverse(true)
+        .build();
+  }
+
+  /**
+   * Creates a fade out effect without playing it
+   *
+   * @param node
+   * @return
+   */
+  public static FadeTransition createDoubleBlink(Node node) {
+    return FadeTransitionBuilder.create()
+        .duration(Duration.millis(400))
+        .node(node)
+        .fromValue(0.1)
+        .cycleCount(2)
         .toValue(1)
         .autoReverse(true)
         .build();

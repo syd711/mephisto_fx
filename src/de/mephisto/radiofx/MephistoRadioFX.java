@@ -2,16 +2,22 @@ package de.mephisto.radiofx;
 
 import de.mephisto.radiofx.ui.UIState;
 import de.mephisto.radiofx.ui.UIStateController;
+import de.mephisto.radiofx.util.SystemUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class MephistoRadioFX extends Application {
+  private final static Logger LOG = LoggerFactory.getLogger(MephistoRadioFX.class);
+
   private static MephistoRadioFX instance;
   private Stage stage;
 
@@ -32,6 +38,9 @@ public class MephistoRadioFX extends Application {
   public void start(final Stage primaryStage) {
     instance = this;
     this.stage = primaryStage;
+    if (!SystemUtils.isWindows()) {
+      primaryStage.initStyle(StageStyle.UNDECORATED);
+    }
     primaryStage.show();
 
     UIStateController.getInstance().showSplashScreen();
@@ -43,7 +52,6 @@ public class MephistoRadioFX extends Application {
   public Stage getStage() {
     return stage;
   }
-
 
 
   private static void addStateListener(Stage primaryStage) {
@@ -63,21 +71,24 @@ public class MephistoRadioFX extends Application {
         }
         if (keyEvent.getCode() == KeyCode.DOWN) {
           Platform.runLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
               state.push();
             }
           });
         }
         if (keyEvent.getCode() == KeyCode.UP) {
           Platform.runLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
               state.longPush();
             }
           });
         }
         if (keyEvent.getCode() == KeyCode.LEFT) {
           Platform.runLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
               state.left();
             }
           });

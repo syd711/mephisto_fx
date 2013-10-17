@@ -41,7 +41,7 @@ public class GoogleUIPlayerController extends PageableUIController {
 
   private final static int VISIBLE_ITEM_COUNT = 4;
   private final static int SCROLL_DELAY = 400;
-  private final static int SCROLL_LEFT_LENGTH = 27;
+  private final static int SCROLL_LEFT_LENGTH = 37;
 
   private int scrollPos = 0;
 
@@ -119,7 +119,7 @@ public class GoogleUIPlayerController extends PageableUIController {
     if (getPager().getPosition() < (VISIBLE_ITEM_COUNT - 1)) {
       return this;
     }
-    if (getPager().getPosition() > ((getPager().size()+1) - VISIBLE_ITEM_COUNT)) {
+    if (getPager().getPosition() > ((getPager().size()) - VISIBLE_ITEM_COUNT)) {
       return this;
     }
 
@@ -206,7 +206,7 @@ public class GoogleUIPlayerController extends PageableUIController {
     songScroller.setStyle("-fx-background-color:transparent;");
     songScroller.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
-    songBox = new VBox(4);
+    songBox = new VBox(6);
     songBox.setPadding(new Insets(3, 2, 2, 2));
     int track = 1;
     for (Song song : album.getSongs()) {
@@ -225,11 +225,11 @@ public class GoogleUIPlayerController extends PageableUIController {
 
       BorderPane innerTrackBox = new BorderPane();
       HBox posBox = new HBox(5);
-      posBox.setMinWidth(20);
+      posBox.setMinWidth(40);
       posBox.getChildren().add(createTrackText(track + "."));
       innerTrackBox.setLeft(posBox);
       HBox nameBox = new HBox(5);
-      nameBox.setMinWidth(395);
+      nameBox.setMinWidth(385);
 
       String name = song.getName();
       if (name.endsWith(".mp3")) {
@@ -257,8 +257,8 @@ public class GoogleUIPlayerController extends PageableUIController {
    * @return
    */
   private Text createTrackText(String label) {
-    if (label.length() > 33) {
-      label = label.substring(0, 32) + "...";
+    if (label.length() > 29) {
+      label = label.substring(0, 28) + "...";
     }
     Text text = new Text(label);
     text.setFont(Fonts.FONT_NORMAL_20);
@@ -307,6 +307,7 @@ public class GoogleUIPlayerController extends PageableUIController {
    * @param show
    */
   private void showPlayerMode(final boolean show) {
+    UIStateController.getInstance().setLockInput(true);
     getPager().toggleMode();
     if (show) {
       getPager().setModels(new ArrayList<IServiceModel>(album.getSongs()), album.getSongs().get(0));
@@ -349,18 +350,25 @@ public class GoogleUIPlayerController extends PageableUIController {
       public void handle(ActionEvent actionEvent) {
         if (show) {
           display();
-
-          TransitionUtil.fadeInComponent(songScroller);
+          final FadeTransition inFader = TransitionUtil.createInFader(songScroller);
+          inFader.setOnFinished(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+              UIStateController.getInstance().setLockInput(false);
+            }
+          });
+          inFader.play();
         }
         else {
           if(UIStateController.getInstance().getActiveController() != GoogleUIPlayerController.this) {
             albumNode.setStyle(GoogleUINaviController.STYLE_ACTIVE);
           }
+          UIStateController.getInstance().setLockInput(false);
         }
       }
     };
 
-    TransitionUtil.moveNode(centerRegion, scrollPos, (scrollPos - 215), !show, SCROLL_DELAY, eventHandler, true);
+    TransitionUtil.moveNode(centerRegion, scrollPos, (scrollPos - 245), !show, SCROLL_DELAY, eventHandler, true);
   }
 
 }

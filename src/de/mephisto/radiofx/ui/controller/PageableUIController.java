@@ -5,6 +5,9 @@ import de.mephisto.radiofx.services.IServiceInfoListener;
 import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.ui.Pager;
 import de.mephisto.radiofx.util.TransitionUtil;
+import javafx.animation.FadeTransition;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 
 /**
@@ -14,6 +17,7 @@ public abstract class PageableUIController extends UIController implements IServ
 
   private Pager pager;
   private Node pagingRoot;
+  private boolean changeable = true;
 
   private IService service;
 
@@ -33,6 +37,10 @@ public abstract class PageableUIController extends UIController implements IServ
 
   public Pager getPager() {
     return this.pager;
+  }
+
+  public boolean isChangeable() {
+    return changeable;
   }
 
   @Override
@@ -68,8 +76,16 @@ public abstract class PageableUIController extends UIController implements IServ
    * @param model
    */
   private void refresh(final IServiceModel model) {
+    changeable = false;
     TransitionUtil.createOutFader(pagingRoot);
     updatePage(model);
-    TransitionUtil.fadeInComponent(pagingRoot);
+    final FadeTransition inFader = TransitionUtil.createInFader(pagingRoot);
+    inFader.setOnFinished(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent actionEvent) {
+        changeable = true;
+      }
+    });
+    inFader.play();
   }
 }

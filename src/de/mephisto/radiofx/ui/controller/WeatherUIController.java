@@ -74,7 +74,7 @@ public class WeatherUIController extends PageableUIController {
     createDefaultInfo();
 
     //add page
-    Pager pager = new Pager(tabRoot, ServiceRegistry.getWeatherService().getServiceData());
+    Pager pager = new Pager(tabRoot, ServiceRegistry.getWeatherService().getServiceData(false));
     super.setPager(pager);
     super.setTabRoot(tabRoot);
 
@@ -138,7 +138,7 @@ public class WeatherUIController extends PageableUIController {
     final List<WeatherInfo> forecast = activeModel.getForecast();
     for(WeatherInfo info : forecast) {
       VBox infoBox = new VBox(15);
-      infoBox.setPadding(new Insets(0,20,0,20));
+      infoBox.setMinWidth(PaneUtil.WIDTH/5-30);
       infoBox.setAlignment(Pos.CENTER);
 
       Text dayText = new Text();
@@ -173,7 +173,6 @@ public class WeatherUIController extends PageableUIController {
     locationText.setText(activeModel.getCity() +  ", " + activeModel.getCountry());
 
     if(!forecastMode) {
-
       //icon
       weatherIconCanvas.getGraphicsContext2D().clearRect(0, 0, IMAGE_SIZE, IMAGE_SIZE);
       String url = activeModel.getImageUrl();
@@ -193,7 +192,8 @@ public class WeatherUIController extends PageableUIController {
       sunriseText.setText("Sunrise: " + format.format(activeModel.getSunrise()));
     }
     else {
-      //no refresh for forecast
+      mainSection.getChildren().clear();
+      createForecastInfo();
     }
   }
 

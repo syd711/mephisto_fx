@@ -10,6 +10,7 @@ import de.mephisto.radiofx.ui.Pager;
 import de.mephisto.radiofx.ui.UIStateController;
 import de.mephisto.radiofx.util.*;
 import javafx.animation.TranslateTransitionBuilder;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -86,7 +87,12 @@ public class GoogleUINaviController extends PageableUIController {
     pager = new Pager(tabRoot, new ArrayList<IServiceModel>(ServiceRegistry.getGoogleService().getAlbums()), false, true);
     this.activeAlbum = (Album) pager.getActiveModel();
 
-    display();
+    Platform.runLater(new Runnable() {
+      @Override
+      public void run() {
+        display();
+      }
+    });
 
     super.setPager(pager);
     super.setTabRoot(tabRoot);
@@ -107,7 +113,7 @@ public class GoogleUINaviController extends PageableUIController {
 
     hBoxAlbums = new HBox(4);
     centerRegion.getChildren().add(hBoxAlbums);
-    centerRegion.setPadding(new Insets(0, 225, 0, 225));
+    centerRegion.setPadding(new Insets(0, 255, 0, 255));
 
     for (Album album : albums) {
       HBox albumRoot = new HBox(0);
@@ -132,7 +138,7 @@ public class GoogleUINaviController extends PageableUIController {
       text.setFill(Colors.COLOR_DARK_HEADER);
       vbox.getChildren().add(text);
 
-      text = new Text(0, 0, formatLabel(album.getName(), 22));
+      text = new Text(0, 0, formatLabel(album.getName(), 20));
       text.setFont(Fonts.FONT_NORMAL_14);
       text.setFill(Colors.COLOR_DARK_HEADER);
       vbox.getChildren().add(text);
@@ -152,13 +158,15 @@ public class GoogleUINaviController extends PageableUIController {
       selectedAlbumNode.setStyle(STYLE_INACTIVE);
     }
 
-    final ObservableList<Node> children = hBoxAlbums.getChildren();
-    for (Node node : children) {
-      String id = node.getId();
-      if (id.equals(String.valueOf(album.getMID()))) {
-        selectedAlbumNode = node;
-        selectedAlbumNode.setStyle(STYLE_ACTIVE);
-        break;
+    if(hBoxAlbums != null) { //null because of lazy loading
+      final ObservableList<Node> children = hBoxAlbums.getChildren();
+      for (Node node : children) {
+        String id = node.getId();
+        if (id.equals(String.valueOf(album.getMID()))) {
+          selectedAlbumNode = node;
+          selectedAlbumNode.setStyle(STYLE_ACTIVE);
+          break;
+        }
       }
     }
   }

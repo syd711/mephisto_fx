@@ -34,7 +34,7 @@ public class EarthToolsTimeServiceImpl extends RefreshingService {
   }
 
   @Override
-  public List<IServiceModel> getServiceData() {
+  public List<IServiceModel> getServiceData(boolean forceRefresh) {
     List<IServiceModel> data = new ArrayList<IServiceModel>();
     if (localTime != null) {
       DateTimeInfo info = new DateTimeInfo();

@@ -97,6 +97,8 @@ public class YahooWeatherServiceImpl extends RefreshingService implements IWeath
   public static final String IMG_STORMY = "weather-thunder.png";
   private static final int REFRESH_INTERVAL = 60000;
 
+  private List<IServiceModel> latestServiceData = new ArrayList<IServiceModel>();
+
   public YahooWeatherServiceImpl() {
     super(REFRESH_INTERVAL);
   }
@@ -107,7 +109,11 @@ public class YahooWeatherServiceImpl extends RefreshingService implements IWeath
    * @return
    */
   @Override
-  public List<IServiceModel> getServiceData() {
+  public List<IServiceModel> getServiceData(boolean forceRefresh) {
+    if(!forceRefresh && !latestServiceData.isEmpty()) {
+      return latestServiceData;
+    }
+
     List<IServiceModel> infoList = new ArrayList<IServiceModel>();
     final Configuration configuration = Config.getConfiguration("weather.properties");
     int count = 0;
@@ -125,8 +131,8 @@ public class YahooWeatherServiceImpl extends RefreshingService implements IWeath
         break;
       }
     }
-
-    return infoList;
+    latestServiceData = infoList;
+    return latestServiceData;
   }
 
   @Override
@@ -319,7 +325,7 @@ public class YahooWeatherServiceImpl extends RefreshingService implements IWeath
 
   @Override
   public WeatherInfo getDefaultWeather() {
-    final List<IServiceModel> serviceData = ServiceRegistry.getWeatherService().getServiceData();
+    final List<IServiceModel> serviceData = ServiceRegistry.getWeatherService().getServiceData(false);
     for(IServiceModel model : serviceData) {
       WeatherInfo info = (WeatherInfo) model;
       if(info.isDefaultLocation()) {

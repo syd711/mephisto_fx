@@ -25,8 +25,6 @@ public class ImageCache {
   private final static Logger LOG = LoggerFactory.getLogger(ImageCache.class);
 
   private static final File IMAGE_CACHE_DIR = new File("./image_cache/");
-
-  private static ExecutorService executor = Executors.newFixedThreadPool(3);
   private static Map<String, File> imageCache = new HashMap<String, File>();
 
   static {
@@ -45,36 +43,32 @@ public class ImageCache {
 
   public static Canvas createLazyLoadingImageCanvas(final String id, final String url, final int width, final int height) {
     final Canvas canvas = new Canvas(width, height);
-    executor.execute(new Runnable() {
-      public void run() {
-        String imageUrl = url;
-        try {
-          if (imageCache.containsKey(id)) {
-            File image = imageCache.get(id);
-            imageUrl = image.toURI().toURL().toString();
-          }
-          else {
-            imageUrl = imageUrl.replaceAll("s130", "s" + width); //scale to used size
-            LOG.info("Caching " + imageUrl);
-            URL imgUrl = new URL(imageUrl);
-            BufferedImage image = ImageIO.read(imgUrl);
-            File target = new File(IMAGE_CACHE_DIR, id + ".png");
-            ImageIO.write(image, "png", target);
-            LOG.info("Written " + target.getAbsolutePath() + " to cache, URL: " + url);
-            imageCache.put(id, target);
-            imageUrl = target.toURI().toURL().toString();
-
-          }
-        } catch (IOException e) {
-          LOG.error("Error storing image to cache: " + e.getMessage());
-        }
-
-        ImageView img = new ImageView(new Image(imageUrl, width, height, false, true));
-        final GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.drawImage(img.getImage(), 1, 1);
-        gc.rect(0, 0, width, height);
+    String imageUrl = url;
+    try {
+      if (imageCache.containsKey(id)) {
+        File image = imageCache.get(id);
+        imageUrl = image.toURI().toURL().toString();
       }
-    });
+      else {
+        imageUrl = imageUrl.replaceAll("s130", "s" + width); //scale to used size
+        LOG.info("Caching " + imageUrl);
+        URL imgUrl = new URL(imageUrl);
+        BufferedImage image = ImageIO.read(imgUrl);
+        File target = new File(IMAGE_CACHE_DIR, id + ".png");
+        ImageIO.write(image, "png", target);
+        LOG.info("Written " + target.getAbsolutePath() + " to cache, URL: " + imageUrl);
+        imageCache.put(id, target);
+        imageUrl = target.toURI().toURL().toString();
+
+      }
+    } catch (IOException e) {
+      LOG.error("Error storing image to cache: " + e.getMessage());
+    }
+
+    ImageView img = new ImageView(new Image(imageUrl, width, height, false, true));
+    final GraphicsContext gc = canvas.getGraphicsContext2D();
+    gc.drawImage(img.getImage(), 1, 1);
+    gc.rect(0, 0, width, height);
     return canvas;
   }
 }

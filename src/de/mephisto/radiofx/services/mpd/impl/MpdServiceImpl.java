@@ -105,7 +105,7 @@ public class MpdServiceImpl extends RefreshingService implements IMpdService {
         for (IServiceModel model : stations) {
           StationInfo info = (StationInfo) model;
           if(info.getId() == id) {
-            info.setActive(true);
+            playStation(info);
             break;
           }
         }
@@ -144,7 +144,7 @@ public class MpdServiceImpl extends RefreshingService implements IMpdService {
   private void refreshAlbum() {
     long currentDuration = new Date().getTime()-playbackTime;
     Song activeSong = activeAlbum.getActiveSong();
-    if(activeSong != null && currentDuration > activeSong.getDurationMillis()) {
+    if(playbackTime > 0 && activeSong != null && currentDuration > activeSong.getDurationMillis()) {
       Song song = activeAlbum.nextSong();
       activeSong.setActive(false);
       if(song != null) {
@@ -183,7 +183,7 @@ public class MpdServiceImpl extends RefreshingService implements IMpdService {
   }
 
   @Override
-  public List<IServiceModel> getServiceData() {
+  public List<IServiceModel> getServiceData(boolean forceRefresh) {
     //this is a little bit tricky here since we use this service by to UI controller
     //this call maybe a delegation of another service controller to fix the thread refresh.
     if(mode == MODE_RADIO) {

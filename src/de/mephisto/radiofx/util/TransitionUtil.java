@@ -75,6 +75,21 @@ public class TransitionUtil {
     return canvas;
   }
 
+  /**
+   * Creates a fade out effect without playing it
+   *
+   * @param node
+   * @return
+   */
+  public static FadeTransition createInFader(Node node) {
+    return FadeTransitionBuilder.create()
+        .duration(Duration.millis(300))
+        .node(node)
+        .fromValue(0)
+        .toValue(1)
+        .autoReverse(false)
+        .build();
+  }
 
   /**
    * Creates a fade out effect without playing it
@@ -115,15 +130,15 @@ public class TransitionUtil {
    * @param node
    * @return
    */
-  public static FadeTransition createDoubleBlink(Node node) {
-    return FadeTransitionBuilder.create()
+  public static void playDoubleBlink(Node node) {
+    FadeTransitionBuilder.create()
         .duration(Duration.millis(400))
         .node(node)
         .fromValue(0.1)
         .cycleCount(2)
         .toValue(1)
         .autoReverse(true)
-        .build();
+        .build().play();
   }
 
   /**

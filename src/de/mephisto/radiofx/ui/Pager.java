@@ -24,8 +24,9 @@ import java.util.List;
 public class Pager {
   private final static double PAGER_WIDTH = PaneUtil.WIDTH-40;
   private final static int STROKE_WIDTH = 2;
+  private final static int DEFAULT_BUBBLE_RADIUS = 12;
 
-  private int bubbleRadius= 12;
+  private int bubbleRadius= DEFAULT_BUBBLE_RADIUS;
   private HBox box;
   private IServiceModel activeModel;
   private List<IServiceModel> models;
@@ -66,6 +67,10 @@ public class Pager {
       if (models.size() > 25) {
         margin = 2;
         bubbleRadius = 8;
+      }
+      if (models.size() > 30) {
+        margin = 2;
+        bubbleRadius = 5;
       }
       box = new HBox(0);
       box.setAlignment(Pos.BASELINE_LEFT);
@@ -214,6 +219,7 @@ public class Pager {
   public void setModels(List<IServiceModel> models, IServiceModel activeModel) {
     this.models = models;
     this.activeModel = activeModel;
+    bubbleRadius = DEFAULT_BUBBLE_RADIUS;
     updateUI();
   }
 

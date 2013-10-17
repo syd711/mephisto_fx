@@ -25,6 +25,9 @@ public class ServiceRegistry {
     new Thread() {
       @Override
       public void run() {
+        mpdService = new MpdServiceImpl();
+        mpdService.initService(splashScene);
+
         googleService = new GoogleServiceImpl();
         googleService.initService(splashScene);
 
@@ -33,9 +36,6 @@ public class ServiceRegistry {
 
         timeService = new EarthToolsTimeServiceImpl();
         timeService.initService(splashScene);
-
-        mpdService = new MpdServiceImpl();
-        mpdService.initService(splashScene);
 
         rotaryEncoderService = new RotaryEncoderService(splashScene);
 

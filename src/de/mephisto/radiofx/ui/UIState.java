@@ -6,11 +6,11 @@ package de.mephisto.radiofx.ui;
 public class UIState {
 
   public void left() {
-    UIStateController.getInstance().showPrevious();
+    UIStateController.getInstance().previous();
   }
 
   public void right() {
-    UIStateController.getInstance().showNext();
+    UIStateController.getInstance().next();
   }
 
   public void push() {

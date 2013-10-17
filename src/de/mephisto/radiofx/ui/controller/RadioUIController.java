@@ -76,15 +76,15 @@ public class RadioUIController extends PageableUIController {
 
     verticalRoot.getChildren().add(urlText);
 
-    super.setPager(new Pager(tabRoot, ServiceRegistry.getMpdService().getServiceData()));
+    super.setPager(new Pager(tabRoot, ServiceRegistry.getMpdService().getServiceData(false)));
     super.setTabRoot(tabRoot);
 
-    final List<IServiceModel> serviceData = ServiceRegistry.getMpdService().getServiceData();
+    final List<IServiceModel> serviceData = ServiceRegistry.getMpdService().getServiceData(false);
     if(!serviceData.isEmpty()) {
       for(IServiceModel model : serviceData) {
         StationInfo info = (StationInfo) model;
         if(info.isActive())  {
-          playStation(info);
+          activeStation = info;
           getPager().select(model);
           break;
         }
@@ -124,7 +124,7 @@ public class RadioUIController extends PageableUIController {
     }
     else {
 
-      trackText.setText(formatValue(info.getTrack(), 52));
+      trackText.setText(formatValue(info.getTrack(), 44));
       stopBlink();
     }
     urlText.setText(formatValue(info.getUrl(), 120));
@@ -138,7 +138,7 @@ public class RadioUIController extends PageableUIController {
   @Override
   public IRotaryControllable push() {
     StationInfo info = (StationInfo) getPager().getActiveModel();
-    TransitionUtil.createDoubleBlink(stationText);
+//    TransitionUtil.playDoubleBlink(stationText);
     playStation(info);
     return this;
   }
@@ -150,7 +150,7 @@ public class RadioUIController extends PageableUIController {
 
   @Override
   public void onDisplay() {
-    if(!mpdService.isRadioMode()) {
+    if(!mpdService.isRadioMode() && activeStation != null) {
       activeStation.setActive(false);
     }
     getPager().updateActivity();

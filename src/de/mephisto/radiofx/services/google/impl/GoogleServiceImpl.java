@@ -112,7 +112,7 @@ public class GoogleServiceImpl extends RefreshingService implements IGoogleMusic
   }
 
   @Override
-  public List<IServiceModel> getServiceData() {
+  public List<IServiceModel> getServiceData(boolean forceRefresh) {
     return new ArrayList<IServiceModel>(getAlbums());
   }
 

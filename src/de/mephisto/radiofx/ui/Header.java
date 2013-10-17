@@ -43,7 +43,7 @@ public class Header implements IServiceInfoListener {
     root.setTop(topRoot);
     topRoot.getChildren().add(hbox);
 
-    final List<IServiceModel> serviceData = ServiceRegistry.getTimeService().getServiceData();
+    final List<IServiceModel> serviceData = ServiceRegistry.getTimeService().getServiceData(false);
     final DateTimeInfo dateTimeInfo = (DateTimeInfo) serviceData.get(0);
     Date date = dateTimeInfo.getDate();
     String dateString = new SimpleDateFormat("d. MMMMMMMMMMMM yyyy", Locale.US).format(date);
@@ -115,4 +115,11 @@ public class Header implements IServiceInfoListener {
       timeText.setText(timeString);
     }
   }
+
+  @Override
+  public boolean isChangeable() {
+    return true;
+  }
+
+
 }

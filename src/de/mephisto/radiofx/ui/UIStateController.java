@@ -9,16 +9,14 @@ import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.Screen;
 
 /**
  * The global UI controller, receives the input from the state machine that
  * can be triggered via GPIO or via keyboard inputs.
  */
-public class UIStateController implements RotaryEncoderListener{
+public class UIStateController implements RotaryEncoderListener {
   private static UIStateController instance = new UIStateController();
   private BorderPane borderPane;
   private Footer footer;
@@ -31,6 +29,8 @@ public class UIStateController implements RotaryEncoderListener{
   //radio controller is default
   private UIController activeController = radioController;
 
+  private boolean lockInput = false;
+
   private UIStateController() {
     borderPane = new BorderPane();
     borderPane.setOpacity(1);
@@ -42,6 +42,7 @@ public class UIStateController implements RotaryEncoderListener{
 
   /**
    * Singleton getter
+   *
    * @return
    */
   public static UIStateController getInstance() {
@@ -78,38 +79,79 @@ public class UIStateController implements RotaryEncoderListener{
     TransitionUtil.fadeInComponent(borderPane);
   }
 
-  public void showNext() {
-    UIController newController = (UIController) activeController.next();
-    updateActiveController(newController);
+  @Override
+  public void next() {
+    if(isLockInput()) {
+      return;
+    }
+
+    Platform.runLater(new Runnable() {
+      @Override
+      public void run() {
+        UIController newController = (UIController) activeController.next();
+        updateActiveController(newController);
+      }
+    });
   }
 
-  public void showPrevious() {
-    UIController newController = (UIController) activeController.prev();
-    updateActiveController(newController);
+  @Override
+  public void previous() {
+    if(isLockInput()) {
+      return;
+    }
+
+    Platform.runLater(new Runnable() {
+      @Override
+      public void run() {
+        UIController newController = (UIController) activeController.prev();
+        updateActiveController(newController);
+      }
+    });
   }
 
+  @Override
   public void push() {
-    UIController newController = (UIController) activeController.push();
-    updateActiveController(newController);
+    if(isLockInput()) {
+      return;
+    }
+
+    Platform.runLater(new Runnable() {
+      @Override
+      public void run() {
+        UIController newController = (UIController) activeController.push();
+        updateActiveController(newController);
+      }
+    });
   }
 
+  @Override
   public void longPush() {
-    UIController newController = (UIController) activeController.longPush();
-    updateActiveController(newController);
+    if(isLockInput()) {
+      return;
+    }
+
+    Platform.runLater(new Runnable() {
+      @Override
+      public void run() {
+        UIController newController = (UIController) activeController.longPush();
+        updateActiveController(newController);
+      }
+    });
   }
 
   /**
    * Checks if the active controller has changed.
    * The events are delegated to the new controller in this case.
+   *
    * @param newController
    */
   private synchronized void updateActiveController(final UIController newController) {
-    if(!newController.equals(activeController)) {
+    if (!newController.equals(activeController)) {
       footer.switchTab(newController.getFooterId());
       activeController.onDispose();
 
       //check if the controller creates a new UI
-      if(newController.getTabRoot() != null && activeController.getTabRoot() != null) {
+      if (newController.getTabRoot() != null && activeController.getTabRoot() != null) {
         final Node center = newController.getTabRoot();
         final FadeTransition outFader = TransitionUtil.createOutFader(center);
         outFader.onFinishedProperty().set(new EventHandler<ActionEvent>() {
@@ -148,23 +190,11 @@ public class UIStateController implements RotaryEncoderListener{
     return this.activeController;
   }
 
-  @Override
-  public void left() {
-    Platform.runLater(new Runnable() {
-      @Override
-      public void run() {
-        showPrevious();
-      }
-    });
+  public boolean isLockInput() {
+    return lockInput;
   }
 
-  @Override
-  public void right() {
-    Platform.runLater(new Runnable() {
-      @Override
-      public void run() {
-        showNext();
-      }
-    });
+  public void setLockInput(boolean lockInput) {
+    this.lockInput = lockInput;
   }
 }

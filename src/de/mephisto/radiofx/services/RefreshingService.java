@@ -28,7 +28,7 @@ public abstract class RefreshingService implements IService {
 
   @Override
   public void forceRefresh() {
-    getServiceData();
+    getServiceData(true);
   }
 
   /**
@@ -48,7 +48,9 @@ public abstract class RefreshingService implements IService {
       Platform.runLater(new Runnable() {
         @Override
         public void run() {
-          listener.serviceDataChanged(model);
+          if(listener.isChangeable()) {
+            listener.serviceDataChanged(model);
+          }
         }
       });
     }
@@ -65,7 +67,7 @@ public abstract class RefreshingService implements IService {
       while (running) {
         try {
           Thread.sleep(refreshInterval);
-          final List<IServiceModel> infoList = getServiceData();
+          final List<IServiceModel> infoList = getServiceData(true);
           if(infoList == null) {
             return;
           }

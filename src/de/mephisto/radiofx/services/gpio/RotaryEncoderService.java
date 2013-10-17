@@ -1,9 +1,11 @@
 package de.mephisto.radiofx.services.gpio;
 
+import com.pi4j.io.gpio.*;
+import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
+import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import de.mephisto.radiofx.ui.SplashScreen;
 import de.mephisto.radiofx.util.Config;
 import de.mephisto.radiofx.util.SystemUtils;
-import javafx.application.Platform;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +16,7 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,6 +31,11 @@ public class RotaryEncoderService {
 
   private final static int LEFT = 0;
   private final static int RIGHT = 1;
+  private final static int PUSH = 2;
+  private final static int LONG_PUSH = 3;
+
+  private long pushStart = 0;
+  private static final long LONG_PUSH_WAIT_MILLIS = 400;
 
   private List<RotaryEncoderListener> listeners = new ArrayList<RotaryEncoderListener>();
 
@@ -40,10 +48,38 @@ public class RotaryEncoderService {
       configuration = Config.getConfiguration("gpio.properties");
       createSocketServer();
       connect();
+      connectPushListener();
     }
     catch (IOException e) {
       LOG.error("Error creating rotary encoder service: " + e.getMessage(), e);
     }
+  }
+
+  private void connectPushListener() {
+    final GpioController gpio = GpioFactory.getInstance();
+
+    // provision gpio pin #02/Pin 13 as an input pin with its internal pull down resistor enabled
+    final GpioPinDigitalInput pushButton = gpio.provisionDigitalInputPin(RaspiPin.GPIO_02, PinPullResistance.PULL_DOWN);
+
+    // create and register gpio pin listener
+    pushButton.addListener(new GpioPinListenerDigital() {
+      @Override
+      public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+        PinState state = event.getState();
+        if (state == PinState.LOW) {
+          long pushEnd = new Date().getTime();
+          if(pushStart > 0 && (pushEnd-pushStart) > LONG_PUSH_WAIT_MILLIS) {
+            updateListeners(LONG_PUSH);
+          }
+          else {
+            updateListeners(PUSH);
+          }
+        }
+        else {
+          pushStart = new Date().getTime();
+        }
+      }
+    });
   }
 
   /**
@@ -120,19 +156,31 @@ public class RotaryEncoderService {
 
   /**
    * Updates the UI
-   * @param direction
+   * @param state
    */
-  private void updateListeners(final int direction) {
-    switch (direction) {
+  private void updateListeners(final int state) {
+    switch (state) {
       case LEFT: {
         for(RotaryEncoderListener listener : listeners) {
-          listener.left();
+          listener.previous();
         }
         break;
       }
       case RIGHT: {
         for(RotaryEncoderListener listener : listeners) {
-          listener.right();
+          listener.next();
+        }
+        break;
+      }
+      case PUSH: {
+        for(RotaryEncoderListener listener : listeners) {
+          listener.push();
+        }
+        break;
+      }
+      case LONG_PUSH: {
+        for(RotaryEncoderListener listener : listeners) {
+          listener.longPush();
         }
         break;
       }

@@ -13,7 +13,7 @@ public interface IService {
    * Retrieves the service data for the refreshing.
    * @return
    */
-  List<IServiceModel> getServiceData();
+  List<IServiceModel> getServiceData(boolean forceRefresh);
 
   /**
    * Forces the service to refresh the data without waiting for the refresh interval.

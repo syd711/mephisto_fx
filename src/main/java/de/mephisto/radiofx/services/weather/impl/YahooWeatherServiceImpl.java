@@ -287,7 +287,7 @@ public class YahooWeatherServiceImpl extends RefreshingService implements IWeath
 
   private String convertTypeCodeImage(int code) {
     String img = IMG_SUNNY_CLOUDY_1;
-    if (code < 5 || (code >= 37 && code <= 39) || code == 45) {
+    if (code < 5 || code == 45) {
       img = IMG_STORMY;
     }
     else if ((code >= 5 && code < 9) || code == 17 || code == 18 || code == 13 || code == 14 || code == 46 || code == 47) {
@@ -296,14 +296,11 @@ public class YahooWeatherServiceImpl extends RefreshingService implements IWeath
     else if ((code >= 15 && code <= 16) || (code >= 40 && code <= 43)) {
       img = IMG_SNOW;
     }
-    else if(code >= 9 && code < 13) {
+    else if( (code >= 9 && code < 13) ||(code >= 35 && code <= 39)) {
       img = IMG_RAINY;
     }
     else if (code == 36 || (code >= 32 && code <= 34) || code == 31) {
       img = IMG_SUNNY;
-    }
-    else if (code == 35) {
-      img = IMG_RAINY;
     }
     else if ((code >= 20 && code <= 25) || code == 19) {
       img = IMG_CLOUDY;

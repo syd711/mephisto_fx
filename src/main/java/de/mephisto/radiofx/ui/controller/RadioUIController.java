@@ -27,13 +27,15 @@ import java.util.List;
  * Controls the UI for the radio
  */
 public class RadioUIController extends PageableUIController {
-  private static final Font RADIO_STATION_FONT = Font.font("Tahoma", FontWeight.BOLD, 32);
-  private static final Font RADIO_TRACK_FONT= Font.font("Tahoma", FontWeight.NORMAL, 24);
+  private static final Font RADIO_STATION_FONT = Font.font("Tahoma", FontWeight.BOLD, 34);
+  private static final Font RADIO_TRACK_FONT= Font.font("Tahoma", FontWeight.BOLD, 28);
+  private static final Font RADIO_INTERPRET_FONT= Font.font("Tahoma", FontWeight.NORMAL, 28);
 
   private static final String LOADING_MSG = "Resolving Station Info...";
   private static final int REFRESH_TIMEOUT = 8000;
 
   private Text stationText;
+  private Text interpretText;
   private Text trackText;
   private Text urlText;
   private FadeTransition blink;
@@ -66,6 +68,11 @@ public class RadioUIController extends PageableUIController {
     trackText.setFont(RADIO_TRACK_FONT);
     trackText.setFill(Colors.COLOR_DARK_HEADER);
     verticalRoot.getChildren().add(trackText);
+
+    interpretText = new Text(0, 0, "");
+    interpretText.setFont(RADIO_INTERPRET_FONT);
+    interpretText.setFill(Colors.COLOR_DARK_HEADER);
+    verticalRoot.getChildren().add(interpretText);
 
     blink = TransitionUtil.createBlink(trackText);
     blink.play();
@@ -112,19 +119,28 @@ public class RadioUIController extends PageableUIController {
         long current = new Date().getTime();
         if(current-selectionTime > REFRESH_TIMEOUT) {
           trackText.setText("- not station info available -");
+          interpretText.setText("");
           stopBlink();
         }
         else {
           trackText.setText(LOADING_MSG);
+          interpretText.setText("");
         }
       }
       else {
         trackText.setText("");
+        interpretText.setText("");
       }
     }
     else {
-
-      trackText.setText(formatValue(info.getTrack(), 44));
+      String track = info.getTrack();
+      String interpret = "";
+      if(track.contains("-")) {
+        interpret = track.substring(track.indexOf("-")+1, track.length()).trim();
+        track = track.substring(0, track.indexOf("-")).trim();
+      }
+      trackText.setText(formatValue(track, 42));
+      interpretText.setText(formatValue(interpret, 44));
       stopBlink();
     }
     urlText.setText(formatValue(info.getUrl(), 120));
@@ -182,6 +198,7 @@ public class RadioUIController extends PageableUIController {
     this.activeStation = info;
     selectionTime = new Date().getTime();
     trackText.setText(LOADING_MSG);
+    interpretText.setText("");
     blink.play();
     mpdService.playStation(info);
     mpdService.forceRefresh();

@@ -48,7 +48,6 @@ public class MusicDictionary {
     createMID(song);
     songs.put(song.getId(), song);
     addToAlbum(song);
-    LOG.debug("Add song " + song);
   }
 
   /**

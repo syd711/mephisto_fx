@@ -49,7 +49,6 @@ public class MpdServiceImpl extends RefreshingService implements IMpdService {
 
   private List<IServiceModel> stations = new ArrayList<IServiceModel>();
 
-  private PropertiesConfiguration streamConfig;
   private long playbackTime = 0l;
   private int mode = MODE_RADIO;
 
@@ -76,29 +75,8 @@ public class MpdServiceImpl extends RefreshingService implements IMpdService {
     }
 
     try {
-      streamConfig = new PropertiesConfiguration(CONFIG_FILE);
-
-      Iterator<String> keys = streamConfig.getKeys();
-      while (keys.hasNext()) {
-        String key = keys.next();
-        if (!key.contains(".url")) {
-          continue;
-        }
-
-        String id = key.substring(0, key.indexOf("."));
-        String url = streamConfig.getString(key);
-        StationInfo info = new StationInfo(Integer.parseInt(id));
-        info.setUrl(url);
-        String nameKey = id + ".name";
-        if (streamConfig.containsKey(nameKey)) {
-          info.setName(streamConfig.getString(nameKey));
-        }
-        else {
-          info.setName(url);
-        }
-
-        stations.add(info);
-      }
+      PropertiesConfiguration streamConfig = new PropertiesConfiguration(CONFIG_FILE);
+      this.stations = loadStations(streamConfig);
 
       if(streamConfig.containsKey(PROPERTY_ACTIVE_STATION)) {
         int id = Integer.parseInt(streamConfig.getString(PROPERTY_ACTIVE_STATION));
@@ -117,6 +95,39 @@ public class MpdServiceImpl extends RefreshingService implements IMpdService {
 
 
     LOG.info("Created MPD service with " + stations.size() + " stations.");
+  }
+
+  /**
+   * Loads the station infos from a properties file and returns the representing model
+   * @return
+   * @throws ConfigurationException
+   * @param streamConfig
+   */
+  private List<IServiceModel> loadStations(PropertiesConfiguration streamConfig) throws ConfigurationException {
+    List<IServiceModel> stationInfoList = new ArrayList<IServiceModel>();
+
+    Iterator<String> keys = streamConfig.getKeys();
+    while (keys.hasNext()) {
+      String key = keys.next();
+      if (!key.contains(".url")) {
+        continue;
+      }
+
+      String id = key.substring(0, key.indexOf("."));
+      String url = streamConfig.getString(key);
+      StationInfo info = new StationInfo(Integer.parseInt(id));
+      info.setUrl(url);
+      String nameKey = id + ".name";
+      if (streamConfig.containsKey(nameKey)) {
+        info.setName(streamConfig.getString(nameKey));
+      }
+      else {
+        info.setName(url);
+      }
+
+      stationInfoList.add(info);
+    }
+    return stationInfoList;
   }
 
   /**
@@ -162,7 +173,8 @@ public class MpdServiceImpl extends RefreshingService implements IMpdService {
    */
   private void saveStations() {
     try {
-      streamConfig.clear();
+      PropertiesConfiguration streamConfig = new PropertiesConfiguration(CONFIG_FILE);
+      List<IServiceModel> stations = loadStations(streamConfig);
       for (IServiceModel model : stations) {
         StationInfo info = (StationInfo) model;
         streamConfig.addProperty(info.getId() + ".url", info.getUrl());

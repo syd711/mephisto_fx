@@ -1,6 +1,10 @@
 *.class
-
+*.log
+.idea/
+image_cache/
+out/
 # Package Files #
 *.jar
 *.war
 *.ear
+conf/google.properties

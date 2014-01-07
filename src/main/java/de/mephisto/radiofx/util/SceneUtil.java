@@ -53,8 +53,12 @@ public class SceneUtil {
     vbox.getChildren().add(loadingBar);
 
     Text loadingMsg = new Text("Initializing...");
-    loadingMsg.setFont(Fonts.FONT_NORMAL_16);
+    loadingMsg.setFont(Fonts.FONT_NORMAL_14);
     vbox.getChildren().add(loadingMsg);
+
+    Text statusMsg = new Text("");
+    statusMsg.setFont(Fonts.FONT_BOLD_22);
+    vbox.getChildren().add(statusMsg);
 
     try {
       HBox ipBox = new HBox();
@@ -74,7 +78,7 @@ public class SceneUtil {
     primaryStage.setScene(scene);
     primaryStage.setY(10);
 
-    return new SplashScreen(vbox, loadingBar, loadingMsg);
+    return new SplashScreen(vbox, loadingBar, loadingMsg, statusMsg);
   }
 
   /**

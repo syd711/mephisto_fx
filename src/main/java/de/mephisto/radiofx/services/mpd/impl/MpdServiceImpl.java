@@ -84,6 +84,9 @@ public class MpdServiceImpl extends RefreshingService implements IMpdService {
           StationInfo info = (StationInfo) model;
           if(info.getId() == id) {
             playStation(info);
+            if(!StringUtils.isEmpty(info.getName())) {
+              screen.setStatusInfo("Playing \"" + info.getName() + "\"");
+            }
             break;
           }
         }

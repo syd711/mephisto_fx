@@ -36,7 +36,7 @@ public class ImageCache {
     });
     for (File file : files) {
       String id = file.getName().substring(0, file.getName().length() - 4);
-      imageCache.put(id, file);
+      imageCache.put(id.toLowerCase(), file);
     }
   }
 
@@ -45,8 +45,8 @@ public class ImageCache {
     final Canvas canvas = new Canvas(width, height);
     String imageUrl = url;
     try {
-      if (imageCache.containsKey(id)) {
-        File image = imageCache.get(id);
+      if (imageCache.containsKey(id.toLowerCase())) {
+        File image = imageCache.get(id.toLowerCase());
         imageUrl = image.toURI().toURL().toString();
       }
       else {

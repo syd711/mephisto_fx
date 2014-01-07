@@ -267,7 +267,7 @@ public class YahooWeatherServiceImpl extends RefreshingService implements IWeath
 
             int code = Integer.parseInt(element.getAttribute("code").getValue());
             String imageUrl = convertTypeCodeImage(code);
-            LOG.info("Weather code for " + info.getCity() + " is " + code);
+//            LOG.info("Weather code for " + info.getCity() + " is " + code);
             info.setImageUrl(WeatherBigResourceLoader.getResource(imageUrl));
             info.setIconWhiteUrl(WeatherSmallWhiteResourceLoader.getResource(imageUrl));
           } catch (ParseException e) {

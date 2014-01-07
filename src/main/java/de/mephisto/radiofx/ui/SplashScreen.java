@@ -16,13 +16,15 @@ import javafx.scene.text.Text;
 public class SplashScreen {
   private ProgressBar progressBar;
   private Text loadingMsg;
+  private Text statusMsg;
   private Node root;
   private double progress;
 
-  public SplashScreen(Node root, ProgressBar progressBar, Text loadingMsg) {
+  public SplashScreen(Node root, ProgressBar progressBar, Text loadingMsg, Text statusMsg) {
     this.progressBar = progressBar;
     this.root = root;
     this.loadingMsg = loadingMsg;
+    this.statusMsg = statusMsg;
   }
 
   public void setMessage(final String text, final double progress) {
@@ -55,5 +57,9 @@ public class SplashScreen {
 
   public double getProgress() {
     return progress;
+  }
+
+  public void setStatusInfo(String msg) {
+    this.statusMsg.setText(msg);
   }
 }

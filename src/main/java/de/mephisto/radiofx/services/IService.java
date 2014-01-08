@@ -27,6 +27,12 @@ public interface IService {
   void addServiceListener(IServiceInfoListener listener);
 
   /**
+   * Listener for notifying when the service is loaded.
+   * @param listener
+   */
+  void addServiceStateListener(IServiceStateListener listener);
+
+  /**
    * Initializes the service.
    */
   void initService(SplashScreen splashScreen);

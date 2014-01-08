@@ -1,6 +1,7 @@
 package de.mephisto.radiofx.services.google.impl;
 
 import de.mephisto.radiofx.services.IServiceModel;
+import de.mephisto.radiofx.services.IServiceStateListener;
 import de.mephisto.radiofx.services.RefreshingService;
 import de.mephisto.radiofx.services.google.Album;
 import de.mephisto.radiofx.services.google.IGoogleMusicService;
@@ -11,6 +12,7 @@ import gmusic.api.impl.GoogleMusicAPI;
 import gmusic.api.model.Playlist;
 import gmusic.api.model.Playlists;
 import gmusic.api.model.Song;
+import javafx.concurrent.Task;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -36,35 +38,42 @@ public class GoogleServiceImpl extends RefreshingService implements IGoogleMusic
 
   @Override
   public void initService(SplashScreen screen) {
-    Configuration config = Config.getConfiguration(CONFIG_NAME);
-    api = new GoogleMusicAPI();
-    try {
-      api.login(config.getString("google.login"), config.getString("google.password"));
-    } catch (Exception e) {
-      LOG.error("Error connecting to Google:" + e.getMessage());
-      return;
-    }
+    screen.setMessage("Connecting to Google", 0.1);
 
-    LOG.info("Loading all songs for " + this);
+    Task task = new Task<Void>() {
+      @Override public Void call() {
+        Configuration config = Config.getConfiguration(CONFIG_NAME);
+        api = new GoogleMusicAPI();
+        try {
+          api.login(config.getString("google.login"), config.getString("google.password"));
+        } catch (Exception e) {
+          LOG.error("Error connecting to Google:" + e.getMessage());
+          return null;
+        }
 
-    try {
-      screen.setMessage("Loading Google Music", 0.1);
-      Playlists lists = api.getAllPlaylists();
-      for(Playlist list : lists.getPlaylists()) {
-        de.mephisto.radiofx.services.google.Playlist p = playlistFor(list);
-        MusicDictionary.getInstance().addPlaylist(p);
+        LOG.info("Loading all songs for " + this);
+
+        try {
+          Playlists lists = api.getAllPlaylists();
+          for(Playlist list : lists.getPlaylists()) {
+            de.mephisto.radiofx.services.google.Playlist p = playlistFor(list);
+            MusicDictionary.getInstance().addPlaylist(p);
+          }
+          Collection<Song> songs = api.getAllSongs();
+          for (Song song : songs) {
+            de.mephisto.radiofx.services.google.Song mSong = songFor(song);
+            MusicDictionary.getInstance().addSong(mSong);
+          }
+          LOG.info(this + " finished loading songs: " + songs.size() + " total");
+          notifyServiceLoaded();
+        } catch (Exception e) {
+          LOG.error("Failed to load Google songs: " + e.getMessage(), e);
+        }
+        return null;
       }
-      screen.setMessage("Creating Music Dictionary (may take a while)", 0.25);
+    };
 
-      Collection<Song> songs = api.getAllSongs();
-      for (Song song : songs) {
-        de.mephisto.radiofx.services.google.Song mSong = songFor(song);
-        MusicDictionary.getInstance().addSong(mSong);
-      }
-      LOG.info(this + " finished loading songs: " + songs.size() + " total");
-    } catch (Exception e) {
-      LOG.error("Failed to load Google songs: " + e.getMessage(), e);
-    }
+    new Thread(task).start();
   }
 
   /**

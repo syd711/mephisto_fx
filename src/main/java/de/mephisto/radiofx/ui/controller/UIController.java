@@ -13,7 +13,7 @@ public abstract class UIController implements IRotaryControllable {
   private BorderPane tabRoot;
 
   public UIController() {
-    init();
+    this.tabRoot = init();
   }
 
   /**
@@ -30,14 +30,6 @@ public abstract class UIController implements IRotaryControllable {
 
   public Node getTabRoot() {
     return tabRoot;
-  }
-
-  /**
-   * Sets the root for the tab, including possible paging components.
-   * @param root
-   */
-  public void setTabRoot(BorderPane root) {
-    this.tabRoot = root;
   }
 
   /**

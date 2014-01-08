@@ -23,13 +23,12 @@ import java.util.Locale;
 /**
  * Service for retrieving the current time.
  */
-public class EarthToolsTimeServiceImpl extends RefreshingService {
-  private final static Logger LOG = LoggerFactory.getLogger(EarthToolsTimeServiceImpl.class);
+public class DateTimeServiceImpl extends RefreshingService {
   private final static int REFRESH_INTERVAL = 60000;
 
   private Date localTime;
 
-  public EarthToolsTimeServiceImpl() {
+  public DateTimeServiceImpl() {
     super(REFRESH_INTERVAL);
   }
 
@@ -50,33 +49,6 @@ public class EarthToolsTimeServiceImpl extends RefreshingService {
   @Override
   public void initService(SplashScreen splashScreen) {
     splashScreen.setMessage("Loading Date and Time", (splashScreen.getProgress()+0.25));
-    BufferedReader in = null;
-    try {
-      Configuration configuration = Config.getConfiguration("time.properties");
-      String url = configuration.getString("time.service.url");
-      URL earthToolsServer = new URL(url);
-      URLConnection yc = earthToolsServer.openConnection();
-      in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
-      String inputLine;
-
-      while ((inputLine = in.readLine()) != null) {
-        if (inputLine.contains("localtime")) {
-          String date = inputLine.substring(inputLine.indexOf(">") + 1, inputLine.lastIndexOf("<"));
-          localTime = new SimpleDateFormat("d MMM yyyy hh:mm:ss", Locale.US).parse(date);
-          break;
-        }
-      }
-
-    } catch (Exception e) {
-      LOG.error("Error retrieving local time: " + e.getMessage());
-    } finally {
-      if (in != null) {
-        try {
-          in.close();
-        } catch (IOException e) {
-          //ignore
-        }
-      }
-    }
+    localTime = new Date();
   }
 }

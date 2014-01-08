@@ -2,6 +2,7 @@ package de.mephisto.radiofx.ui.controller;
 
 import de.mephisto.radiofx.resources.ResourceLoader;
 import de.mephisto.radiofx.services.IServiceModel;
+import de.mephisto.radiofx.services.IServiceStateListener;
 import de.mephisto.radiofx.services.ServiceRegistry;
 import de.mephisto.radiofx.services.google.Album;
 import de.mephisto.radiofx.services.google.IGoogleMusicService;
@@ -29,7 +30,7 @@ import java.util.List;
 /**
  * Controls the UI for the google music
  */
-public class GoogleUINaviController extends PageableUIController {
+public class GoogleUINaviController extends PageableUIController implements IServiceStateListener {
   public static final String STYLE_ACTIVE = "-fx-background-color:" + Colors.HEX_COLOR_INACTIVE + ";";
   public static final String STYLE_INACTIVE = "-fx-background-color: transparent;";
 
@@ -50,12 +51,13 @@ public class GoogleUINaviController extends PageableUIController {
 
   public GoogleUINaviController() {
     super(ServiceRegistry.getGoogleService());
+    ServiceRegistry.getGoogleService().addServiceStateListener(this);
   }
 
   @Override
-  public BorderPane init() {
-    BorderPane tabRoot = new BorderPane();
-    tabRoot.setMinHeight(PaneUtil.MIN_MAIN_HEIGHT);
+  public void serviceLoaded() {
+    BorderPane tabRoot = (BorderPane) getTabRoot();
+
     IGoogleMusicService service = ServiceRegistry.getGoogleService();
     List<Album> albums = service.getAlbums();
 
@@ -95,11 +97,22 @@ public class GoogleUINaviController extends PageableUIController {
     });
 
     super.setPager(pager);
-    super.setTabRoot(tabRoot);
 
     if (!albums.isEmpty()) {
       updatePage(albums.get(0));
     }
+  }
+
+  @Override
+  public BorderPane init() {
+    BorderPane tabRoot = new BorderPane();
+    tabRoot.setMinHeight(PaneUtil.MIN_MAIN_HEIGHT);
+
+    Text loadingText = new Text(0, 0, "Loading Google Music...");
+    loadingText.setFont(Fonts.FONT_BOLD_20);
+    tabRoot.setCenter(loadingText);
+
+    TransitionUtil.createBlink(loadingText).play();
 
     return tabRoot;
   }

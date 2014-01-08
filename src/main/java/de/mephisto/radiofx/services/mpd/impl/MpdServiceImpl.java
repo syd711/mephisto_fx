@@ -71,7 +71,7 @@ public class MpdServiceImpl extends RefreshingService implements IMpdService {
 
     screen.setMessage("Loading Radio Stations", (screen.getProgress() + 0.1));
     if (client.isLocalModeEnabled()) {
-      client.executeLocalCommand("volume 99");
+      client.executeLocalCommand("volume 95");
     }
 
     try {
@@ -174,21 +174,21 @@ public class MpdServiceImpl extends RefreshingService implements IMpdService {
   /**
    * Saves the stations with updates stations names.
    */
-  private void saveStations() {
+  private synchronized void saveStations() {
     try {
       PropertiesConfiguration streamConfig = new PropertiesConfiguration(CONFIG_FILE);
       List<IServiceModel> stations = loadStations(streamConfig);
       for (IServiceModel model : stations) {
         StationInfo info = (StationInfo) model;
-        streamConfig.addProperty(info.getId() + ".url", info.getUrl());
+        streamConfig.setProperty(info.getId() + ".url", info.getUrl());
 
         if (!StringUtils.isEmpty(info.getName())) {
-          streamConfig.addProperty(info.getId() + ".name", info.getName());
+          streamConfig.setProperty(info.getId() + ".name", info.getName());
         }
       }
 
       if(activeStation != null) {
-        streamConfig.addProperty(PROPERTY_ACTIVE_STATION, activeStation.getId());
+        streamConfig.setProperty(PROPERTY_ACTIVE_STATION, activeStation.getId());
       }
       streamConfig.save(new File(CONFIG_FILE));
       LOG.info("Saved updated streams.properties");

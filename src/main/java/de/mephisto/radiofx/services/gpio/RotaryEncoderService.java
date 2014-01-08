@@ -26,13 +26,13 @@ public class RotaryEncoderService {
   private static final Logger LOG = LoggerFactory.getLogger(RotaryEncoderService.class);
 
   private ServerSocket myServerSocket;
-  private int lastValue = 0;
   private Configuration configuration;
 
   private final static int LEFT = 0;
   private final static int RIGHT = 1;
   private final static int PUSH = 2;
   private final static int LONG_PUSH = 3;
+  private final static int IGNORE = 4;
 
   private long pushStart = 0;
   private static final long LONG_PUSH_WAIT_MILLIS = 400;
@@ -40,7 +40,7 @@ public class RotaryEncoderService {
   private List<RotaryEncoderListener> listeners = new ArrayList<RotaryEncoderListener>();
 
   public RotaryEncoderService(SplashScreen screen) {
-    if(SystemUtils.isWindows()) {
+    if (SystemUtils.isWindows()) {
       return;
     }
     try {
@@ -49,8 +49,7 @@ public class RotaryEncoderService {
       createSocketServer();
       connect();
       connectPushListener();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       LOG.error("Error creating rotary encoder service: " + e.getMessage(), e);
     }
   }
@@ -68,7 +67,7 @@ public class RotaryEncoderService {
         PinState state = event.getState();
         if (state == PinState.LOW) {
           long pushEnd = new Date().getTime();
-          if(pushStart > 0 && (pushEnd-pushStart) > LONG_PUSH_WAIT_MILLIS) {
+          if (pushStart > 0 && (pushEnd - pushStart) > LONG_PUSH_WAIT_MILLIS) {
             updateListeners(LONG_PUSH);
           }
           else {
@@ -84,6 +83,7 @@ public class RotaryEncoderService {
 
   /**
    * Adds a listener for the rotary encoder events.
+   *
    * @param listener
    */
   public void addListener(RotaryEncoderListener listener) {
@@ -92,6 +92,7 @@ public class RotaryEncoderService {
 
   /**
    * Creates the socket server.
+   *
    * @throws IOException
    */
   private void createSocketServer() throws IOException {
@@ -101,6 +102,7 @@ public class RotaryEncoderService {
 
   /**
    * Creates the socket server.
+   *
    * @throws IOException
    */
   private void connect() throws IOException {
@@ -124,12 +126,14 @@ public class RotaryEncoderService {
 
   /**
    * Reads data from the socket.
+   *
    * @param client
    * @return
    * @throws IOException
    */
   private String read(Socket client) throws IOException {
     String response = null;
+    List<Integer> actions = new ArrayList<Integer>();
     try {
       BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(client.getInputStream()));
       while (true) {
@@ -137,14 +141,14 @@ public class RotaryEncoderService {
         int count = bufferedReader.read(buffer, 0, 200);
         response = new String(buffer, 0, count);
         int value = Integer.parseInt(response);
-        if(value%4 == 0) {
-          if(value > lastValue) {
-            updateListeners(RIGHT);
+        LOG.info("Rotary Value: " + value);
+        actions.add(value);
+        if(actions.size() == 4) {
+          int actionCode = getActionCode(actions);
+          if (actionCode != IGNORE) {
+            updateListeners(actionCode);
           }
-          else {
-            updateListeners(LEFT);
-          }
-          lastValue = value;
+          actions.clear();
         }
       }
     } catch (Exception e) {
@@ -154,32 +158,71 @@ public class RotaryEncoderService {
     return response;
   }
 
+  private int getActionCode(List<Integer> actions) {
+    //TODO sooo crappy, but its late
+    if(isLeftAction(actions)) {
+      return LEFT;
+    }
+    if(isRightAction(actions)) {
+      return RIGHT;
+    }
+    return IGNORE;
+  }
+
+  //TODO sooo crappy
+  private boolean isLeftAction(List<Integer> actions) {
+    Integer lastAction = actions.get(0);
+    for(Integer action : actions) {
+      if(action <= lastAction) {
+        lastAction = action;
+        continue;
+      }
+      return false;
+    }
+    return true;
+  }
+
+  //TODO sooo crappy
+  private boolean isRightAction(List<Integer> actions) {
+    Integer lastAction = actions.get(0);
+    for(Integer action : actions) {
+      if(action >= lastAction) {
+        lastAction = action;
+        continue;
+      }
+      return false;
+    }
+    return true;
+  }
+
+
   /**
    * Updates the UI
+   *
    * @param state
    */
   private void updateListeners(final int state) {
     switch (state) {
       case LEFT: {
-        for(RotaryEncoderListener listener : listeners) {
+        for (RotaryEncoderListener listener : listeners) {
           listener.previous();
         }
         break;
       }
       case RIGHT: {
-        for(RotaryEncoderListener listener : listeners) {
+        for (RotaryEncoderListener listener : listeners) {
           listener.next();
         }
         break;
       }
       case PUSH: {
-        for(RotaryEncoderListener listener : listeners) {
+        for (RotaryEncoderListener listener : listeners) {
           listener.push();
         }
         break;
       }
       case LONG_PUSH: {
-        for(RotaryEncoderListener listener : listeners) {
+        for (RotaryEncoderListener listener : listeners) {
           listener.longPush();
         }
         break;

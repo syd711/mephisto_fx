@@ -9,11 +9,15 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.text.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Contains the components to refresh on the splash screen.
  */
 public class SplashScreen {
+  private static final Logger LOG = LoggerFactory.getLogger(SplashScreen.class);
+
   private ProgressBar progressBar;
   private Text loadingMsg;
   private Text statusMsg;
@@ -28,6 +32,7 @@ public class SplashScreen {
   }
 
   public void setMessage(final String text, final double progress) {
+    LOG.info("Splash: " + text);
     Platform.runLater(new Runnable() {
       @Override
       public void run() {
@@ -59,7 +64,12 @@ public class SplashScreen {
     return progress;
   }
 
-  public void setStatusInfo(String msg) {
-    this.statusMsg.setText(msg);
+  public void setStatusInfo(final String msg) {
+    Platform.runLater(new Runnable() {
+      @Override
+      public void run() {
+        statusMsg.setText(msg);
+      }
+    });
   }
 }

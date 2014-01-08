@@ -58,17 +58,20 @@ public class MPDClient {
    * @param url
    */
   public long play(String url) {
-    try {
-      LOG.info("Playback of URL " + url);
-      executeTelnetCommand("clear");
-      Thread.sleep(100);
-      executeTelnetCommand("add " + url);
-      Thread.sleep(100);
-      executeTelnetCommand("play");
-    } catch (Exception e) {
-      LOG.error("Error executing playback of URL " + url + ": " + e.getMessage(), e);
+    synchronized (this) {
+      try {
+        LOG.info("Playback of URL " + url);
+        executeTelnetCommand("clear");
+        Thread.sleep(100);
+        executeTelnetCommand("add " + url);
+        Thread.sleep(100);
+        executeTelnetCommand("play");
+      } catch (Exception e) {
+        LOG.error("Error executing playback of URL " + url + ": " + e.getMessage(), e);
+      }
+      return new Date().getTime();
     }
-    return new Date().getTime();
+
   }
 
   /**
@@ -135,9 +138,11 @@ public class MPDClient {
    */
   public PlaylistInfo playlistInfo() {
     if(client != null && client.isConnected()) {
-      executeTelnetCommand("playlistinfo");
-      String output = outputStream.getLastCommand();
-      return new PlaylistInfo(output);
+      synchronized (this) {
+        executeTelnetCommand("playlistinfo");
+        String output = outputStream.getLastCommand();
+        return new PlaylistInfo(output);
+      }
     }
     else {
       LOG.error("Failed to retrieve mpc playlist info: " + this + " is not connected.");

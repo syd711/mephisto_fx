@@ -76,7 +76,6 @@ public class WeatherUIController extends PageableUIController {
     //add page
     Pager pager = new Pager(tabRoot, ServiceRegistry.getWeatherService().getServiceData(false));
     super.setPager(pager);
-    super.setTabRoot(tabRoot);
 
     WeatherInfo currentWeatherInfo = ServiceRegistry.getWeatherService().getDefaultWeather();
     updatePage(currentWeatherInfo);

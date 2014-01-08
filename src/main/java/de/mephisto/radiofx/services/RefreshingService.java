@@ -17,6 +17,8 @@ public abstract class RefreshingService implements IService {
 
   private Collection<IServiceInfoListener> listeners = new ConcurrentLinkedQueue<IServiceInfoListener>();
 
+  private List<IServiceStateListener> stateListeners = new ArrayList<IServiceStateListener>();
+
   private long refreshInterval;
   private RefreshThread refreshThread;
 
@@ -79,5 +81,20 @@ public abstract class RefreshingService implements IService {
         }
       }
     }
+  }
+
+  public void addServiceStateListener(IServiceStateListener listener) {
+    this.stateListeners.add(listener);
+  }
+
+  public void notifyServiceLoaded() {
+    Platform.runLater(new Runnable() {
+      @Override
+      public void run() {
+        for(IServiceStateListener listener : stateListeners) {
+          listener.serviceLoaded();
+        }
+      }
+    });
   }
 }

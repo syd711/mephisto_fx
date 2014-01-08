@@ -5,7 +5,7 @@ import de.mephisto.radiofx.services.google.impl.GoogleServiceImpl;
 import de.mephisto.radiofx.services.gpio.RotaryEncoderService;
 import de.mephisto.radiofx.services.mpd.IMpdService;
 import de.mephisto.radiofx.services.mpd.impl.MpdServiceImpl;
-import de.mephisto.radiofx.services.time.impl.EarthToolsTimeServiceImpl;
+import de.mephisto.radiofx.services.time.impl.DateTimeServiceImpl;
 import de.mephisto.radiofx.services.weather.IWeatherService;
 import de.mephisto.radiofx.services.weather.impl.YahooWeatherServiceImpl;
 import de.mephisto.radiofx.ui.SplashScreen;
@@ -34,7 +34,7 @@ public class ServiceRegistry {
         weatherService = new YahooWeatherServiceImpl();
         weatherService.initService(splashScene);
 
-        timeService = new EarthToolsTimeServiceImpl();
+        timeService = new DateTimeServiceImpl();
         timeService.initService(splashScene);
 
         rotaryEncoderService = new RotaryEncoderService(splashScene);
@@ -65,7 +65,7 @@ public class ServiceRegistry {
    */
   public static RefreshingService getTimeService() {
     if(timeService == null) {
-      timeService = new EarthToolsTimeServiceImpl();
+      timeService = new DateTimeServiceImpl();
     }
     return timeService;
   }

@@ -84,7 +84,6 @@ public class RadioUIController extends PageableUIController {
     verticalRoot.getChildren().add(urlText);
 
     super.setPager(new Pager(tabRoot, ServiceRegistry.getMpdService().getServiceData(false)));
-    super.setTabRoot(tabRoot);
 
     final List<IServiceModel> serviceData = ServiceRegistry.getMpdService().getServiceData(false);
     if(!serviceData.isEmpty()) {
@@ -113,7 +112,7 @@ public class RadioUIController extends PageableUIController {
     }
 
     StationInfo info = (StationInfo) model;
-    stationText.setText(formatValue(info.getName(), 33));
+    stationText.setText(formatValue(info.getName(), 30));
     if(StringUtils.isEmpty(info.getTrack())) {
       if(info.isActive()) {
         long current = new Date().getTime();
@@ -138,6 +137,9 @@ public class RadioUIController extends PageableUIController {
       if(track.contains("-")) {
         interpret = track.substring(track.indexOf("-")+1, track.length()).trim();
         track = track.substring(0, track.indexOf("-")).trim();
+      }
+      if(interpret.contains("|")) {
+        interpret = interpret.substring(0, interpret.indexOf("|")).trim();
       }
       trackText.setText(formatValue(track, 42));
       interpretText.setText(formatValue(interpret, 44));

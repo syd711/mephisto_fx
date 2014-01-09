@@ -133,7 +133,6 @@ public class RotaryEncoderService {
    */
   private String read(Socket client) throws IOException {
     String response = null;
-    List<Integer> actions = new ArrayList<Integer>();
     try {
       BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(client.getInputStream()));
       while (true) {
@@ -142,13 +141,11 @@ public class RotaryEncoderService {
         response = new String(buffer, 0, count);
         int value = Integer.parseInt(response);
         LOG.info("Rotary Value: " + value);
-        actions.add(value);
-        if(actions.size() == 4) {
-          int actionCode = getActionCode(actions);
-          if (actionCode != IGNORE) {
-            updateListeners(actionCode);
-          }
-          actions.clear();
+        if(value == 1) {
+          updateListeners(LEFT);
+        }
+        else if(value == -1) {
+          updateListeners(RIGHT);
         }
       }
     } catch (Exception e) {
@@ -157,44 +154,6 @@ public class RotaryEncoderService {
     }
     return response;
   }
-
-  private int getActionCode(List<Integer> actions) {
-    //TODO sooo crappy, but its late
-    if(isLeftAction(actions)) {
-      return LEFT;
-    }
-    if(isRightAction(actions)) {
-      return RIGHT;
-    }
-    return IGNORE;
-  }
-
-  //TODO sooo crappy
-  private boolean isLeftAction(List<Integer> actions) {
-    Integer lastAction = actions.get(0);
-    for(Integer action : actions) {
-      if(action <= lastAction) {
-        lastAction = action;
-        continue;
-      }
-      return false;
-    }
-    return true;
-  }
-
-  //TODO sooo crappy
-  private boolean isRightAction(List<Integer> actions) {
-    Integer lastAction = actions.get(0);
-    for(Integer action : actions) {
-      if(action >= lastAction) {
-        lastAction = action;
-        continue;
-      }
-      return false;
-    }
-    return true;
-  }
-
 
   /**
    * Updates the UI

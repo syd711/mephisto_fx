@@ -119,7 +119,7 @@ public class RotaryEncoderService {
     }.start();
 
     //starts the rotary encoder socket client script.
-    String cmd = configuration.getString("rotary.encoder.script");
+    String cmd = " python " + configuration.getString("rotary.encoder.script");
     final ProcessBuilder sudo = new ProcessBuilder("sudo", cmd);
     sudo.start();
   }

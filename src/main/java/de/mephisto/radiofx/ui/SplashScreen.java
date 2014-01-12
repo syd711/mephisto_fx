@@ -32,7 +32,7 @@ public class SplashScreen {
   }
 
   public void setMessage(final String text, final double progress) {
-    LOG.info("Splash: " + text);
+    LOG.info("Splash at " + progress + ": " + text);
     Platform.runLater(new Runnable() {
       @Override
       public void run() {

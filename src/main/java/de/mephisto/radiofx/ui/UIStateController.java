@@ -55,13 +55,13 @@ public class UIStateController implements RotaryEncoderListener {
   }
 
   public void createControllers(SplashScreen splashScene) {
-    splashScene.setMessage("Creating Radio Controller...", 0.9);
+    splashScene.setMessage("Creating Radio Controller...", 0.4);
     radioController = new RadioUIController();
-    splashScene.setMessage("Creating Weather Controller...", 0.92);
+    splashScene.setMessage("Creating Weather Controller...", 0.5);
     weatherController = new WeatherUIController();
-    splashScene.setMessage("Creating Google Navi Controller...", 0.94);
+    splashScene.setMessage("Creating Google Navi Controller...", 0.8);
     googleNaviController = new GoogleUINaviController();
-    splashScene.setMessage("Creating Google Player Controller...", 0.96);
+    splashScene.setMessage("Creating Google Player Controller...", 0.9);
     googlePlayerController = new GoogleUIPlayerController();
 
     ServiceRegistry.getRotaryEncoderService().addListener(this);

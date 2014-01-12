@@ -1,0 +1,1 @@
+sudo python /home/pi/rotary/rotary.py

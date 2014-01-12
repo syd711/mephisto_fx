@@ -23,6 +23,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,8 @@ import java.util.List;
  * Controls the UI for the google music
  */
 public class GoogleUINaviController extends PageableUIController implements IServiceStateListener {
+  private static final Logger LOG = LoggerFactory.getLogger(GoogleUINaviController.class);
+
   public static final String STYLE_ACTIVE = "-fx-background-color:" + Colors.HEX_COLOR_INACTIVE + ";";
   public static final String STYLE_INACTIVE = "-fx-background-color: transparent;";
 
@@ -159,6 +163,7 @@ public class GoogleUINaviController extends PageableUIController implements ISer
       albumRoot.getChildren().add(vbox);
       hBoxAlbums.getChildren().add(albumRoot);
     }
+    LOG.info("Finished loading Google Music UI, loaded " + albums.size() + " albums.");
   }
 
   @Override

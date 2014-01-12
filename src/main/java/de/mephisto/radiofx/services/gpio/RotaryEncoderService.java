@@ -18,6 +18,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Starts a C script that writes the rotary encoder values to a socket.
@@ -32,7 +33,6 @@ public class RotaryEncoderService {
   private final static int RIGHT = 1;
   private final static int PUSH = 2;
   private final static int LONG_PUSH = 3;
-  private final static int IGNORE = 4;
 
   private long pushStart = 0;
   private static final long LONG_PUSH_WAIT_MILLIS = 400;
@@ -98,6 +98,7 @@ public class RotaryEncoderService {
   private void createSocketServer() throws IOException {
     int port = configuration.getInt("rotary.encoder.socket");
     myServerSocket = new ServerSocket(port);
+    LOG.info("Started Socket server for rotary encoder on port " + port);
   }
 
   /**
@@ -119,9 +120,11 @@ public class RotaryEncoderService {
     }.start();
 
     //starts the rotary encoder socket client script.
-    String cmd = " python " + configuration.getString("rotary.encoder.script");
-    final ProcessBuilder sudo = new ProcessBuilder("sudo", cmd);
-    sudo.start();
+    String cmd = configuration.getString("rotary.encoder.script");
+    LOG.info("Executing rotary encoder script: 'sudo " + cmd + "'");
+    final ProcessBuilder pythonScript = new ProcessBuilder("sudo", cmd);
+    pythonScript.start();
+
   }
 
   /**
@@ -139,13 +142,17 @@ public class RotaryEncoderService {
         char[] buffer = new char[200];
         int count = bufferedReader.read(buffer, 0, 200);
         response = new String(buffer, 0, count);
-        int value = Integer.parseInt(response);
-        LOG.info("Rotary Value: " + value);
-        if(value == 1) {
-          updateListeners(LEFT);
-        }
-        else if(value == -1) {
-          updateListeners(RIGHT);
+//        LOG.info("Action Value: " + response);
+        StringTokenizer tokenizer = new StringTokenizer(response, "#", false);
+        while(tokenizer.hasMoreElements()) {
+          String actionToken = tokenizer.nextToken();
+          int value = Integer.parseInt(actionToken);
+          if(value == 1) {
+            updateListeners(LEFT);
+          }
+          else if(value == -1) {
+            updateListeners(RIGHT);
+          }
         }
       }
     } catch (Exception e) {

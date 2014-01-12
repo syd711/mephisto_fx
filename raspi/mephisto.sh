@@ -1,0 +1,2 @@
+cd /home/pi/mephisto_fx
+sudo /opt/jdk1.8.0/bin/java -Xmx128M -cp "mephisto_fx.jar:lib/commons-configuration-1.9.jar:lib/commons-exec-1.1.jar:lib/commons-io-2.4.jar:lib/commons-lang-2.6.jar:lib/commons-logging-1.1.3.jar:lib/commons-net-3.3.jar:lib/googlemusic.jar:lib/gson-2.2.4.jar:lib/guava-14.0.1.jar:lib/jaudiotagger-2.2.0-20130321.142353-1.jar:lib/jdom-1.1.3.jar:lib/pi4j-core.jar:lib/rome-1.0.jar:lib/slf4j-api-1.7.5.jar:lib/slf4j-simple-1.7.5.jar" de.mephisto.radiofx.MephistoRadioFX 

@@ -2,6 +2,7 @@ package de.mephisto.radiofx.services.google;
 
 import de.mephisto.radiofx.services.IServiceStateListener;
 import de.mephisto.radiofx.services.IService;
+import javafx.scene.text.Text;
 
 import java.util.List;
 
@@ -10,4 +11,5 @@ import java.util.List;
  */
 public interface IGoogleMusicService extends IService {
   List<Album> getAlbums();
+  void loadGoogleMusic(Text loadingText);
 }

@@ -52,10 +52,19 @@ public class GoogleUINaviController extends PageableUIController implements ISer
   private HBox hBoxAlbums;
   private double scrollPos;
   private Album activeAlbum;
+  private Text loadingText;
 
   public GoogleUINaviController() {
     super(ServiceRegistry.getGoogleService());
     ServiceRegistry.getGoogleService().addServiceStateListener(this);
+  }
+
+  @Override
+  public void onDisplay() {
+    IGoogleMusicService service = ServiceRegistry.getGoogleService();
+    if(service.getAlbums().isEmpty()) {
+      service.loadGoogleMusic(loadingText);
+    }
   }
 
   @Override
@@ -112,7 +121,7 @@ public class GoogleUINaviController extends PageableUIController implements ISer
     BorderPane tabRoot = new BorderPane();
     tabRoot.setMinHeight(PaneUtil.MIN_MAIN_HEIGHT);
 
-    Text loadingText = new Text(0, 0, "Loading Google Music...");
+    loadingText = new Text(0, 0, "Loading Google Music...");
     loadingText.setFont(Fonts.FONT_BOLD_20);
     tabRoot.setCenter(loadingText);
 

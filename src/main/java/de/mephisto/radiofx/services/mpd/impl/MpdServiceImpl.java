@@ -71,7 +71,7 @@ public class MpdServiceImpl extends RefreshingService implements IMpdService {
 
     screen.setMessage("Loading Radio Stations", (screen.getProgress() + 0.1));
     if (client.isLocalModeEnabled()) {
-      client.executeLocalCommand("volume 95");
+      client.executeLocalCommand("volume 80");
     }
 
     try {
@@ -85,7 +85,11 @@ public class MpdServiceImpl extends RefreshingService implements IMpdService {
           if(info.getId() == id) {
             playStation(info);
             if(!StringUtils.isEmpty(info.getName())) {
-              screen.setStatusInfo("Playing \"" + info.getName() + "\"");
+              String name = info.getName();
+              if(name.length() > 30) {
+                name = name.substring(0, 29) + "...";
+              }
+              screen.setStatusInfo("Playing \"" + name + "\"");
             }
             break;
           }

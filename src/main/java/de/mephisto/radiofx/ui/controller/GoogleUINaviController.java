@@ -69,10 +69,14 @@ public class GoogleUINaviController extends PageableUIController implements ISer
 
   @Override
   public void serviceLoaded() {
-    BorderPane tabRoot = (BorderPane) getTabRoot();
-
     IGoogleMusicService service = ServiceRegistry.getGoogleService();
     List<Album> albums = service.getAlbums();
+    if(albums.isEmpty()) {
+      return;
+    }
+
+    BorderPane tabRoot = (BorderPane) getTabRoot();
+
 
     final VBox vMain = new VBox(5);
     vMain.setAlignment(Pos.TOP_LEFT);

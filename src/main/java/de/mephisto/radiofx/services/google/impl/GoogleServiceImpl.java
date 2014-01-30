@@ -78,6 +78,8 @@ public class GoogleServiceImpl extends RefreshingService implements IGoogleMusic
           notifyServiceLoaded();
         } catch (Exception e) {
           LOG.error("Failed to load Google songs: " + e.getMessage(), e);
+          updateLoadingText(loadingText, "Failed to load Google Music: " + e.getMessage());
+          notifyServiceLoaded();
         }
         return null;
       }

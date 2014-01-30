@@ -74,7 +74,7 @@ public class GoogleUINaviController extends PageableUIController implements ISer
     IGoogleMusicService service = ServiceRegistry.getGoogleService();
     List<Album> albums = service.getAlbums();
 
-    VBox vMain = new VBox(5);
+    final VBox vMain = new VBox(5);
     vMain.setAlignment(Pos.TOP_LEFT);
 
     HBox topBox = new HBox(5);
@@ -97,8 +97,6 @@ public class GoogleUINaviController extends PageableUIController implements ISer
     tabRoot.setCenter(vMain);
 
     centerRegion = new HBox();
-    vMain.getChildren().add(centerRegion);
-
     pager = new Pager(tabRoot, new ArrayList<IServiceModel>(ServiceRegistry.getGoogleService().getAlbums()), false, true);
     this.activeAlbum = (Album) pager.getActiveModel();
 
@@ -106,6 +104,7 @@ public class GoogleUINaviController extends PageableUIController implements ISer
       @Override
       public void run() {
         display();
+        vMain.getChildren().add(centerRegion);
       }
     });
 

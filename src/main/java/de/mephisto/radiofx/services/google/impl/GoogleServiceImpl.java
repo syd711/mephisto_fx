@@ -11,6 +11,7 @@ import gmusic.api.impl.GoogleMusicAPI;
 import gmusic.api.model.Playlist;
 import gmusic.api.model.Playlists;
 import gmusic.api.model.Song;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.text.Text;
 import org.apache.commons.configuration.Configuration;
@@ -47,33 +48,33 @@ public class GoogleServiceImpl extends RefreshingService implements IGoogleMusic
         Configuration config = Config.getConfiguration(CONFIG_NAME);
         api = new GoogleMusicAPI();
         try {
-          loadingText.setText("Login to Google...");
+          updateLoadingText(loadingText, "Login to Google...");
           api.login(config.getString("google.login"), config.getString("google.password"));
         } catch (Exception e) {
           LOG.error("Error connecting to Google:" + e.getMessage());
           return null;
         }
 
-        loadingText.setText("Loading Songs....");
+        updateLoadingText(loadingText, "Loading Songs....");
         LOG.info("Loading all songs for " + this);
 
         try {
           Playlists lists = api.getAllPlaylists();
 
-          loadingText.setText("Creating Albums....");
+          updateLoadingText(loadingText, "Creating Albums....");
           for(Playlist list : lists.getPlaylists()) {
             de.mephisto.radiofx.services.google.Playlist p = playlistFor(list);
             MusicDictionary.getInstance().addPlaylist(p);
           }
 
-          loadingText.setText("Creating Music Dictionary....");
+          updateLoadingText(loadingText, "Creating Music Dictionary....");
           Collection<Song> songs = api.getAllSongs();
           for (Song song : songs) {
             de.mephisto.radiofx.services.google.Song mSong = songFor(song);
             MusicDictionary.getInstance().addSong(mSong);
           }
           LOG.info(this + " finished loading songs: " + songs.size() + " total");
-          loadingText.setText("Creating UI....");
+          updateLoadingText(loadingText, "Creating UI....");
           notifyServiceLoaded();
         } catch (Exception e) {
           LOG.error("Failed to load Google songs: " + e.getMessage(), e);
@@ -83,6 +84,15 @@ public class GoogleServiceImpl extends RefreshingService implements IGoogleMusic
     };
 
     new Thread(task).start();
+  }
+
+  private void updateLoadingText(final Text text, final String msg) {
+    Platform.runLater(new Runnable() {
+      @Override
+      public void run() {
+        text.setText(msg);
+      }
+    });
   }
 
   /**

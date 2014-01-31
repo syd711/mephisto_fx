@@ -27,7 +27,7 @@ Create a new folder *lib* and copy the mandatory jar files for the project into 
     * googlemusic.jar
     * gson-2.2.4.jar
     * guava-14.0.1.jar
-    * jaudiotagger-2.2.0-20130321.142353-1.jar
+    * jaudiotagger-2.2.0-20130321.142353-1.jar (not sure if actually used)
     * jdom-1.1.3.jar
     * logback-classic-1.0.13.jar
     * logback-core-1.0.13.jar

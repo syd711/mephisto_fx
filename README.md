@@ -119,3 +119,6 @@ References
 * Disable the Raspberry Pi screen saver: http://www.raspberrypi.org/phpBB3/viewtopic.php?f=29&t=43932
 * Pi4J: http://pi4j.com/
 
+Updates
+========
+* 30.05.2014: Updated documentation

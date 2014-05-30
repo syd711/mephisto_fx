@@ -16,7 +16,7 @@ The following steps assume that you use IntelliJ's IDEA since the project file i
 * Clone the repository: *git clone git@github.com:syd711/mephisto_fx.git*
 * Start IDEA and open the *mephisto_fx.iml* project file
 * Add the mandatory jar files: I wasn't sure if it is allowed to push them on github too, so you have to download them manually.
-Additionally, you have to create the googlemusic.jar from Simon Weber's github project: https://github.com/simon-weber/Unofficial-Google-Music-API.
+Additionally, you have to create the googlemusic.jar from github project: https://github.com/jkiddo/gmusic.api
 Create a new folder *lib* and copy the mandatory jar files for the project into the directory. These are:
     * commons-configuration-1.9.jar
     * commons-exec-1.1.jar

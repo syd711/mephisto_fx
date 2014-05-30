@@ -26,4 +26,14 @@ public interface IMpdService extends IService {
    * @return
    */
   boolean isRadioMode();
+
+  /**
+   * Starts the latest playback, may fail if the URL (e.g. Google) is not valid anymore.
+   */
+  void start();
+
+  /**
+   * Stops the current playback
+   */
+  void stop();
 }

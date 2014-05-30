@@ -263,4 +263,14 @@ public class MpdServiceImpl extends RefreshingService implements IMpdService {
   public boolean isRadioMode() {
     return mode == MODE_RADIO;
   }
+
+  @Override
+  public void start() {
+    client.start();
+  }
+
+  @Override
+  public void stop() {
+    client.stop();
+  }
 }

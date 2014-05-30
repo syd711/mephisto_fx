@@ -50,7 +50,7 @@ public class ImageCache {
         imageUrl = image.toURI().toURL().toString();
       }
       else {
-        imageUrl = imageUrl.replaceAll("s130", "s" + width); //scale to used size
+        imageUrl = imageUrl.replaceAll("http:https", "http"); //scale to used size
         LOG.info("Caching " + imageUrl);
         URL imgUrl = new URL(imageUrl);
         BufferedImage image = ImageIO.read(imgUrl);

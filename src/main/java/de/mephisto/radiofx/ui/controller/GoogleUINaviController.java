@@ -1,5 +1,6 @@
 package de.mephisto.radiofx.ui.controller;
 
+import de.mephisto.radiofx.MephistoRadioFX;
 import de.mephisto.radiofx.resources.ResourceLoader;
 import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.services.IServiceStateListener;
@@ -26,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.ws.Service;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,7 +65,9 @@ public class GoogleUINaviController extends PageableUIController implements ISer
   public void onDisplay() {
     IGoogleMusicService service = ServiceRegistry.getGoogleService();
     if(service.getAlbums().isEmpty()) {
+      ServiceRegistry.getMpdService().stop();
       service.loadGoogleMusic(loadingText);
+      ServiceRegistry.getMpdService().start();
     }
   }
 

@@ -71,7 +71,22 @@ public class MPDClient {
       }
       return new Date().getTime();
     }
+  }
 
+  public void start() {
+    try {
+      executeTelnetCommand("play");
+    } catch (Exception e) {
+      LOG.error("Error executing play: " + e.getMessage(), e);
+    }
+  }
+
+  public void stop() {
+    try {
+      executeTelnetCommand("stop");
+    } catch (Exception e) {
+      LOG.error("Error executing stop: " + e.getMessage(), e);
+    }
   }
 
   /**

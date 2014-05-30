@@ -155,8 +155,12 @@ public class RadioUIController extends PageableUIController {
 
   @Override
   public IRotaryControllable push() {
+    if(getPager().getActiveModel() == this.activeStation) {
+      getPager().next();
+      push();
+    }
+
     StationInfo info = (StationInfo) getPager().getActiveModel();
-//    TransitionUtil.playDoubleBlink(stationText);
     playStation(info);
     return this;
   }
@@ -192,6 +196,7 @@ public class RadioUIController extends PageableUIController {
         length = lastWhitespace;
       }
       value = value.substring(0, length) + "...";
+      value = value.replaceAll("\"", "");
     }
     return value;
   }

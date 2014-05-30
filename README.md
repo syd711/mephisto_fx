@@ -16,7 +16,7 @@ The following steps assume that you use IntelliJ's IDEA since the project file i
 * Clone the repository: *git clone git@github.com:syd711/mephisto_fx.git*
 * Start IDEA and open the *mephisto_fx.iml* project file
 * Add the mandatory jar files: I wasn't sure if it is allowed to push them on github too, so you have to download them manually.
-Additionally, you have to create the googlemusic.jar from Simon Weber's github project: https://github.com/simon-weber/Unofficial-Google-Music-API.
+Additionally, you have to create the googlemusic.jar from github project: https://github.com/jkiddo/gmusic.api
 Create a new folder *lib* and copy the mandatory jar files for the project into the directory. These are:
     * commons-configuration-1.9.jar
     * commons-exec-1.1.jar
@@ -24,6 +24,8 @@ Create a new folder *lib* and copy the mandatory jar files for the project into 
     * commons-lang-2.6.jar
     * commons-logging-1.1.3.jar
     * commons-net-3.3.jar
+    * httpclient-4.2.5
+    * httpcore-4.2.4
     * googlemusic.jar
     * gson-2.2.4.jar
     * guava-14.0.1.jar
@@ -46,7 +48,7 @@ Create a new folder *lib* and copy the mandatory jar files for the project into 
 cached there for a faster access instead of downloading them each time. If you are using Linux, ensure that the folder is
 writeable.
 * Configure *.properties* files of the *conf* folder:
-    * *google.properties*: Input the username and password of your Google account here
+    * *google.properties*: You have to create this file and add the property values for google.login and google.password
     * *gpio.properties*: The file configures the rotary encoder, see section "Raspberry Pi Installation".
     * *mpd.properties*: Enter the host and port of the server you have the mpd running (the Raspberry Pi). *6600* is the default port for mpd, so there is no need to change it.
     * *settings.properties*: Configures the screen size of the TFT that is connected, see section "Raspberry Pi Installation".
@@ -113,9 +115,12 @@ References
 * Icons have been used from http://defaulticon.com/
 * Install Java on the Raspberry Pi: http://www.oracle.com/technetwork/articles/java/raspberrypi-1704896.html
 * Gaugette's Rotary Encoder Library: https://github.com/guyc/py-gaugette
-* Simon's Webers Google Music API: https://github.com/simon-weber/Unofficial-Google-Music-API
+* JKIDDO Google Music API: https://github.com/jkiddo/gmusic.api
 * Rotary Encoder for the Raspberry Pi: http://planb.nicecupoftea.org/2013/06/30/rotary-encoder-for-the-raspberry-pi/
 * Install a Raspberry Pi start script: http://raspberrypi.stackexchange.com/questions/8734/execute-script-on-start-up
 * Disable the Raspberry Pi screen saver: http://www.raspberrypi.org/phpBB3/viewtopic.php?f=29&t=43932
 * Pi4J: http://pi4j.com/
 
+Updates
+========
+* 30.05.2014: Updated documentation

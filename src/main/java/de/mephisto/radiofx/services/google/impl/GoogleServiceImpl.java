@@ -2,6 +2,7 @@ package de.mephisto.radiofx.services.google.impl;
 
 import de.mephisto.radiofx.services.IServiceModel;
 import de.mephisto.radiofx.services.RefreshingService;
+import de.mephisto.radiofx.services.ServiceRegistry;
 import de.mephisto.radiofx.services.google.Album;
 import de.mephisto.radiofx.services.google.IGoogleMusicService;
 import de.mephisto.radiofx.services.google.MusicDictionary;
@@ -36,6 +37,7 @@ public class GoogleServiceImpl extends RefreshingService implements IGoogleMusic
     Task task = new Task<Void>() {
       @Override public Void call() {
         try {
+          ServiceRegistry.getMpdService().stop();
           updateLoadingText(loadingText, "Loading Google Music...");
           MusicDictionary.getInstance().createDictionary();
           notifyServiceLoaded();
@@ -43,6 +45,9 @@ public class GoogleServiceImpl extends RefreshingService implements IGoogleMusic
           LOG.error("Failed to load Google songs: " + e.getMessage(), e);
           updateLoadingText(loadingText, "Failed to load Google Music: " + e.getMessage());
           notifyServiceLoaded();
+        }
+        finally {
+          ServiceRegistry.getMpdService().start();
         }
         return null;
       }

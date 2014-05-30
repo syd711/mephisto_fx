@@ -40,14 +40,23 @@ public class MusicDictionary {
 
 
   public void createDictionary() throws Exception {
-    Configuration config = Config.getConfiguration(CONFIG_NAME);
-    api.login(config.getString("google.login"), config.getString("google.password"));
+    try {
+      LOG.info("Creating Music Dictionary");
+      Configuration config = Config.getConfiguration(CONFIG_NAME);
+      LOG.info("Loaded google config");
+      api.login(config.getString("google.login"), config.getString("google.password"));
+      LOG.info("Google login successful, loading songs...");
 
-    Collection<gmusic.api.model.Song> songs = api.getAllSongs();
-    LOG.info(this + " finished loading songs: " + songs.size() + " total");
-    for (gmusic.api.model.Song song : songs) {
-      de.mephisto.radiofx.services.google.Song fxSong = songFor(song);
-      addSong(fxSong);
+      Collection<gmusic.api.model.Song> songs = api.getAllSongs();
+      LOG.info(this + " finished loading songs: " + songs.size() + " total");
+      for (gmusic.api.model.Song song : songs) {
+        de.mephisto.radiofx.services.google.Song fxSong = songFor(song);
+        addSong(fxSong);
+      }
+    }
+    catch (RuntimeException re) {
+      LOG.error("Error initializing google music: " + re.getMessage(), re);
+      throw re;
     }
   }
 

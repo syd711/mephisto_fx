@@ -65,9 +65,7 @@ public class GoogleUINaviController extends PageableUIController implements ISer
   public void onDisplay() {
     IGoogleMusicService service = ServiceRegistry.getGoogleService();
     if(service.getAlbums().isEmpty()) {
-      ServiceRegistry.getMpdService().stop();
       service.loadGoogleMusic(loadingText);
-      ServiceRegistry.getMpdService().start();
     }
   }
 

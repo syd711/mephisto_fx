@@ -46,7 +46,7 @@ Create a new folder *lib* and copy the mandatory jar files for the project into 
 cached there for a faster access instead of downloading them each time. If you are using Linux, ensure that the folder is
 writeable.
 * Configure *.properties* files of the *conf* folder:
-    * *google.properties*: Input the username and password of your Google account here
+    * *google.properties*: You have to create this file and add the property values for google.login and google.password
     * *gpio.properties*: The file configures the rotary encoder, see section "Raspberry Pi Installation".
     * *mpd.properties*: Enter the host and port of the server you have the mpd running (the Raspberry Pi). *6600* is the default port for mpd, so there is no need to change it.
     * *settings.properties*: Configures the screen size of the TFT that is connected, see section "Raspberry Pi Installation".

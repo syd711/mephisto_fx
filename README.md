@@ -113,7 +113,7 @@ References
 * Icons have been used from http://defaulticon.com/
 * Install Java on the Raspberry Pi: http://www.oracle.com/technetwork/articles/java/raspberrypi-1704896.html
 * Gaugette's Rotary Encoder Library: https://github.com/guyc/py-gaugette
-* Simon's Webers Google Music API: https://github.com/simon-weber/Unofficial-Google-Music-API
+* JKIDDO Google Music API: https://github.com/jkiddo/gmusic.api
 * Rotary Encoder for the Raspberry Pi: http://planb.nicecupoftea.org/2013/06/30/rotary-encoder-for-the-raspberry-pi/
 * Install a Raspberry Pi start script: http://raspberrypi.stackexchange.com/questions/8734/execute-script-on-start-up
 * Disable the Raspberry Pi screen saver: http://www.raspberrypi.org/phpBB3/viewtopic.php?f=29&t=43932

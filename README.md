@@ -125,4 +125,4 @@ Updates
 ========
 * 30.05.2014: Updated documentation
 * 30.05.2014: Fixed Google Music Integration
-* 30.05.2014: Radion station is changed on push if selection has not changed
+* 30.05.2014: Radio station is changed on push if selection has not changed

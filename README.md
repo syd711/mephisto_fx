@@ -24,6 +24,8 @@ Create a new folder *lib* and copy the mandatory jar files for the project into 
     * commons-lang-2.6.jar
     * commons-logging-1.1.3.jar
     * commons-net-3.3.jar
+    * httpclient-4.2.5
+    * httpcore-4.2.4
     * googlemusic.jar
     * gson-2.2.4.jar
     * guava-14.0.1.jar

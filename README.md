@@ -1,3 +1,8 @@
+Updates
+=======
+
+The UI has been re-implemented an can be found here: https://github.com/syd711/mephisto_iii
+
 The Radio
 =========
 
